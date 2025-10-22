@@ -186,11 +186,20 @@ class DatasetLoader:
                         # Convert RGB mask to grayscale if needed
                         mask_array = mask_array[:, :, 0]
                     
+                    # Ensure mask and image have the same spatial dimensions
+                    if mask_array.shape[:2] != img_array.shape[:2]:
+                        # Resize mask to match image dimensions
+                        mask_resized = Image.fromarray(mask_array).resize(
+                            (img_array.shape[1], img_array.shape[0]),
+                            Image.NEAREST
+                        )
+                        mask_array = np.array(mask_resized)
+                    
                     mask_binary = mask_array > 0
                     if mask_binary.any():
                         # Handle both grayscale and RGB images
                         if img_array.ndim == 3:
-                            # For RGB images, calculate mean across channels
+                            # For RGB images, apply mask to each channel
                             masked_pixels = img_array[mask_binary].mean(axis=1)
                         else:
                             # For grayscale images

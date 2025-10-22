@@ -181,9 +181,21 @@ class DatasetLoader:
                     img_array = np.array(Image.open(img_path))
 
                     # Calculate masked region stats
+                    # Handle both 2D (grayscale) and 3D (RGB) masks
+                    if mask_array.ndim == 3:
+                        # Convert RGB mask to grayscale if needed
+                        mask_array = mask_array[:, :, 0]
+                    
                     mask_binary = mask_array > 0
                     if mask_binary.any():
-                        masked_pixels = img_array[mask_binary]
+                        # Handle both grayscale and RGB images
+                        if img_array.ndim == 3:
+                            # For RGB images, calculate mean across channels
+                            masked_pixels = img_array[mask_binary].mean(axis=1)
+                        else:
+                            # For grayscale images
+                            masked_pixels = img_array[mask_binary]
+                        
                         img_info["mask_area_fraction"] = float(
                             mask_binary.sum() / mask_binary.size
                         )

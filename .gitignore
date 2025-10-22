@@ -180,3 +180,5 @@ doc/
 # latex
 
 img_latex/
+# EDA Pipeline outputs
+outputs/

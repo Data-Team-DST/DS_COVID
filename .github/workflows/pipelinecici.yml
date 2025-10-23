@@ -5,16 +5,12 @@ on:
     paths-ignore:
       - ".checkmarx/scan_results/*"
     branches:
-      - main
-      - staging
-      - develop
+        - '**'
   push:
     paths-ignore:
       - ".checkmarx/scan_results/*"
     branches:
-      - main
-      - staging
-      - develop
+        - '**'
 
 permissions:
   contents: "read"

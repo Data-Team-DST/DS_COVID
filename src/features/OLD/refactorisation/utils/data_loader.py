@@ -15,7 +15,7 @@ load_dotenv()
 ROOT = Path(__file__).resolve().parents[5]
 
 # Charger settings.json
-DEFAULT_SETTINGS_PATH = ROOT / "src" / "features" / "OLD" / "refactorisation" / "config" / "settings.json"
+DEFAULT_SETTINGS_PATH = ROOT / "src" / "features" / "OLD" / "refactorisation" / "config" / "settings.json" # noqa
 
 if not DEFAULT_SETTINGS_PATH.exists():
     raise FileNotFoundError(f"settings.json introuvable : {DEFAULT_SETTINGS_PATH}")
@@ -44,11 +44,13 @@ DEFAULT_FOLDER_MAP = {
     "LUNG": "Lung_Opacity"
 }
 
+
 def _list_png_files(folder_path):
     try:
         return [f for f in os.listdir(folder_path) if f.lower().endswith(".png")]
     except FileNotFoundError:
         return []
+
 
 def load_images_flat_for_class(folder_path, label_index, img_size, max_images=None):
     """Charge les images (aplaties)."""
@@ -70,6 +72,7 @@ def load_images_flat_for_class(folder_path, label_index, img_size, max_images=No
             print(f"[WARNING] Erreur lecture {file_path} : {e}")
     return data, labels, files
 
+
 def load_masks_flat_for_class(folder_path, label_index, mask_size, file_list):
     """Charge les masques correspondants (même ordre que file_list)."""
     data = []
@@ -84,11 +87,13 @@ def load_masks_flat_for_class(folder_path, label_index, mask_size, file_list):
             data.append(np.zeros(mask_size).flatten())  # fallback masque vide
     return data
 
+
 def masking(img: np.array, mask: np.array) -> np.array:
     """Applique un masque binaire à une image."""
     img = (img - np.min(img)) / (np.max(img) - np.min(img) + 1e-8)  # Normalisation
     mask_binary = (mask > 0).astype(np.float32)  # Binarisation
     return img * mask_binary
+
 
 def load_dataset(img_size=None, samples_per_class=None, classes=None, folder_map=None, dataset_root=None, masks_root=None):
     """

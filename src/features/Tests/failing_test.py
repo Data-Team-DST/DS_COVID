@@ -1,3 +1,2 @@
-prgtrt
-
-# ce code existe uniquement pour échouer le test
+def test_failing():
+    assert 1 + 1 == 3 

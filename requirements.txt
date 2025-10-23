@@ -41,3 +41,6 @@ plotly>=5.0.0
 
 # Progress and monitoring
 tensorboard>=2.8.0
+
+# Linter
+pylint>=2.15.0

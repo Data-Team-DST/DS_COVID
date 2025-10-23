@@ -74,26 +74,30 @@ jobs:
           path: coverage.xml
           retention-days: 7
 
-  sonarqube:
-    name: SonarQube Scan
-    runs-on: ubuntu-latest
-    needs: unit_tests
-    container:
-      image: docker-atmos-remote.artifactorydev.p230559371484.aws-emea.sanofi.com/sonar-scanner-cli-sanofi:latest
-    env:
-      SONAR_HOST_FQN: sonarqubeentprod.p095208641432.aws-emea.sanofi.com
-      SONAR_HOST_URL: https://sonarqubeentprod.p095208641432.aws-emea.sanofi.com/
-      SONAR_TOKEN: ${{ secrets.SONARQUBE_CI_READ_TOKEN_PROD }}
-    steps:
-      - uses: actions/checkout@v4
+    sonarqube:
+        name: "SonarCloud Scan"
+        runs-on: ubuntu-latest
+        needs: unit_tests
+        env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            SONAR_PROJECT_KEY: ton_nom_utilisateur_ton_repo
+            SONAR_ORGANIZATION: ton_organisation
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Download coverage report
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-report
+            - name: Download coverage report
+            uses: actions/download-artifact@v4
+            with:
+                name: coverage-report
 
-      - name: Move coverage report
-        run: mkdir -p reports && mv coverage.xml reports/coverage.xml
+            - name: Move coverage report
+            run: mkdir -p reports && mv coverage.xml reports/coverage.xml
 
-      - name: Run SonarQube Analysis
-        run: sonar-scanner -X
+            - name: Run SonarCloud Analysis
+            uses: SonarSource/sonarcloud-github-action@v2
+            with:
+                args: >
+                    -Dsonar.projectKey=${{ env.SONAR_PROJECT_KEY }}
+                    -Dsonar.organization=${{ env.SONAR_ORGANIZATION }}
+                    -Dsonar.python.coverage.reportPaths=reports/coverage.xml
+                    -Dsonar.s

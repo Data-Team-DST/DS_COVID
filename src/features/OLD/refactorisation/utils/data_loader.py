@@ -12,10 +12,11 @@ from pathlib import Path
 load_dotenv()
 
 # Racine du projet
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[5]
 
 # Charger settings.json
-DEFAULT_SETTINGS_PATH = ROOT / "config" / "settings.json"
+DEFAULT_SETTINGS_PATH = ROOT / "src" / "features" / "OLD" / "refactorisation" / "config" / "settings.json"
+
 if not DEFAULT_SETTINGS_PATH.exists():
     raise FileNotFoundError(f"settings.json introuvable : {DEFAULT_SETTINGS_PATH}")
 

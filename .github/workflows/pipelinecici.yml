@@ -51,7 +51,6 @@ jobs:
             pylint --fail-under=7 "$f" || true
           done
 
-
   unit_tests:
     name: "Run Unit Tests"
     runs-on: ubuntu-latest

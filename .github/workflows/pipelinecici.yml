@@ -106,8 +106,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=data-team-dst-1_DS_COVID
+            -Dsonar.projectKey=Data-Team-DST_DS_COVID
             -Dsonar.organization=data-team-dst-1
             -Dsonar.python.coverage.reportPaths=reports/coverage.xml
             -Dsonar.sources=src
- 

@@ -1,0 +1,269 @@
+.
+├── .env.example
+├── .env.portable
+├── .github
+│   └── workflows
+│       └── pep8-check.yml
+├── .gitignore
+├── .streamlit
+│   └── config.toml
+├── CONFIG.md
+├── INSTALLATION.md
+├── LICENSE
+├── MANIFEST.in
+├── PROJECT_STRUCTURE.txt
+├── README.md
+├── example_env_usage.py
+├── latex
+│   └── sections
+│       ├── 00_titlepage.tex
+│       └── 01_introduction.tex
+├── logbook
+│   ├── 15_06_2025_20_58_logkbook_moire_steven.md
+│   ├── logbook_15_06_2025_20_58_moire_steven.md
+│   ├── logbook_18_06_2025_09_04_moire_steven.md
+│   └── logbook_19_06_2025_16_31_moire_steven.md
+├── models
+│   └── .gitkeep
+├── notebooks
+│   ├── .gitkeep
+│   ├── Advanced_ML_COVID_Classification.ipynb
+│   ├── Interpretability_SHAP_GradCAM_Demo.ipynb
+│   ├── OLD_Notebooks
+│   │   ├── Data_Process
+│   │   │   ├── C_01_Visu.ipynb
+│   │   │   ├── Data_Augmentation.ipynb
+│   │   │   ├── L_02_Generate_Masked_Images.ipynb
+│   │   │   ├── L_03_Data_Augmentation.ipynb
+│   │   │   ├── L_04_Revamp_main.ipynb
+│   │   │   ├── Visualisation.ipynb
+│   │   │   ├── main.ipynb
+│   │   │   ├── model_baseline.ipynb
+│   │   │   ├── prepro.ipynb
+│   │   │   └── visulize.ipynb
+│   │   ├── Init_Env
+│   │   │   ├── 00_create_env.ipynb
+│   │   │   ├── 01_activate_env.ipynb
+│   │   │   ├── 02_install_requirements.ipynb
+│   │   │   ├── 03_update_requirements.ipynb
+│   │   │   ├── 04-check_pep8.ipynb
+│   │   │   └── 05_check_python_version.ipynb
+│   │   └── data_augmentation
+│   │       ├── main.ipynb
+│   │       ├── over_sampling.ipynb
+│   │       ├── select_folders.py
+│   │       └── under_sampling.ipynb
+│   ├── data_augmentation
+│   └── modelebaseline
+│       └── refactorisation
+│           ├── controllers
+│           ├── models
+│           ├── utils
+│           └── views
+├── projet_covid (1).docx
+├── pyproject.toml
+├── references
+│   └── .gitkeep
+├── reports
+│   ├── .gitkeep
+│   ├── Iterations_rapports
+│   │   ├── rapport_classification_20250910_125154.docx
+│   │   ├── rapport_classification_20250910_130111.docx
+│   │   ├── rapport_classification_20250912_091937.docx
+│   │   ├── rapport_classification_20250912_094633.docx
+│   │   ├── rapport_classification_20250912_095114.docx
+│   │   ├── rapport_classification_20250912_095114.pdf
+│   │   ├── rapport_classification_20250912_112826.docx
+│   │   ├── rapport_classification_20250912_112826.pdf
+│   │   ├── rapport_classification_20250912_122624.docx
+│   │   ├── rapport_classification_20250912_122624.pdf
+│   │   ├── rapport_classification_20250912_141825.docx
+│   │   ├── rapport_classification_20250912_141825.pdf
+│   │   ├── rapport_classification_20250912_153535.docx
+│   │   └── rapport_classification_20250912_153535.pdf
+│   ├── explorationdata
+│   │   ├── Template_rapport_exploration_donnees_18_06_2025_18_28.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_13_20.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_13_31.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_13_38.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_13_44.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_13_57.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_16_29.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_16_57.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_17_29.csv
+│   │   ├── Template_rapport_exploration_donnees_19_06_2025_17_37.csv
+│   │   ├── Template_rapport_exploration_donnees_20_06_2025_19_54.csv
+│   │   ├── Template_rapport_exploration_donnees_24_06_2025_20_05.csv
+│   │   ├── logs_18_06_2025_18_28.txt
+│   │   ├── logs_19_06_2025_13_20.txt
+│   │   ├── logs_19_06_2025_13_31.txt
+│   │   ├── logs_19_06_2025_13_38.txt
+│   │   ├── logs_19_06_2025_13_44.txt
+│   │   ├── logs_19_06_2025_13_57.txt
+│   │   ├── logs_19_06_2025_16_29.txt
+│   │   ├── logs_19_06_2025_16_57.txt
+│   │   ├── logs_19_06_2025_17_29.txt
+│   │   ├── logs_19_06_2025_17_37.txt
+│   │   └── logs_20_06_2025_19_54.txt
+│   ├── figures
+│   │   ├── .gitkeep
+│   │   ├── cm_LinearSVC.png
+│   │   ├── cm_LinearSVM.png
+│   │   ├── cm_RandomForest.png
+│   │   ├── cm_RandomForestClassifier.png
+│   │   ├── cm_gradient_boosting.png
+│   │   ├── cm_grid_linear_svm.png
+│   │   ├── cm_grid_random_forest.png
+│   │   ├── cm_k-nearest_neighbors.png
+│   │   ├── cm_linear_svm.png
+│   │   ├── cm_random_forest.png
+│   │   ├── erreurs_gradient_boosting.png
+│   │   ├── erreurs_k-nearest_neighbors.png
+│   │   ├── erreurs_linear_svm.png
+│   │   └── erreurs_random_forest.png
+│   ├── projet_covid.odt
+│   └── projet_covid.pdf
+├── requirements-colab.txt
+├── requirements-interpretability.txt
+├── requirements.txt
+├── requirements_clean.txt
+├── requirements_old.txt
+├── setup.py
+└── src
+    ├── __init__.py
+    ├── config.py
+    ├── ds_covid
+    │   ├── __init__.py
+    │   ├── config.py
+    │   └── notebook_utils.py
+    ├── explorationdata
+    │   ├── model
+    │   │   ├── analysis_runner.py
+    │   │   ├── image_analyzer.py
+    │   │   └── metadata_loader.py
+    │   ├── rapport_img_template.py
+    │   └── view
+    │       └── gui.py
+    ├── features
+    │   ├── Inspector
+    │   │   ├── Features_Core.py
+    │   │   ├── Features_Frontend.py
+    │   │   ├── Features_Inspect_Backend.py
+    │   │   └── __init__.py
+    │   ├── OLD
+    │   │   ├── Augmentation
+    │   │   │   ├── Augmentation.py
+    │   │   │   ├── Sampling.py
+    │   │   │   ├── __init__.py
+    │   │   │   └── select_folders.py
+    │   │   ├── Sauvegarde_Model
+    │   │   │   ├── __init__.py
+    │   │   │   ├── model_loader.py
+    │   │   │   └── model_saver.py
+    │   │   ├── Traitement_Data
+    │   │   │   ├── C_traitement.py
+    │   │   │   ├── Traitement.py
+    │   │   │   ├── __init__.py
+    │   │   │   └── traitement_modulaire.py
+    │   │   ├── modelebaseline
+    │   │   │   ├── 02_modele_ml_gridsearch.py
+    │   │   │   ├── _01_modele_ml_baseline.py
+    │   │   │   ├── __init__.py
+    │   │   │   ├── cirine_model_ml_baseline.py
+    │   │   │   ├── grid_search_params.json
+    │   │   │   └── word_generator.py
+    │   │   └── refactorisation
+    │   │       ├── config
+    │   │       │   ├── grid_search_params.json
+    │   │       │   └── settings.json
+    │   │       ├── controllers
+    │   │       │   └── trainer.py
+    │   │       ├── main.py
+    │   │       ├── models
+    │   │       │   └── baseline.py
+    │   │       ├── utils
+    │   │       │   ├── data_loader.py
+    │   │       │   └── load_grid_params.py
+    │   │       └── views
+    │   │           └── word_generator.py
+    │   ├── Pipelines
+    │   │   ├── Pipeline_Sklearn.py
+    │   │   ├── Pipeline_Sklearn_config.json
+    │   │   └── __init__.py
+    │   ├── Tests
+    │   │   ├── __init__.py
+    │   │   └── failing_test.py
+    │   ├── Verifications
+    │   ├── Verifs_Env
+    │   │   ├── Vérifications_Back.py
+    │   │   └── __init__.py
+    │   ├── Widget_Streamlit
+    │   │   ├── W_Vérifications_Front.py
+    │   │   └── __init__.py
+    │   └── raf
+    │       ├── __init__.py
+    │       ├── augmentation
+    │       │   ├── __init__.py
+    │       │   └── augmenter.py
+    │       ├── evaluation
+    │       │   └── __init__.py
+    │       ├── interpretability
+    │       │   ├── README.md
+    │       │   ├── __init__.py
+    │       │   ├── gradcam_explainer.py
+    │       │   ├── lime_explainer.py
+    │       │   ├── shap_explainer.py
+    │       │   └── utils.py
+    │       ├── modeling
+    │       │   └── __init__.py
+    │       ├── models
+    │       │   └── __init__.py
+    │       ├── preprocessing
+    │       │   └── __init__.py
+    │       ├── templates
+    │       │   └── colab_env.template
+    │       ├── utils
+    │       │   ├── __init__.py
+    │       │   ├── analysis.py
+    │       │   └── config.py
+    │       └── visualization
+    │           └── __init__.py
+    ├── models
+    │   └── __init__.py
+    └── streamlit
+        ├── Launch_Streamlit.bat
+        ├── Launch_Streamlit.ps1
+        ├── app.py
+        ├── models
+        │   └── pipelines
+        │       ├── pipeline_basic_rf_20251011_150328.pkl
+        │       ├── pipeline_basic_rf_20251011_153141.pkl
+        │       ├── pipeline_fast_prototype_20251011_150352.pkl
+        │       ├── pipeline_fast_prototype_20251011_155859.pkl
+        │       ├── pipeline_optimized_rf_20251011_150558.pkl
+        │       └── pipeline_svm_pipeline_20251011_150741.pkl
+        ├── pages
+        │   ├── 00_Tutoriel_Streamlit
+        │   ├── 01_Data
+        │   │   ├── 1_Vérification.py
+        │   │   ├── 2_Chargement.py
+        │   │   ├── 3_Exploration.py
+        │   │   └── tabs
+        │   │       ├── __init__.py
+        │   │       ├── filtering_tab.py
+        │   │       ├── images_tab.py
+        │   │       ├── metadata_tab.py
+        │   │       └── overview_tab.py
+        │   ├── 02_Model
+        │   │   ├── 1_Training.py
+        │   │   ├── 2_Evaluation.py
+        │   │   └── 3_Prediction.py
+        │   ├── 03_Interpretability.py
+        │   ├── 03_Results
+        │   │   └── 1_Predictions.py
+        │   └── 04_Backend
+        │       ├── 2_Features_Visualisation.py
+        │       └── 3_Features_Inspect.py
+        └── utils.py
+
+68 directories, 198 files

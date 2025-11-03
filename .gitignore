@@ -1,3 +1,8 @@
+# Environment variables (IMPORTANT - ne pas commiter!)
+.env
+.env.local
+.env.*.local
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -167,3 +172,11 @@ data/
 env_windows/pyvenv.cfg
 /env_windows
 /env_linux
+
+#doc
+
+doc/
+
+# latex
+
+img_latex/

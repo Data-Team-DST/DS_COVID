@@ -1,20 +1,20 @@
 name: CI/CD
 
 on:
-  pull_request:
+  push:
     paths-ignore:
       - ".checkmarx/scan_results/*"
     branches:
       - '**'
-  push:
+  pull_request:
     paths-ignore:
       - ".checkmarx/scan_results/*"
     branches:
       - '**'
 
 permissions:
-  contents: "read"
-  id-token: "write"
+  contents: read
+  id-token: write
 
 jobs:
   lint:
@@ -35,20 +35,17 @@ jobs:
           if [ -f requirements.txt ]; then
             python -m pip install -r requirements.txt
           fi
-          # Installer pylint si pas dans requirements
           python -m pip install pylint
 
-      - name: Lint per subfolder
+      - name: Lint per subfolder (fail if score < 8)
         run: |
           set -e
-          # Définir les dossiers à lint
           folders=("src/ds_covid" "src/explorationdata" "src/features" "src/models" "src/streamlit")
-          
           for f in "${folders[@]}"; do
             echo "=========================="
             echo "Linting $f"
             echo "=========================="
-            pylint --fail-under=7 "$f" || true
+            pylint --fail-under=8 "$f"
           done
 
   unit_tests:
@@ -73,9 +70,7 @@ jobs:
 
       - name: Run Pytest with coverage
         run: |
-          # ⚠️ TEMPORAIRE : seuil de couverture abaissé à 5% pour tests CI/CD initiaux
-          # Une fois la base de tests établie → remettre --cov-fail-under=30
-          pytest --cov=src/ --cov-report xml:coverage.xml --cov-fail-under=1 .
+          pytest --cov=src/ --cov-report xml:coverage.xml --cov-fail-under=30 .
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4

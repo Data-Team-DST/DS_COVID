@@ -1,6 +1,7 @@
 """DS COVID - COVID-19 Radiography Analysis Package.
 
-A comprehensive package for analyzing COVID-19 radiographic images using deep learning.
+A comprehensive package for analyzing COVID-19 radiographic
+images using deep learning.
 """
 
 __version__ = "0.1.0"
@@ -19,7 +20,7 @@ except ImportError:
 
 __all__ = [
     "features",
-    "models", 
+    "models",
     "explorationdata",
     "streamlit",
     "__version__",

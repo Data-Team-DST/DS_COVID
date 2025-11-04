@@ -22,18 +22,20 @@ __description__ = "Framework ML/DL complet pour classification d'images COVID-19
 try:
     # Utils (prioritaire - configuration universelle)
     from .utils import Config, get_config, setup_universal_environment
-    
+
     # Data
     from .data import DataLoader, MaskProcessor
-    
+
     # Augmentation
     from .augmentation import CustomImageAugmenter
-    
+
     # Interpretability
     from .interpretability import SHAPExplainer, GradCAMExplainer
-    
+
     print(f"🎨 RAF (Raw Augmentation Framework) v{__version__} chargé avec succès")
-    print(f"✨ NOUVELLE FONCTIONNALITÉ: setup_universal_environment() remplace la cellule 1!")
+    print(
+        f"✨ NOUVELLE FONCTIONNALITÉ: setup_universal_environment() remplace la cellule 1!"
+    )
     print(f"� NOUVEAU MODULE: interpretability (SHAP + GradCAM)")
     print(f"��������� Modules disponibles: utils, data, augmentation, interpretability")
 
@@ -43,8 +45,8 @@ except ImportError as e:
 
 # Configuration par défaut
 DEFAULT_CONFIG = {
-    'img_size': (256, 256),
-    'batch_size': 32,
-    'random_seed': 42,
-    'classes': ['COVID', 'Lung_Opacity', 'Normal', 'Viral Pneumonia']
+    "img_size": (256, 256),
+    "batch_size": 32,
+    "random_seed": 42,
+    "classes": ["COVID", "Lung_Opacity", "Normal", "Viral Pneumonia"],
 }

@@ -1,6 +1,6 @@
 # Models module
 # from .baseline import BaselineModels
-# from .boosting import BoostingModels  
+# from .boosting import BoostingModels
 # from .deep_learning import DeepLearningModels
 # from .ensemble import EnsembleModels
 

@@ -40,7 +40,7 @@ jobs:
       - name: Lint per subfolder (fail if score < 8)
         run: |
           set -e
-          folders=("src/")
+          folders=("src/", "src\features", "src\utils", "notebooks\colab", "notebooks")
           for f in "${folders[@]}"; do
             echo "=========================="
             echo "Linting $f"

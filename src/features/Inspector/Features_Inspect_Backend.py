@@ -176,7 +176,8 @@ def show_features_files():
 
     else:
         st.warning(
-            f"⚠️ Aucun fichier Python trouvé dans le dossier `{features_dir}` et ses sous-dossiers"
+            "⚠️ Aucun fichier Python trouvé dans le dossier"
+            f" `{features_dir}` et ses sous-dossiers"
         )
 
         # Suggestions de dépannage
@@ -185,7 +186,7 @@ def show_features_files():
         st.write("- Assurez-vous qu'il contient des fichiers `.py`")
         st.write("- Vérifiez les permissions d'accès au dossier")
         st.write(
-            "- Vérifiez les sous-dossiers comme `Inspector/`, `Verifications/`, etc."
+            "- Vérifiez les sous-dossiers comme `Inspector/`," " `Verifications/`, etc."
         )
 
 

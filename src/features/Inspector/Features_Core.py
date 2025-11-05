@@ -2,9 +2,9 @@
 Backend pur pour l'inspection des features (sans dépendance Streamlit)
 """
 
-from pathlib import Path
 import inspect
 import sys
+from pathlib import Path
 
 
 def get_features_files():
@@ -134,12 +134,16 @@ def analyze_module_functions(file_path):
                             "name": param_name,
                             "inputs": [],
                             "outputs": [],
-                            "annotation": str(param.annotation)
-                            if param.annotation != inspect.Parameter.empty
-                            else None,
-                            "default": str(param.default)
-                            if param.default != inspect.Parameter.empty
-                            else None,
+                            "annotation": (
+                                str(param.annotation)
+                                if param.annotation != inspect.Parameter.empty
+                                else None
+                            ),
+                            "default": (
+                                str(param.default)
+                                if param.default != inspect.Parameter.empty
+                                else None
+                            ),
                             "kind": str(param.kind),
                         }
                         params_info.append(param_info)
@@ -188,9 +192,11 @@ def analyze_module_functions(file_path):
                         "source": source,
                         "source_lines": source_lines,
                         "file": file_path.name,
-                        "folder": file_path.parent.name
-                        if file_path.parent.name != "features"
-                        else "features (racine)",
+                        "folder": (
+                            file_path.parent.name
+                            if file_path.parent.name != "features"
+                            else "features (racine)"
+                        ),
                     }
                     functions_info.append(function_info)
                 except Exception as e:
@@ -204,9 +210,11 @@ def analyze_module_functions(file_path):
                             "source": "Non disponible",
                             "source_lines": 0,
                             "file": file_path.name,
-                            "folder": file_path.parent.name
-                            if file_path.parent.name != "features"
-                            else "features (racine)",
+                            "folder": (
+                                file_path.parent.name
+                                if file_path.parent.name != "features"
+                                else "features (racine)"
+                            ),
                         }
                     )
 

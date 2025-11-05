@@ -6,8 +6,8 @@ Utilitaires spécifiques pour les notebooks du projet ds-covid
 Approche simple avec imports directs depuis src/
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 
 def setup_notebook_imports():
@@ -20,19 +20,19 @@ def setup_notebook_imports():
 
     # Recherche de la racine du projet
     project_root = current_dir
-    if current_dir.name == 'notebooks':
+    if current_dir.name == "notebooks":
         project_root = current_dir.parent
-    elif (current_dir / 'notebooks').exists():
+    elif (current_dir / "notebooks").exists():
         project_root = current_dir
     else:
         # Recherche récursive du pyproject.toml
         while project_root != project_root.parent:
-            if (project_root / 'pyproject.toml').exists():
+            if (project_root / "pyproject.toml").exists():
                 break
             project_root = project_root.parent
 
     # Ajout de src/ au Python path
-    src_path = project_root / 'src'
+    src_path = project_root / "src"
     if src_path.exists() and str(src_path) not in sys.path:
         sys.path.insert(0, str(src_path))
         print(f"✅ Ajouté au path: {src_path}")
@@ -70,16 +70,14 @@ def get_project_paths():
     project_root, _ = setup_notebook_imports()
 
     paths = {
-        'project_root': project_root,
-        'data_dir': project_root / 'data',
-        'raw_data': project_root / 'data' / 'raw',
-        'covid_data': (
-            project_root / 'data' / 'raw' / 'COVID-19_Radiography_Dataset'
-            ),
-        'models_dir': project_root / 'models',
-        'notebooks_dir': project_root / 'notebooks',
-        'results_dir': project_root / 'results',
-        'reports_dir': project_root / 'reports'
+        "project_root": project_root,
+        "data_dir": project_root / "data",
+        "raw_data": project_root / "data" / "raw",
+        "covid_data": (project_root / "data" / "raw" / "COVID-19_Radiography_Dataset"),
+        "models_dir": project_root / "models",
+        "notebooks_dir": project_root / "notebooks",
+        "results_dir": project_root / "results",
+        "reports_dir": project_root / "reports",
     }
 
     # Vérification des chemins existants

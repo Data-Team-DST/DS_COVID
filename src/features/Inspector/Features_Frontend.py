@@ -3,17 +3,19 @@ Frontend Streamlit pour l'inspection des features.
 """
 
 from datetime import datetime
-import pandas as pd  # type: ignore
-import streamlit as st
 
+import pandas as pd  # type: ignore
+
+import streamlit as st
 from src.features.Inspector.Features_Core import (
-    get_features_files,
     analyze_module_functions,
     get_all_functions_summary,
+    get_features_files,
 )
 
 # -------------------- Constantes -------------------- #
 NO_DOC = "Pas de documentation"
+
 
 # -------------------- Helper affichage -------------------- #
 def _render_function_content(func_info: dict) -> None:
@@ -52,7 +54,11 @@ def _render_function_content(func_info: dict) -> None:
             with col1:
                 st.write(f"**{param['name']}**")
             with col2:
-                st.code(param["annotation"], language="python") if param.get("annotation") else st.write("_Type non spécifié_")
+                (
+                    st.code(param["annotation"], language="python")
+                    if param.get("annotation")
+                    else st.write("_Type non spécifié_")
+                )
             with col3:
                 default = param.get("default")
                 st.write(f"Défaut: `{default}`" if default else "_Requis_")
@@ -77,7 +83,10 @@ def show_features_files() -> None:
 
     if not files:
         st.warning(f"⚠️ Aucun fichier Python trouvé dans `{features_dir}`")
-        st.info("💡 Suggestions:\n- Vérifiez l'existence du dossier\n- Vérifiez qu'il contient des `.py`\n- Vérifiez les permissions")
+        st.info(
+            "💡 Suggestions:\n- Vérifiez l'existence du dossier"
+            "\n- Vérifiez qu'il contient des `.py`\n- Vérifiez les permissions"
+        )
         return
 
     st.success(f"✅ {len(files)} fichier(s) Python trouvé(s)")
@@ -87,24 +96,30 @@ def show_features_files() -> None:
         info = file_info.get(file.name, {})
         if "error" not in info:
             try:
-                modified_date = datetime.fromtimestamp(info["modified"]).strftime("%Y-%m-%d %H:%M:%S")
+                modified_date = datetime.fromtimestamp(info["modified"]).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
             except Exception:
                 modified_date = "Inconnu"
-            table_data.append({
-                "Fichier": file.name,
-                "Taille (KB)": info.get("size_kb", "N/A"),
-                "Lignes": info.get("lines", "N/A"),
-                "Modifié": modified_date,
-                "Statut": "✅ OK" if info.get("exists", False) else "❌ Erreur",
-            })
+            table_data.append(
+                {
+                    "Fichier": file.name,
+                    "Taille (KB)": info.get("size_kb", "N/A"),
+                    "Lignes": info.get("lines", "N/A"),
+                    "Modifié": modified_date,
+                    "Statut": "✅ OK" if info.get("exists", False) else "❌ Erreur",
+                }
+            )
         else:
-            table_data.append({
-                "Fichier": file.name,
-                "Taille (KB)": "Erreur",
-                "Lignes": "Erreur",
-                "Modifié": "Erreur",
-                "Statut": f"❌ {info['error']}",
-            })
+            table_data.append(
+                {
+                    "Fichier": file.name,
+                    "Taille (KB)": "Erreur",
+                    "Lignes": "Erreur",
+                    "Modifié": "Erreur",
+                    "Statut": f"❌ {info['error']}",
+                }
+            )
 
     st.dataframe(pd.DataFrame(table_data), use_container_width=True)
     with st.expander("📋 Liste simple des fichiers"):
@@ -160,15 +175,26 @@ def _analyze_single_file(file_path) -> None:
         with col1:
             st.metric("🔧 Fonctions", len(functions_info))
         with col2:
-            st.metric("📏 Lignes totales", sum(f.get("source_lines", 0) for f in functions_info))
+            st.metric(
+                "📏 Lignes totales",
+                sum(f.get("source_lines", 0) for f in functions_info),
+            )
         with col3:
             documented = sum(1 for f in functions_info if f.get("doc", "") != NO_DOC)
             st.metric("📖 Documentées", f"{documented}/{len(functions_info)}")
 
         st.markdown("---")
-        filter_option = st.radio("🔍 Filtrer les fonctions:", ["Toutes", "Documentées uniquement", "Non documentées uniquement"], horizontal=True)
+        filter_option = st.radio(
+            "🔍 Filtrer les fonctions:",
+            ["Toutes", "Documentées uniquement", "Non documentées uniquement"],
+            horizontal=True,
+        )
         filtered_functions = _filter_functions(functions_info, filter_option)
-        display_mode = st.radio("📋 Mode d'affichage:", ["Liste compacte", "Détails complets"], horizontal=True)
+        display_mode = st.radio(
+            "📋 Mode d'affichage:",
+            ["Liste compacte", "Détails complets"],
+            horizontal=True,
+        )
         _display_functions(filtered_functions, display_mode)
 
     except Exception as exc:
@@ -186,13 +212,16 @@ def _analyze_all_files() -> None:
             st.info("ℹ️ Aucune fonction trouvée")
             return
 
-        summary_data = [{
-            "🔧 Fonction": f.get("name", "N/A"),
-            "📄 Fichier": f.get("file", "N/A"),
-            "📏 Lignes": f.get("source_lines", 0),
-            "📖 Documentée": "✅" if f.get("doc", "") != NO_DOC else "❌",
-            "📝 Paramètres": len(f.get("parameters", [])),
-        } for f in summary["all_functions"]]
+        summary_data = [
+            {
+                "🔧 Fonction": f.get("name", "N/A"),
+                "📄 Fichier": f.get("file", "N/A"),
+                "📏 Lignes": f.get("source_lines", 0),
+                "📖 Documentée": "✅" if f.get("doc", "") != NO_DOC else "❌",
+                "📝 Paramètres": len(f.get("parameters", [])),
+            }
+            for f in summary["all_functions"]
+        ]
 
         st.dataframe(pd.DataFrame(summary_data), use_container_width=True)
 
@@ -205,12 +234,21 @@ def _analyze_all_files() -> None:
         with col3:
             st.metric("📏 Lignes totales", summary.get("total_lines", 0))
         with col4:
-            st.metric("📖 Documentation", f"{summary.get('documented_functions', 0)}/{summary.get('total_functions', 0)}")
+            st.metric(
+                "📖 Documentation",
+                f"{summary.get('documented_functions', 0)}"
+                f" /{summary.get('total_functions', 0)}",
+            )
 
         # Chart
         if len(summary.get("functions_by_file", {})) > 1:
             st.subheader("📊 Répartition des fonctions par fichier")
-            chart_df = pd.DataFrame([{"Fichier": fname, "Nombre de fonctions": len(funcs)} for fname, funcs in summary["functions_by_file"].items()])
+            chart_df = pd.DataFrame(
+                [
+                    {"Fichier": fname, "Nombre de fonctions": len(funcs)}
+                    for fname, funcs in summary["functions_by_file"].items()
+                ]
+            )
             st.bar_chart(chart_df.set_index("Fichier"))
 
     except Exception as exc:
@@ -229,7 +267,9 @@ def show_features_functions_analysis() -> None:
             return
         st.success(f"✅ {len(files)} fichier(s) trouvé(s) à analyser")
 
-        selected_file = st.selectbox("📁 Choisir un fichier:", options=[f.name for f in files])
+        selected_file = st.selectbox(
+            "📁 Choisir un fichier:", options=[f.name for f in files]
+        )
         if selected_file:
             file_path = next((f for f in files if f.name == selected_file), None)
             if file_path:

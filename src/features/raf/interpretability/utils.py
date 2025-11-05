@@ -6,21 +6,20 @@ Utilitaires pour l'interprétabilité
 Fonctions helpers et visualisations combinées
 """
 
+import warnings
+from typing import Any, Dict, List, Optional
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from typing import Optional, Union, Dict, List, Tuple, Any
-import warnings
 
 warnings.filterwarnings("ignore")
 
-from .shap_explainer import SHAPExplainer, explain_prediction, visualize_shap_values
 from .gradcam_explainer import (
     GradCAMExplainer,
-    generate_gradcam,
     visualize_gradcam_comparison,
 )
+from .shap_explainer import SHAPExplainer
 
 
 class InterpretabilityAnalyzer:
@@ -240,9 +239,7 @@ class InterpretabilityAnalyzer:
             confidence_level = (
                 "élevée"
                 if report["cnn_confidence"] > 0.8
-                else "moyenne"
-                if report["cnn_confidence"] > 0.6
-                else "faible"
+                else "moyenne" if report["cnn_confidence"] > 0.6 else "faible"
             )
             report["summary"] = (
                 f"Confiance CNN: {confidence_level} ({report['cnn_confidence']:.2%})"

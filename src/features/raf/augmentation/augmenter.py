@@ -6,10 +6,11 @@ Classe d'augmentation d'images personnalisée qui remplace ImageDataGenerator
 pour éviter les problèmes d'images noires et offrir plus de contrôle.
 """
 
-import numpy as np
-import cv2
 import random
-from typing import Tuple, Optional
+from typing import Optional, Tuple
+
+import cv2
+import numpy as np
 
 
 class CustomImageAugmenter:

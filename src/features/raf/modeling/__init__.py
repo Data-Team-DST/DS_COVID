@@ -3,22 +3,23 @@ Module d'évaluation et de modélisation pour le framework RAF
 Gère l'entraînement, l'évaluation et l'analyse des modèles ML/DL
 """
 
-import numpy as np
+import warnings
+from typing import Any, Dict, List, Optional, Tuple
+
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 from sklearn.metrics import (
+    accuracy_score,
+    auc,
     classification_report,
     confusion_matrix,
-    accuracy_score,
+    f1_score,
     precision_score,
     recall_score,
-    f1_score,
     roc_auc_score,
     roc_curve,
-    auc,
 )
-import warnings
-from typing import Dict, List, Tuple, Any, Optional
 
 from ..utils.config import Config
 
@@ -71,12 +72,12 @@ def evaluate_model(
     train_f1 = f1_score(y_train, y_train_pred, average="weighted")
     val_f1 = f1_score(y_val, y_val_pred, average="weighted")
 
-    print(f"📊 Accuracy:")
+    print("📊 Accuracy:")
     print(f"   Train: {train_acc:.3f}")
     print(f"   Val:   {val_acc:.3f}")
     print(f"   Écart: {abs(train_acc - val_acc):.3f}")
 
-    print(f"\n📊 F1-Score (weighted):")
+    print("\n📊 F1-Score (weighted):")
     print(f"   Train: {train_f1:.3f}")
     print(f"   Val:   {val_f1:.3f}")
 
@@ -84,7 +85,7 @@ def evaluate_model(
     val_precision = precision_score(y_val, y_val_pred, average="weighted")
     val_recall = recall_score(y_val, y_val_pred, average="weighted")
 
-    print(f"\n📊 Métriques de validation:")
+    print("\n📊 Métriques de validation:")
     print(f"   Precision: {val_precision:.3f}")
     print(f"   Recall:    {val_recall:.3f}")
 
@@ -99,7 +100,7 @@ def evaluate_model(
         val_auc = None
 
     # Rapport de classification
-    print(f"\n📋 Rapport de classification (Validation):")
+    print("\n📋 Rapport de classification (Validation):")
     print(classification_report(y_val, y_val_pred))
 
     # Matrice de confusion
@@ -119,7 +120,7 @@ def evaluate_model(
     elif overfitting_score < -0.05:
         print(f"⚠️ Sous-apprentissage possible (écart: {overfitting_score:.3f})")
     else:
-        print(f"✅ Bon équilibre biais-variance")
+        print("✅ Bon équilibre biais-variance")
 
     return {
         "model_name": model_name,
@@ -271,12 +272,12 @@ def create_ensemble_comparison() -> Dict[str, Any]:
         Dictionnaire avec les configurations d'ensemble
     """
     from sklearn.ensemble import (
+        AdaBoostClassifier,
+        BaggingClassifier,
+        ExtraTreesClassifier,
+        GradientBoostingClassifier,
         RandomForestClassifier,
         VotingClassifier,
-        BaggingClassifier,
-        AdaBoostClassifier,
-        GradientBoostingClassifier,
-        ExtraTreesClassifier,
     )
     from sklearn.linear_model import LogisticRegression
     from sklearn.svm import SVC

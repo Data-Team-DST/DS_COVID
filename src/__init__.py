@@ -10,10 +10,7 @@ __email__ = "rafael.cepa@example.fr"
 
 # Import main modules for easy access
 try:
-    from . import features
-    from . import models
-    from . import explorationdata
-    from . import streamlit
+    from . import explorationdata, features, models, streamlit
 except ImportError:
     # Handle cases where some modules might not be available
     pass

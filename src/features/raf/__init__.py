@@ -21,23 +21,22 @@ __description__ = "Framework ML/DL complet pour classification d'images COVID-19
 # Imports principaux
 try:
     # Utils (prioritaire - configuration universelle)
-    from .utils import Config, get_config, setup_universal_environment
+    # Augmentation
+    from .augmentation import CustomImageAugmenter
 
     # Data
     from .data import DataLoader, MaskProcessor
 
-    # Augmentation
-    from .augmentation import CustomImageAugmenter
-
     # Interpretability
-    from .interpretability import SHAPExplainer, GradCAMExplainer
+    from .interpretability import GradCAMExplainer, SHAPExplainer
+    from .utils import Config, get_config, setup_universal_environment
 
     print(f"🎨 RAF (Raw Augmentation Framework) v{__version__} chargé avec succès")
     print(
-        f"✨ NOUVELLE FONCTIONNALITÉ: setup_universal_environment() remplace la cellule 1!"
+        "✨ NOUVELLE FONCTIONNALITÉ: setup_universal_environment() remplace la cellule 1!"
     )
-    print(f"� NOUVEAU MODULE: interpretability (SHAP + GradCAM)")
-    print(f"��������� Modules disponibles: utils, data, augmentation, interpretability")
+    print("� NOUVEAU MODULE: interpretability (SHAP + GradCAM)")
+    print("��������� Modules disponibles: utils, data, augmentation, interpretability")
 
 except ImportError as e:
     print(f"⚠️ Erreur import RAF: {e}")

@@ -1,5 +1,7 @@
-from pathlib import Path
+"""Vérifications backend de l'environnement du projet."""
+
 import sys
+from pathlib import Path
 
 # ====================================================================
 # 🔧 BACKEND - LOGIQUE MÉTIER

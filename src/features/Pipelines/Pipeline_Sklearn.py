@@ -10,7 +10,6 @@ Date: 2025
 """
 
 import json
-import os
 import pickle
 from datetime import datetime
 from pathlib import Path
@@ -131,7 +130,7 @@ class PipelineManager:
     def _load_config(self):
         """Charge la configuration depuis le fichier JSON."""
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 return json.load(f)
         except FileNotFoundError:
             raise FileNotFoundError(
@@ -257,7 +256,7 @@ class PipelineManager:
 
         # Évaluation sur les données de test si disponibles
         if X_test is not None and y_test is not None:
-            print(f"\n📊 ÉVALUATION SUR LE JEU DE TEST")
+            print("\n📊 ÉVALUATION SUR LE JEU DE TEST")
             print(f"Données de test: {X_test.shape}")
 
             # Prédictions
@@ -283,18 +282,18 @@ class PipelineManager:
             if self.config["evaluation_metrics"].get("detailed_report", True):
                 report = classification_report(y_test, y_pred)
                 results["classification_report"] = report
-                print(f"\n📋 RAPPORT DE CLASSIFICATION:")
+                print("\n📋 RAPPORT DE CLASSIFICATION:")
                 print(report)
 
             # Matrice de confusion
             if self.config["evaluation_metrics"].get("confusion_matrix", True):
                 cm = confusion_matrix(y_test, y_pred)
                 results["confusion_matrix"] = cm
-                print(f"\n🔄 MATRICE DE CONFUSION:")
+                print("\n🔄 MATRICE DE CONFUSION:")
                 print(cm)
 
         # Cross-validation sur les données d'entraînement
-        print(f"\n🔄 VALIDATION CROISÉE")
+        print("\n🔄 VALIDATION CROISÉE")
         cv_folds = pipeline_config.get("cv_folds", 5)
 
         # Utiliser le pipeline de base si c'est un GridSearch
@@ -355,7 +354,7 @@ class PipelineManager:
             return None
 
         print(f"\n{'=' * 80}")
-        print(f"📊 COMPARAISON DES PIPELINES")
+        print("📊 COMPARAISON DES PIPELINES")
         print(f"{'=' * 80}")
 
         # Création du tableau de comparaison

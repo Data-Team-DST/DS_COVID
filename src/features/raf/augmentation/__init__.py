@@ -3,12 +3,13 @@ Module d'augmentation de données pour le framework RAF
 Gère l'augmentation d'images médicales avec préservation des caractéristiques cliniques
 """
 
-import numpy as np
-import cv2
-from PIL import Image, ImageEnhance, ImageOps
 import random
-from typing import List, Tuple, Dict, Any, Optional
 import warnings
+from typing import Any, Dict, List, Optional, Tuple
+
+import cv2
+import numpy as np
+from PIL import Image, ImageEnhance, ImageOps
 
 from ..utils.config import Config
 
@@ -286,9 +287,9 @@ class MedicalImageAugmentor:
             ("brightness_contrast", lambda img: self.adjust_brightness_contrast(img)),
             (
                 "noise",
-                lambda img: self.add_gaussian_noise(img)
-                if random.random() < 0.2
-                else img,
+                lambda img: (
+                    self.add_gaussian_noise(img) if random.random() < 0.2 else img
+                ),
             ),  # Rare
             ("zoom", lambda img: self.zoom_image(img)),
             ("translation", lambda img: self.translate_image(img)),
@@ -346,7 +347,7 @@ class MedicalImageAugmentor:
         final_labels = np.concatenate(augmented_labels, axis=0)
 
         print(f"✅ Augmentation terminée: {final_images.shape[0]} images")
-        print(f"📊 Statistiques d'augmentation:")
+        print("📊 Statistiques d'augmentation:")
         for aug_type, count in self.augmentation_stats.items():
             if count > 0:
                 print(f"   {aug_type}: {count} applications")
@@ -429,7 +430,7 @@ def demonstrate_augmentation_fixed(sample_images: np.ndarray, n_samples: int = 3
     plt.show()
 
     # Statistiques
-    print(f"\n📊 Statistiques d'augmentation:")
+    print("\n📊 Statistiques d'augmentation:")
     for aug_type, count in augmentor.augmentation_stats.items():
         if count > 0:
             print(f"   {aug_type}: {count} applications")
@@ -453,7 +454,7 @@ def balance_dataset_with_augmentation(
     """
     unique_labels, counts = np.unique(labels, return_counts=True)
 
-    print(f"📊 Distribution originale:")
+    print("📊 Distribution originale:")
     for label, count in zip(unique_labels, counts):
         print(f"   Classe {label}: {count} échantillons")
 
@@ -517,7 +518,7 @@ def balance_dataset_with_augmentation(
 
     # Vérification finale
     unique_final, counts_final = np.unique(final_labels, return_counts=True)
-    print(f"📊 Distribution finale:")
+    print("📊 Distribution finale:")
     for label, count in zip(unique_final, counts_final):
         print(f"   Classe {label}: {count} échantillons")
 

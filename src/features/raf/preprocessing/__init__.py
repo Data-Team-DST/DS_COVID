@@ -3,13 +3,14 @@ Module de préprocessing pour le framework RAF
 Gère le preprocessing des images et la préparation des données
 """
 
-import numpy as np
-import cv2
-from PIL import Image, ImageEnhance
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder
-from sklearn.model_selection import train_test_split
 import warnings
-from typing import Tuple, Optional, Dict, Any, List
+from typing import Any, Dict, List, Optional, Tuple
+
+import cv2
+import numpy as np
+from PIL import Image, ImageEnhance
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler
 
 from ..utils.config import Config
 
@@ -233,7 +234,7 @@ def prepare_data_splits(
     Returns:
         Tuple (X_train, X_val, X_test, y_train, y_val, y_test)
     """
-    print(f"📊 Division des données:")
+    print("📊 Division des données:")
     print(f"   Dataset original: {X.shape[0]} échantillons")
 
     # Stratification si demandée
@@ -268,7 +269,7 @@ def prepare_data_splits(
 
     # Vérification de la distribution des classes
     unique_classes = np.unique(y)
-    print(f"\n📈 Distribution des classes:")
+    print("\n📈 Distribution des classes:")
 
     for split_name, split_y in [("Train", y_train), ("Val", y_val), ("Test", y_test)]:
         print(f"   {split_name}:")

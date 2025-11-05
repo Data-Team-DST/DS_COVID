@@ -1,31 +1,35 @@
-import streamlit as st
-from pathlib import Path
 import inspect
-import sys
+from pathlib import Path
+
+import streamlit as st
 
 
 # Analyse de la structure du dossier Features
 def get_features_files():
     """
-    Retourne la liste des fichiers dans le dossier Features et ses sous-dossiers avec informations détaillées.
+    Retourne la liste des fichiers dans le dossier Features
+    et ses sous-dossiers avec informations détaillées.
 
     Returns:
         tuple: (sorted_files, features_dir, file_info)
-            - sorted_files: Liste des fichiers Python triés avec leurs chemins relatifs
+            - sorted_files: Liste des fichiers Python triés
+            avec leurs chemins relatifs
             - features_dir: Chemin vers le dossier features
             - file_info: Dictionnaire avec infos détaillées sur chaque fichier
     """
     try:
         # Chemin correct vers le dossier src/features
         current_file = Path(__file__)
-        features_dir = current_file.parent.parent  # Remonte au dossier features
+        # Remonte au dossier features
+        features_dir = current_file.parent.parent
 
         # Vérifier que le dossier existe
         if not features_dir.exists():
             st.warning(f"⚠️ Le dossier features n'existe pas: {features_dir}")
             return [], features_dir, {}
 
-        # Récupérer tous les fichiers Python récursivement, sauf __init__.py et __pycache__
+        # Récupérer tous les fichiers Python récursivement,
+        # sauf __init__.py et __pycache__
         all_files = []
         for py_file in features_dir.rglob("*.py"):
             # Exclure __init__.py et les fichiers dans __pycache__
@@ -53,9 +57,11 @@ def get_features_files():
                     "path": str(file_path),
                     "exists": file_path.exists(),
                     "relative_path": display_name,
-                    "folder": str(relative_path.parent)
-                    if relative_path.parent != Path(".")
-                    else "racine",
+                    "folder": (
+                        str(relative_path.parent)
+                        if relative_path.parent != Path(".")
+                        else "racine"
+                    ),
                 }
             except Exception as e:
                 relative_path = file_path.relative_to(features_dir)
@@ -64,9 +70,11 @@ def get_features_files():
                     "error": str(e),
                     "exists": file_path.exists(),
                     "relative_path": display_name,
-                    "folder": str(relative_path.parent)
-                    if relative_path.parent != Path(".")
-                    else "racine",
+                    "folder": (
+                        str(relative_path.parent)
+                        if relative_path.parent != Path(".")
+                        else "racine"
+                    ),
                 }
 
         return sorted_files, features_dir, file_info
@@ -78,7 +86,8 @@ def get_features_files():
 
 # Afficher la liste des fichiers dans le dossier Features
 def show_features_files():
-    """Affiche la liste des fichiers dans le dossier Features et ses sous-dossiers avec informations détaillées."""
+    """Affiche la liste des fichiers dans le dossier Features
+    et ses sous-dossiers avec informations détaillées."""
     st.subheader("📁 Fichiers dans le dossier Features et sous-dossiers:")
 
     files, features_dir, file_info = get_features_files()
@@ -88,12 +97,14 @@ def show_features_files():
 
     if files:
         st.success(
-            f"✅ {len(files)} fichier(s) Python trouvé(s) (incluant les sous-dossiers)"
+            f"✅ {len(files)} fichier(s) Python trouvé(s)"
+            " (incluant les sous-dossiers)"
         )
 
         # Créer un tableau avec les informations détaillées
-        import pandas as pd
         from datetime import datetime
+
+        import pandas as pd
 
         table_data = []
         for file in files:
@@ -156,7 +167,7 @@ def show_features_files():
             # Afficher par dossier
             for folder, file_list in sorted(files_by_folder.items()):
                 if folder == "racine":
-                    st.write(f"📁 **Dossier racine (features/)**")
+                    st.write("📁 **Dossier racine (features/)**")
                 else:
                     st.write(f"📁 **{folder}/**")
                 for filename in sorted(file_list):
@@ -183,7 +194,7 @@ def show_function_details(func):
     """Affiche les détails d'une fonction."""
     st.write(f"### {func.__name__}")
     st.write(f"**Documentation:** {func.__doc__ or 'Pas de documentation disponible'}")
-    st.write(f"**Code:**")
+    st.write("**Code:**")
     st.code(inspect.getsource(func))
 
 
@@ -245,8 +256,9 @@ def show_verification_backend():
         st.success(f"✅ **{len(files)} fichier(s) Python trouvé(s)**")
 
         # Tableau détaillé
-        import pandas as pd
         from datetime import datetime
+
+        import pandas as pd
 
         table_data = []
         import pycodestyle
@@ -289,9 +301,7 @@ def show_verification_backend():
                 statut = (
                     "✅ OK"
                     if info.get("exists", False) and not has_code_error
-                    else "❌ Erreur code"
-                    if has_code_error
-                    else "❌ Erreur"
+                    else "❌ Erreur code" if has_code_error else "❌ Erreur"
                 )
                 pep8_statut = "✅" if pep8_ok else f"❌ ({pep8_count})"
                 table_data.append(
@@ -323,7 +333,7 @@ def show_verification_backend():
             st.dataframe(df, use_container_width=True)
 
     else:
-        st.warning(f"⚠️ **Aucun fichier Python trouvé**")
+        st.warning("⚠️ **Aucun fichier Python trouvé**")
 
 
 def analyze_module_functions(file_path):
@@ -369,12 +379,16 @@ def analyze_module_functions(file_path):
                     for param_name, param in sig.parameters.items():
                         param_info = {
                             "name": param_name,
-                            "annotation": str(param.annotation)
-                            if param.annotation != inspect.Parameter.empty
-                            else None,
-                            "default": str(param.default)
-                            if param.default != inspect.Parameter.empty
-                            else None,
+                            "annotation": (
+                                str(param.annotation)
+                                if param.annotation != inspect.Parameter.empty
+                                else None
+                            ),
+                            "default": (
+                                str(param.default)
+                                if param.default != inspect.Parameter.empty
+                                else None
+                            ),
                             "kind": str(param.kind),
                         }
                         params_info.append(param_info)
@@ -550,9 +564,9 @@ def show_features_functions_analysis():
                         "🔧 Fonction": func["name"],
                         "📄 Fichier": func["file"],
                         "📏 Lignes": func["source_lines"],
-                        "📖 Documentée": "✅"
-                        if func["doc"] != "Pas de documentation"
-                        else "❌",
+                        "📖 Documentée": (
+                            "✅" if func["doc"] != "Pas de documentation" else "❌"
+                        ),
                         "📝 Paramètres": len(func["parameters"]),
                     }
                 )

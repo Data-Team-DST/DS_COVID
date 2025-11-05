@@ -4,16 +4,13 @@ Contient les fonctions d'analyse système et de support
 """
 
 import os
-import sys
-import psutil
 import platform
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from typing import Dict, Any, List, Optional, Tuple
-import warnings
+import sys
+from typing import Any, Dict, Optional, Tuple
 
-from ..utils.config import Config
+import matplotlib.pyplot as plt
+import numpy as np
+import psutil
 
 
 def print_system_info():
@@ -31,20 +28,20 @@ def print_system_info():
 
     # Mémoire
     memory = psutil.virtual_memory()
-    print(f"\n💾 MÉMOIRE:")
+    print("\n💾 MÉMOIRE:")
     print(f"   Total: {memory.total / (1024**3):.1f} GB")
     print(f"   Disponible: {memory.available / (1024**3):.1f} GB")
     print(f"   Utilisée: {memory.percent:.1f}%")
 
     # CPU
-    print(f"\n🔥 PROCESSEUR:")
+    print("\n🔥 PROCESSEUR:")
     print(f"   Cœurs logiques: {psutil.cpu_count()}")
     print(f"   Cœurs physiques: {psutil.cpu_count(logical=False)}")
     print(f"   Utilisation: {psutil.cpu_percent(interval=1):.1f}%")
 
     # Disque
     disk = psutil.disk_usage("/")
-    print(f"\n💽 STOCKAGE:")
+    print("\n💽 STOCKAGE:")
     print(f"   Total: {disk.total / (1024**3):.1f} GB")
     print(f"   Libre: {disk.free / (1024**3):.1f} GB")
     print(f"   Utilisé: {disk.percent:.1f}%")
@@ -54,8 +51,8 @@ def print_system_info():
         import torch
 
         if torch.cuda.is_available():
-            print(f"\n🎮 GPU (CUDA):")
-            print(f"   Disponible: Oui")
+            print("\n🎮 GPU (CUDA):")
+            print("   Disponible: Oui")
             print(f"   Périphériques: {torch.cuda.device_count()}")
             for i in range(torch.cuda.device_count()):
                 print(f"   GPU {i}: {torch.cuda.get_device_name(i)}")
@@ -63,12 +60,12 @@ def print_system_info():
                     f"   Mémoire: {torch.cuda.get_device_properties(i).total_memory / (1024**3):.1f} GB"
                 )
         else:
-            print(f"\n🎮 GPU: Non disponible")
+            print("\n🎮 GPU: Non disponible")
     except ImportError:
-        print(f"\n🎮 GPU: PyTorch non installé")
+        print("\n🎮 GPU: PyTorch non installé")
 
     # Répertoire de travail
-    print(f"\n📁 ENVIRONNEMENT:")
+    print("\n📁 ENVIRONNEMENT:")
     print(f"   Répertoire: {os.getcwd()}")
 
     # Variables d'environnement importantes
@@ -94,7 +91,7 @@ def analyze_image_properties(
     Returns:
         Dictionnaire avec les statistiques d'analyse
     """
-    print(f"🔍 ANALYSE DES PROPRIÉTÉS D'IMAGES")
+    print("🔍 ANALYSE DES PROPRIÉTÉS D'IMAGES")
     print("=" * 50)
 
     # Échantillonnage si nécessaire
@@ -112,7 +109,7 @@ def analyze_image_properties(
     stats = {}
 
     # Dimensions
-    print(f"\n📏 DIMENSIONS:")
+    print("\n📏 DIMENSIONS:")
     shapes = [img.shape for img in sample_images]
     unique_shapes = list(set(shapes))
     stats["shapes"] = unique_shapes
@@ -127,11 +124,11 @@ def analyze_image_properties(
         print(f"   Canaux: {n_channels}")
         stats["channels"] = n_channels
     else:
-        print(f"   Images en niveaux de gris")
+        print("   Images en niveaux de gris")
         stats["channels"] = 1
 
     # Statistiques de pixels
-    print(f"\n🎨 STATISTIQUES DE PIXELS:")
+    print("\n🎨 STATISTIQUES DE PIXELS:")
 
     # Conversion pour analyse
     flattened_pixels = []
@@ -196,7 +193,7 @@ def analyze_image_properties(
 
         # Statistiques par classe
         stats["class_stats"] = {}
-        print(f"\n📊 STATISTIQUES PAR CLASSE:")
+        print("\n📊 STATISTIQUES PAR CLASSE:")
 
         for label in unique_labels:
             mask = sample_labels == label
@@ -268,7 +265,7 @@ def analyze_image_properties(
     plt.show()
 
     # Détection d'anomalies
-    print(f"\n⚠️ DÉTECTION D'ANOMALIES:")
+    print("\n⚠️ DÉTECTION D'ANOMALIES:")
 
     # Images très sombres ou très claires
     image_means = []

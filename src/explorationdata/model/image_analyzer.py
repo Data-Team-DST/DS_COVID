@@ -7,6 +7,7 @@ poids total, etc.
 """
 
 import os
+
 from PIL import Image  # type: ignore
 
 

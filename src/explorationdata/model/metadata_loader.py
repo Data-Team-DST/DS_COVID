@@ -48,5 +48,5 @@ def load_metadata(xlsx_path: str):
 
     return (
         set(df["FILE NAME"].astype(str)),
-        dict(zip(df["FILE NAME"], df["parsed_size"]))
+        dict(zip(df["FILE NAME"], df["parsed_size"])),
     )

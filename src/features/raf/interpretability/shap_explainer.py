@@ -6,12 +6,12 @@ Module SHAP pour l'explication des prédictions de modèles
 Supporte les modèles de machine learning classiques et les réseaux de neurones
 """
 
+import warnings
+from typing import Any, Dict, List, Optional
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from typing import Optional, Union, Dict, List, Tuple, Any
-import warnings
 
 warnings.filterwarnings("ignore")
 
@@ -22,10 +22,6 @@ try:
 except ImportError:
     SHAP_AVAILABLE = False
     print("⚠️ SHAP non installé. Utilisez: pip install shap")
-
-from sklearn.base import BaseEstimator
-import tensorflow as tf
-from tensorflow import keras
 
 
 class SHAPExplainer:

@@ -7,11 +7,11 @@ Remplace la cellule de configuration du notebook par une approche modulaire
 """
 
 import os
-import shutil
 import subprocess
-from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple, Optional
+from pathlib import Path
+from typing import List, Optional, Tuple
+
 from dotenv import load_dotenv
 
 
@@ -118,7 +118,7 @@ def create_colab_env_file():
 
     try:
         # Lecture du template
-        with open(template_path, "r", encoding="utf-8") as f:
+        with open(template_path, encoding="utf-8") as f:
             colab_env_content = f.read()
 
         # Écriture du fichier .env
@@ -453,7 +453,7 @@ def setup_universal_environment() -> Config:
     in_colab, in_wsl = detect_environment()
     env_name = "Colab" if in_colab else "WSL/Linux"
 
-    print(f"\n📊 === RÉCAPITULATIF ===")
+    print("\n📊 === RÉCAPITULATIF ===")
     print(f"🌍 Environnement: {env_name}")
     print(f"📂 Projet: {config.project_root}")
     print(f"📊 Dataset: {config.data_dir}")
@@ -464,7 +464,7 @@ def setup_universal_environment() -> Config:
 
     # Vérification dataset
     if config.data_dir.exists():
-        print(f"✅ Dataset accessible")
+        print("✅ Dataset accessible")
 
         # Comptage rapide des images
         total_images = 0
@@ -487,7 +487,7 @@ def setup_universal_environment() -> Config:
     else:
         print(f"❌ Dataset non accessible: {config.data_dir}")
 
-    print(f"\n🎉 CONFIGURATION UNIVERSELLE TERMINÉE!")
-    print(f"💡 Prêt pour l'entraînement ML/DL")
+    print("\n🎉 CONFIGURATION UNIVERSELLE TERMINÉE!")
+    print("💡 Prêt pour l'entraînement ML/DL")
 
     return config

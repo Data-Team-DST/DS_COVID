@@ -16,8 +16,4 @@ from .config import Settings
 # Crée une instance globale (optionnel)
 settings = Settings()
 
-__all__ = [
-    'Settings',
-    'settings',
-    '__version__'
-]
+__all__ = ["Settings", "settings", "__version__"]

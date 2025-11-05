@@ -7,8 +7,9 @@ Il produit un rapport synthétique par sous-dossier.
 """
 
 import os
-from model.metadata_loader import load_metadata
+
 from model.image_analyzer import collect_image_stats
+from model.metadata_loader import load_metadata
 
 
 def run_analysis(path: str):
@@ -36,10 +37,11 @@ def run_analysis(path: str):
             )
             logs.extend(log_entries)
 
-            output.append(build_output_entry(
-                dossier, sous_dossier, img_stats,
-                correspondance_rate, taille_check
-            ))
+            output.append(
+                build_output_entry(
+                    dossier, sous_dossier, img_stats, correspondance_rate, taille_check
+                )
+            )
 
     return output, logs
 
@@ -54,10 +56,7 @@ def get_dossiers(path: str):
     Returns:
         list[str]: Liste des noms de dossiers.
     """
-    return [
-        d for d in os.listdir(path)
-        if os.path.isdir(os.path.join(path, d))
-    ]
+    return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
 
 def get_sous_dossiers(dossier_path: str):
@@ -95,9 +94,7 @@ def analyze_metadata(metadata_file: str, img_stats: dict):
     taille_check = "N/A"
 
     if not os.path.exists(metadata_file):
-        logs.append(
-            f"Aucun metadata trouvé pour {os.path.basename(metadata_file)}"
-        )
+        logs.append(f"Aucun metadata trouvé pour {os.path.basename(metadata_file)}")
         return correspondance_rate, taille_check, logs
 
     meta_names, meta_sizes = load_metadata(metadata_file)
@@ -129,7 +126,7 @@ def build_output_entry(
     sous_dossier: str,
     img_stats: dict,
     correspondance_rate: str,
-    taille_check: str
+    taille_check: str,
 ):
     """
     Construit une entrée de rapport pour un sous-dossier.
@@ -146,7 +143,8 @@ def build_output_entry(
     """
     moyenne_ko = (
         img_stats["total_size"] / len(img_stats["names"]) / 1024
-        if img_stats["names"] else 0
+        if img_stats["names"]
+        else 0
     )
 
     return {
@@ -155,19 +153,14 @@ def build_output_entry(
         "Description": "",
         "Disponibilité de la variable a priori": "Oui",
         "Type informatique": ", ".join(img_stats["formats"]),
-        "Taux de non correspondance"
-        " entre metadata et dossier": correspondance_rate,
+        "Taux de non correspondance" " entre metadata et dossier": correspondance_rate,
         "Gestion du taux de non correspondance": "",
         "Distribution des valeurs": len(img_stats["names"]),
         "Remarques sur la colonne": "",
-        "Taille totale (Mo)": round(
-            img_stats["total_size"] / (1024 * 1024), 2
-        ),
+        "Taille totale (Mo)": round(img_stats["total_size"] / (1024 * 1024), 2),
         "Nb fichiers": len(img_stats["names"]),
         "Taille moyenne (Ko)": round(moyenne_ko, 2),
         "Mode couleur": ", ".join(img_stats["color_modes"]),
         "Taille d'image conforme au metadata": taille_check,
-        "Dimensions uniques trouvées": ", ".join(
-            str(s) for s in img_stats["shapes"]
-        ),
+        "Dimensions uniques trouvées": ", ".join(str(s) for s in img_stats["shapes"]),
     }

@@ -6,23 +6,23 @@ Module d'interprétabilité pour le framework RAF
 Contient les implémentations SHAP, GradCAM et LIME pour expliquer les prédictions
 """
 
-from .shap_explainer import (
-    SHAPExplainer,
-    explain_prediction,
-    visualize_shap_values,
-    compare_explanations,
-)
 from .gradcam_explainer import (
     GradCAMExplainer,
-    generate_gradcam,
-    visualize_gradcam_comparison,
     analyze_gradcam_regions,
     extract_gradcam_features,
+    generate_gradcam,
+    visualize_gradcam_comparison,
 )
 from .lime_explainer import (
     LIMEExplainer,
     create_lime_explainer,
     visualize_lime_comparison,
+)
+from .shap_explainer import (
+    SHAPExplainer,
+    compare_explanations,
+    explain_prediction,
+    visualize_shap_values,
 )
 from .utils import (
     InterpretabilityAnalyzer,

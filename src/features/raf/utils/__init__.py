@@ -1,8 +1,8 @@
 # Utils module
 from .config import (
     Config,
-    get_project_config,
     get_config,
+    get_project_config,
     set_config,
     setup_universal_environment,
 )

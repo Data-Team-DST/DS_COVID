@@ -6,11 +6,10 @@ Module LIME pour expliquer les prédictions de modèles image
 LIME (Local Interpretable Model-agnostic Explanations)
 """
 
-import numpy as np
+from typing import Any, Dict, List, Optional
+
 import matplotlib.pyplot as plt
-from typing import Dict, List, Tuple, Optional, Any, Union
-import cv2
-from PIL import Image
+import numpy as np
 
 try:
     from lime import lime_image
@@ -108,7 +107,7 @@ class LIMEExplainer:
         predicted_class = np.argmax(original_pred)
         confidence = original_pred[predicted_class]
 
-        print(f"🔍 Explication LIME...")
+        print("🔍 Explication LIME...")
         print(f"• Classe prédite: {predicted_class}")
         print(f"• Confiance: {confidence:.2%}")
         print(f"• Échantillons LIME: {num_samples}")
@@ -214,7 +213,7 @@ class LIMEExplainer:
             min_weight=min_weight,
         )
         axes[2].imshow(temp_pos)
-        axes[2].set_title(f"Features Positives\n(Soutiennent la prédiction)")
+        axes[2].set_title("Features Positives\n(Soutiennent la prédiction)")
         axes[2].axis("off")
 
         plt.suptitle(title, fontsize=14, fontweight="bold")
@@ -258,9 +257,9 @@ class LIMEExplainer:
             "total_positive_weight": total_positive_weight,
             "total_negative_weight": total_negative_weight,
             "total_weight": total_weight,
-            "positive_ratio": total_positive_weight / total_weight
-            if total_weight > 0
-            else 0,
+            "positive_ratio": (
+                total_positive_weight / total_weight if total_weight > 0 else 0
+            ),
             "top_positive_features": positive_features[:5],
             "top_negative_features": negative_features[:5],
             "feature_weights": features_weights,

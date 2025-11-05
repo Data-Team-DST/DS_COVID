@@ -6,13 +6,12 @@ Module GradCAM pour l'explication des prédictions de modèles CNN
 Implémente Grad-CAM, Grad-CAM++, et d'autres techniques de visualisation
 """
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from typing import Optional, Union, Dict, List, Tuple, Any
-import cv2
 import warnings
+from typing import Any, Dict, List, Optional
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 
 warnings.filterwarnings("ignore")
 

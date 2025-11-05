@@ -1,6 +1,6 @@
+"""Interface Streamlit pour afficher le statut global des vérifications."""
+
 import streamlit as st
-from pathlib import Path
-import sys
 
 # ====================================================================
 # 🎨 FRONTEND - INTERFACE UTILISATEUR

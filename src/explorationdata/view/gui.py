@@ -33,17 +33,16 @@ class GUI:
         self.root.title("Analyse automatique des images + metadata")
 
         # Zone de sélection du dossier
-        tk.Label(
-            root,
-            text="📁 Dossier principal :"
-        ).grid(row=0, column=0, sticky="w", padx=5, pady=10)
+        tk.Label(root, text="📁 Dossier principal :").grid(
+            row=0, column=0, sticky="w", padx=5, pady=10
+        )
 
         self.entry_root = tk.Entry(root, width=60)
         self.entry_root.grid(row=0, column=1, padx=5)
 
-        tk.Button(
-            root, text="Parcourir", command=self.choisir_dossier
-        ).grid(row=0, column=2)
+        tk.Button(root, text="Parcourir", command=self.choisir_dossier).grid(
+            row=0, column=2
+        )
 
         # Bouton de lancement d’analyse
         self.btn_analyse = tk.Button(
@@ -52,16 +51,13 @@ class GUI:
             bg="#4CAF50",
             fg="white",
             font=("Arial", 10, "bold"),
-            command=on_analyse_callback
+            command=on_analyse_callback,
         )
         self.btn_analyse.grid(row=1, column=1, pady=10)
 
         # Barre de progression
         self.progress_bar = ttk.Progressbar(
-            root,
-            orient="horizontal",
-            length=400,
-            mode="determinate"
+            root, orient="horizontal", length=400, mode="determinate"
         )
         self.progress_bar.grid(row=2, column=0, columnspan=3, padx=10, pady=5)
 

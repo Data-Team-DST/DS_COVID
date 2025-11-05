@@ -30,3 +30,7 @@ pytz>=2025.2
 six>=1.17.0
 threadpoolctl>=3.6.0
 tzdata>=2025.2
+
+# Test
+pytest>=7.0.0
+pytest-cov>=4.0.0

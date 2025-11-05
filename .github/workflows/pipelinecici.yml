@@ -40,12 +40,12 @@ jobs:
       - name: Lint per subfolder (fail if score < 8)
         run: |
           set -e
-          folders=("src/", "src\features", "src\utils", "notebooks\colab", "notebooks")
+          folders=("src" "src/features" "src/utils" "notebooks/colab" "notebooks")
           for f in "${folders[@]}"; do
-            echo "=========================="
-            echo "Linting $f"
-            echo "=========================="
-            pylint --fail-under=8 "$f"
+              echo "=========================="
+              echo "Linting $f"
+              echo "=========================="
+              pylint --fail-under=8 "$f"
           done
 
   unit_tests:

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
+from typing import Any
 
 import numpy as np  # type: ignore
 from PIL import Image  # type: ignore
@@ -14,12 +16,12 @@ logger = logging.getLogger(__name__)
 
 # Pillow resampling compatibility
 try:
-    RESAMPLING = Image.Resampling  # type: ignore[attr-defined]
-except Exception:  # pragma: no cover
-    RESAMPLING = Image
+    resampling = Image.resampling  # type: ignore[attr-defined]
+except AttributeError:  # pragma: no cover
+    resampling = Image
 
-RESAMPLE_LANCZOS = getattr(RESAMPLING, "LANCZOS", getattr(Image, "LANCZOS", 1))
-RESAMPLE_NEAREST = getattr(RESAMPLING, "NEAREST", getattr(Image, "NEAREST", 0))
+RESAMPLE_LANCZOS = getattr(resampling, "LANCZOS", getattr(Image, "LANCZOS", 1))
+resample_nearest = getattr(resampling, "NEAREST", getattr(Image, "NEAREST", 0))
 
 
 class ImageResizer(BaseEstimator, TransformerMixin):
@@ -32,6 +34,15 @@ class ImageResizer(BaseEstimator, TransformerMixin):
         preserve_aspect_ratio: bool = False,
         verbose: bool = True,
     ):
+        """
+        Initialize the ImageResizer.
+
+        Args:
+            img_size: Target size (width, height) for resized images.
+            resample: Resampling filter to use.
+            preserve_aspect_ratio: Whether to preserve the aspect ratio.
+            verbose: Whether to log processing information.
+        """
         self.img_size = img_size
         self.resample = resample
         self.preserve_aspect_ratio = preserve_aspect_ratio
@@ -39,14 +50,16 @@ class ImageResizer(BaseEstimator, TransformerMixin):
         self.original_shapes_: list[tuple[int, ...]] = []
         self.n_images_processed_: int = 0
 
-    def fit(self, *_):
+    def fit(self, *_: Any) -> ImageResizer:
         """No-op fit to keep sklearn API compatible."""
         return self
 
     def _resize_with_aspect_ratio(self, img: Image.Image) -> Image.Image:
+        """Resize an image while preserving its aspect ratio."""
         ratio = min(
-            self.img_size[0] / img.size[0], self.img_size[1] / img.size[1]
-            )
+            self.img_size[0] / img.size[0],
+            self.img_size[1] / img.size[1],
+        )
         new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
         img_resized = img.resize(new_size, self.resample)
 
@@ -57,6 +70,15 @@ class ImageResizer(BaseEstimator, TransformerMixin):
         return new_img
 
     def transform(self, data_x: list[Image.Image | np.ndarray]) -> np.ndarray:
+        """
+        Resize a list of images to the target size.
+
+        Args:
+            data_x: List of PIL Images or NumPy arrays.
+
+        Returns:
+            NumPy array of resized images.
+        """
         if self.verbose:
             logger.info("Resizing %d images to %s", len(data_x), self.img_size)
 
@@ -101,13 +123,29 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
         per_image: bool = False,
         verbose: bool = True,
     ):
+        """
+        Initialize the ImageNormalizer.
+
+        Args:
+            method: Normalization method ('minmax', 'standard', 'custom').
+            feature_range: Range for 'minmax' or 'custom' normalization.
+            per_image: Normalize each image individually if True.
+            verbose: Whether to log processing information.
+        """
         self.method = method.lower()
         self.feature_range = feature_range
         self.per_image = per_image
         self.verbose = verbose
-        self._globals = {"min": None, "max": None, "mean": None, "std": None}
+        self._globals: dict[
+            str,
+            float | None
+            ] = {"min": None, "max": None, "mean": None, "std": None}
 
-    def fit(self, data_x, *_):
+    def fit(
+            self,
+            data_x: list[np.ndarray] | np.ndarray, *_: Any
+            ) -> ImageNormalizer:
+        """Fit normalizer on data (compute global stats if needed)."""
         if not self.per_image:
             arr = np.array(data_x, dtype=np.float32)
             if self.method in ("minmax", "custom"):
@@ -121,12 +159,23 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
                 logger.info("Fitted normalizer with method %s", self.method)
         return self
 
-    def transform(self, data_x, *_):
+    def transform(
+            self,
+            data_x: list[np.ndarray] | np.ndarray, *_: Any
+            ) -> np.ndarray:
+        """
+        Apply normalization to images.
+
+        Args:
+            data_x: List or array of images.
+
+        Returns:
+            Normalized images as NumPy array.
+        """
         if self.verbose:
             logger.info(
                 "Normalizing %d images using '%s' method",
-                len(data_x),
-                self.method
+                len(data_x), self.method
                 )
         arr = np.array(data_x, dtype=np.float32)
 
@@ -143,11 +192,12 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
             logger.info(
                 "Normalization completed. Output range: [%.2f, %.2f]",
                 float(result.min()),
-                float(result.max()),
-            )
+                float(result.max())
+                )
         return result
 
     def _normalize_minmax(self, arr: np.ndarray) -> np.ndarray:
+        """Apply min-max normalization."""
         if self.per_image:
             return np.array([self._minmax_image(img) for img in arr])
         gmin, gmax = self._globals["min"], self._globals["max"]
@@ -156,6 +206,7 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
         return (arr - gmin) / (gmax - gmin)
 
     def _normalize_standard(self, arr: np.ndarray) -> np.ndarray:
+        """Apply standard score normalization."""
         if self.per_image:
             return np.array([self._standardize_image(img) for img in arr])
         gmean, gstd = self._globals["mean"], self._globals["std"]
@@ -164,11 +215,12 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
         return (arr - gmean) / (gstd + 1e-8)
 
     def _normalize_custom(self, arr: np.ndarray) -> np.ndarray:
+        """Apply custom range normalization."""
         fr_min, fr_max = self.feature_range
         if self.per_image:
-            return np.array([
-                self._custom_image(img, fr_min, fr_max) for img in arr
-                ])
+            return np.array(
+                [self._custom_image(img, fr_min, fr_max) for img in arr]
+                )
         gmin, gmax = self._globals["min"], self._globals["max"]
         if gmin is None or gmax is None:
             raise RuntimeError("Normalizer not fitted for global min/max")
@@ -177,6 +229,7 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _minmax_image(img: np.ndarray) -> np.ndarray:
+        """Normalize single image with min-max."""
         img_min, img_max = img.min(), img.max()
         return (
             img - img_min
@@ -184,14 +237,17 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _standardize_image(img: np.ndarray) -> np.ndarray:
+        """Standardize single image to zero mean and unit variance."""
         img_mean, img_std = img.mean(), img.std()
         return (img - img_mean) / img_std if img_std > 0 else img - img_mean
 
     @staticmethod
     def _custom_image(
-        img: np.ndarray, fr_min: float,
+        img: np.ndarray,
+        fr_min: float,
         fr_max: float
          ) -> np.ndarray:
+        """Normalize single image to a custom range."""
         img_min, img_max = img.min(), img.max()
         if img_max <= img_min:
             return img
@@ -199,35 +255,57 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
         return normalized * (fr_max - fr_min) + fr_min
 
 
+@dataclass
+class MaskerConfig:
+    """Configuration dataclass for ImageMasker."""
+    mask_threshold: float = 0.5
+    resize_masks: bool = True
+    invert_mask: bool = False
+    verbose: bool = True
+
+
 class ImageMasker(BaseEstimator, TransformerMixin):
     """Apply binary masks to images."""
 
     def __init__(
-        self,
-        mask_paths: list[str],
-        mask_threshold: float = 0.5,
-        resize_masks: bool = True,
-        invert_mask: bool = False,
-        verbose: bool = True,
-    ):
+            self, mask_paths: list[str],
+            config: MaskerConfig = MaskerConfig()
+            ):
+        """
+        Initialize the ImageMasker.
+
+        Args:
+            mask_paths: List of file paths to mask images.
+            config: MaskerConfig dataclass with optional parameters:
+                mask_threshold, resize_masks, invert_mask, verbose
+        """
         self.mask_paths = mask_paths
-        self.mask_threshold = mask_threshold
-        self.resize_masks = resize_masks
-        self.invert_mask = invert_mask
-        self.verbose = verbose
+        self.mask_threshold = config.mask_threshold
+        self.resize_masks = config.resize_masks
+        self.invert_mask = config.invert_mask
+        self.verbose = config.verbose
         self.n_images_masked_: int = 0
 
     def fit(self, *_):
+        """No-op fit to keep sklearn API compatible."""
         if not self.mask_paths:
             logger.warning("No mask paths provided")
         return self
 
     def transform(self, data_x: np.ndarray) -> np.ndarray:
+        """
+        Apply binary masks to a list of images.
+
+        Args:
+            data_x: Array of images to mask.
+
+        Returns:
+            Masked images as NumPy array.
+        """
         if len(self.mask_paths) != len(data_x):
             raise ValueError(
-                "Number of masks (%d) must match number of images (%d)",
-                len(self.mask_paths),
-                len(data_x),
+                f"Number of masks ({len(self.mask_paths)})"
+                f" must match number of images ({len(data_x)})"
             )
         if self.verbose:
             logger.info("Applying masks to %d images", len(data_x))
@@ -242,7 +320,7 @@ class ImageMasker(BaseEstimator, TransformerMixin):
                 mask = Image.open(mask_path).convert("L")
                 if self.resize_masks:
                     target_size = (img.shape[1], img.shape[0])
-                    mask = mask.resize(target_size, RESAMPLE_NEAREST)
+                    mask = mask.resize(target_size, resample_nearest)
 
                 mask_arr = (np.array(mask) / 255.0) > self.mask_threshold
                 if self.invert_mask:
@@ -257,7 +335,8 @@ class ImageMasker(BaseEstimator, TransformerMixin):
         self.n_images_masked_ = len(masked)
         if self.verbose:
             logger.info(
-                "Masking completed: %d images processed", self.n_images_masked_
+                "Masking completed: %d images processed",
+                self.n_images_masked_
                 )
         return np.array(masked)
 
@@ -266,12 +345,28 @@ class ImageFlattener(BaseEstimator, TransformerMixin):
     """Flatten images for ML models."""
 
     def __init__(self, order: str = "C", verbose: bool = True):
+        """
+        Initialize the ImageFlattener.
+
+        Args:
+            order: Memory order for flattening ('C' or 'F').
+            verbose: Whether to log processing information.
+        """
         self.order = order
         self.verbose = verbose
         self.original_shape_: tuple[int, ...] = ()
         self.n_features_: int = 0
 
     def fit(self, data_x, *_):
+        """
+        Fit flattener by storing original shape.
+
+        Args:
+            data_x: Array of images.
+
+        Returns:
+            Self.
+        """
         arr = np.array(data_x)
         self.original_shape_ = arr.shape[1:]
         self.n_features_ = int(np.prod(self.original_shape_))
@@ -284,20 +379,37 @@ class ImageFlattener(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, data_x: np.ndarray) -> np.ndarray:
+        """
+        Flatten images into 2D array.
+
+        Args:
+            data_x: Array of images.
+
+        Returns:
+            Flattened images.
+        """
         if self.verbose:
             logger.info("Flattening %d images...", len(data_x))
         arr = np.array(data_x)
         n_samples = arr.shape[0]
-        data_flat = arr.reshape(n_samples, -1, order=self.order)
+        data_flat = arr.reshape((n_samples, -1), order=self.order)
         if self.verbose:
             logger.info(
-                "Flattening completed: %s -> %s",
-                arr.shape,
+                "Flattening completed: %s -> %s", arr.shape,
                 data_flat.shape
                 )
         return data_flat
 
     def inverse_transform(self, data_x: np.ndarray) -> np.ndarray:
+        """
+        Restore flattened images to original shape.
+
+        Args:
+            data_x: Flattened images.
+
+        Returns:
+            Images reshaped to original dimensions.
+        """
         if not self.original_shape_:
             raise RuntimeError(
                 "Transformer must be fitted before inverse_transform"
@@ -317,6 +429,15 @@ class ImageBinarizer(BaseEstimator, TransformerMixin):
         output_dtype=np.float32,
         verbose: bool = True,
     ):
+        """
+        Initialize the ImageBinarizer.
+
+        Args:
+            threshold: Threshold value or method ('mean', 'median', 'otsu').
+            invert: Invert the binarization.
+            output_dtype: Output data type of binarized images.
+            verbose: Whether to log processing information.
+        """
         self.threshold = threshold
         self.invert = invert
         self.output_dtype = output_dtype
@@ -324,6 +445,15 @@ class ImageBinarizer(BaseEstimator, TransformerMixin):
         self.threshold_value_: float | None = None
 
     def fit(self, data_x, *_):
+        """
+        Fit the binarizer (compute threshold if needed).
+
+        Args:
+            data_x: Array of images.
+
+        Returns:
+            Self.
+        """
         arr = np.array(data_x)
         if isinstance(self.threshold, str):
             self.threshold_value_ = self._compute_threshold(arr)
@@ -337,6 +467,7 @@ class ImageBinarizer(BaseEstimator, TransformerMixin):
         return self
 
     def _compute_threshold(self, arr: np.ndarray) -> float:
+        """Compute adaptive threshold based on method."""
         method = str(self.threshold).lower()
         if method == "mean":
             return float(arr.mean())
@@ -348,6 +479,7 @@ class ImageBinarizer(BaseEstimator, TransformerMixin):
 
     @staticmethod
     def _compute_otsu_threshold(arr: np.ndarray) -> float:
+        """Compute Otsu's threshold for an image."""
         hist, bins = np.histogram(arr.flatten(), bins=256)
         bin_centers = (bins[:-1] + bins[1:]) / 2.0
         max_var = 0.0
@@ -366,6 +498,15 @@ class ImageBinarizer(BaseEstimator, TransformerMixin):
         return threshold
 
     def transform(self, data_x, *_):
+        """
+        Apply binarization to images.
+
+        Args:
+            data_x: Array of images.
+
+        Returns:
+            Binarized images as NumPy array.
+        """
         if self.threshold_value_ is None:
             if isinstance(self.threshold, str):
                 raise RuntimeError(
@@ -376,7 +517,8 @@ class ImageBinarizer(BaseEstimator, TransformerMixin):
         if self.verbose:
             logger.info(
                 "Binarizing %d images with threshold %.4f",
-                len(data_x), self.threshold_value_
+                len(data_x),
+                self.threshold_value_
                 )
 
         arr = np.array(data_x)

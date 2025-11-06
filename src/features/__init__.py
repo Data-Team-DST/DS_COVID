@@ -1,7 +1,8 @@
 """Features module - Image transformers and estimators for the data pipeline.
 
-This module contains all the custom transformers and estimators extracted from
-the Jupyter notebook, organized into logical categories:
+This package contains all the custom transformers and estimators extracted from
+the Jupyter notebooks, organized into logical categories:
+
 - Image loaders: Loading images from file paths
 - Image preprocessing: Resizing, normalizing, masking, flattening, binarizing
 - Image augmentation: Data augmentation techniques
@@ -9,5 +10,6 @@ the Jupyter notebook, organized into logical categories:
 - Utilities: Visualization and saving transformers
 """
 
-# Import tous les transformateurs depuis le module Pipelines
-from .Pipelines import Transformateurs as Transformateurs  # noqa
+from . import Pipelines  # noqa: F401
+
+__all__ = ["Pipelines"]

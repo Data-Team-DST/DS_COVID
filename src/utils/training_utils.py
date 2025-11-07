@@ -13,10 +13,9 @@ Date: November 2025
 import logging
 from typing import Dict, List, Optional
 
+import keras
 import numpy as np
 from sklearn.metrics import classification_report
-
-import keras
 
 # ImageDataGenerator is deprecated in Keras 3, use tf.keras version
 # pylint: disable=import-error,no-name-in-module
@@ -169,10 +168,10 @@ def evaluate_model(
         test_generator.reset()
         y_pred_probs = model.predict(test_generator, verbose=0)
         y_pred = np.argmax(y_pred_probs, axis=1)
-        
+
         # Extract y_true from generator
         # DirectoryIterator has .classes, NumpyArrayIterator doesn't
-        if hasattr(test_generator, 'classes'):
+        if hasattr(test_generator, "classes"):
             y_true = test_generator.classes
         else:
             # For NumpyArrayIterator, extract labels from batches

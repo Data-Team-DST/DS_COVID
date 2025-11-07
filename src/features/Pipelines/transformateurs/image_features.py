@@ -19,13 +19,13 @@ class ImageHistogram(BaseEstimator, TransformerMixin):
     """Extract histogram features from images."""
 
     def __init__(
-            self,
-            bins: int = 32,
-            hist_range: Optional[Tuple[float, float]] = None,
-            density: bool = False,
-            per_channel: bool = False,
-            verbose: bool = True
-                 ):
+        self,
+        bins: int = 32,
+        hist_range: Optional[Tuple[float, float]] = None,
+        density: bool = False,
+        per_channel: bool = False,
+        verbose: bool = True,
+    ):
         self._init_params(bins, hist_range, density, per_channel, verbose)
 
     def _init_params(self, bins, hist_range, density, per_channel, verbose):
@@ -55,8 +55,8 @@ class ImageHistogram(BaseEstimator, TransformerMixin):
                 "Fitted histogram extractor: %d bins, range=%s, %d features",
                 self.bins,
                 self.range_,
-                self.n_features_
-                )
+                self.n_features_,
+            )
 
         return self
 
@@ -74,27 +74,25 @@ class ImageHistogram(BaseEstimator, TransformerMixin):
         for img in data_array:
             if self.per_channel and len(img.shape) == 3:
                 hist_channels = [
-                    np.histogram(img[:, :, c].ravel(), bins=self.bins,
-                                 range=self.range_, density=self.density)[0]
+                    np.histogram(
+                        img[:, :, c].ravel(),
+                        bins=self.bins,
+                        range=self.range_,
+                        density=self.density,
+                    )[0]
                     for c in range(img.shape[-1])
                 ]
                 histogram = np.concatenate(hist_channels)
             else:
                 histogram = np.histogram(
-                    img.ravel(),
-                    bins=self.bins,
-                    range=self.range_,
-                    density=self.density
-                    )[0]
+                    img.ravel(), bins=self.bins, range=self.range_, density=self.density
+                )[0]
             histograms.append(histogram)
 
         result = np.array(histograms)
 
         if self.verbose:
-            logger.info(
-                "Histogram extraction completed. Shape: %s",
-                result.shape
-                )
+            logger.info("Histogram extraction completed. Shape: %s", result.shape)
 
         return result
 
@@ -105,25 +103,17 @@ class ImageHistogram(BaseEstimator, TransformerMixin):
 class ImagePCA(BaseEstimator, TransformerMixin):
     """Apply PCA dimensionality reduction to images."""
 
-    def __init__(self, n_components: int = 50, whiten: bool = False,
-                 svd_solver: str = "auto", random_state: Optional[int] = None,
-                 verbose: bool = True):
-        self._init_params(
-            n_components,
-            whiten,
-            svd_solver,
-            random_state,
-            verbose
-            )
+    def __init__(
+        self,
+        n_components: int = 50,
+        whiten: bool = False,
+        svd_solver: str = "auto",
+        random_state: Optional[int] = None,
+        verbose: bool = True,
+    ):
+        self._init_params(n_components, whiten, svd_solver, random_state, verbose)
 
-    def _init_params(
-            self,
-            n_components,
-            whiten,
-            svd_solver,
-            random_state,
-            verbose
-            ):
+    def _init_params(self, n_components, whiten, svd_solver, random_state, verbose):
         self.n_components = n_components
         self.whiten = whiten
         self.svd_solver = svd_solver
@@ -140,8 +130,11 @@ class ImagePCA(BaseEstimator, TransformerMixin):
         data_flat = data_array.reshape(n_samples, -1)
 
         if self.verbose:
-            logger.info("Fitting PCA on %d images with shape %s...",
-                        n_samples, data_array.shape[1:])
+            logger.info(
+                "Fitting PCA on %d images with shape %s...",
+                n_samples,
+                data_array.shape[1:],
+            )
 
         self.pca_ = PCA(
             n_components=self.n_components,
@@ -154,14 +147,14 @@ class ImagePCA(BaseEstimator, TransformerMixin):
         self.n_components_ = self.pca_.n_components_
         self.explained_variance_ratio_ = float(
             self.pca_.explained_variance_ratio_.sum()
-            )
+        )
 
         if self.verbose:
             logger.info(
                 "PCA fitted: %d components, explained variance: %.2f%%",
                 self.n_components_,
-                self.explained_variance_ratio_ * 100
-                )
+                self.explained_variance_ratio_ * 100,
+            )
 
         return self
 
@@ -180,10 +173,7 @@ class ImagePCA(BaseEstimator, TransformerMixin):
         data_pca = self.pca_.transform(data_flat)
 
         if self.verbose:
-            logger.info(
-                "PCA transformation completed. Shape: %s",
-                data_pca.shape
-                )
+            logger.info("PCA transformation completed. Shape: %s", data_pca.shape)
 
         return data_pca
 
@@ -202,8 +192,13 @@ class ImageStandardScaler(BaseEstimator, TransformerMixin):
     and optionally reshapes back to original image dimensions.
     """
 
-    def __init__(self, with_mean: bool = True, with_std: bool = True,
-                 reshape_output: bool = True, verbose: bool = True):
+    def __init__(
+        self,
+        with_mean: bool = True,
+        with_std: bool = True,
+        reshape_output: bool = True,
+        verbose: bool = True,
+    ):
         self._init_params(with_mean, with_std, reshape_output, verbose)
 
     def _init_params(self, with_mean, with_std, reshape_output, verbose):
@@ -223,15 +218,9 @@ class ImageStandardScaler(BaseEstimator, TransformerMixin):
         data_flat = data_array.reshape(n_samples, -1)
 
         if self.verbose:
-            logger.info(
-                "Fitting StandardScaler on %d flattened images...",
-                n_samples
-                )
+            logger.info("Fitting StandardScaler on %d flattened images...", n_samples)
 
-        self.scaler_ = StandardScaler(
-            with_mean=self.with_mean,
-            with_std=self.with_std
-        )
+        self.scaler_ = StandardScaler(with_mean=self.with_mean, with_std=self.with_std)
         self.scaler_.fit(data_flat)
 
         if self.verbose:
@@ -246,9 +235,7 @@ class ImageStandardScaler(BaseEstimator, TransformerMixin):
     def transform(self, data_x):
         """Transform images using fitted StandardScaler."""
         if self.scaler_ is None:
-            raise RuntimeError(
-                "StandardScaler must be fitted before transform"
-                )
+            raise RuntimeError("StandardScaler must be fitted before transform")
 
         data_array = np.array(data_x)
         n_samples = data_array.shape[0]
@@ -276,9 +263,7 @@ class ImageStandardScaler(BaseEstimator, TransformerMixin):
     def inverse_transform(self, data_x: np.ndarray) -> np.ndarray:
         """Reverse standardization."""
         if self.scaler_ is None:
-            raise RuntimeError(
-                "StandardScaler must be fitted before inverse_transform"
-                )
+            raise RuntimeError("StandardScaler must be fitted before inverse_transform")
 
         original_shape = data_x.shape
         n_samples = original_shape[0] if len(original_shape) > 2 else None

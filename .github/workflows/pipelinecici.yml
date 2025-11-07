@@ -40,12 +40,12 @@ jobs:
       - name: Lint per subfolder (fail if score < 8)
         run: |
           set -e
-          folders=("src/ds_covid" "src/explorationdata" "src/features" "src/models" "src/streamlit")
+          folders=("src" "src/features" "src/utils" "notebooks/colab" "notebooks")
           for f in "${folders[@]}"; do
-            echo "=========================="
-            echo "Linting $f"
-            echo "=========================="
-            pylint --fail-under=8 "$f"
+              echo "=========================="
+              echo "Linting $f"
+              echo "=========================="
+              pylint --fail-under=8 "$f"
           done
 
   unit_tests:
@@ -68,9 +68,11 @@ jobs:
             python -m pip install -r requirements.txt
           fi
 
+      - name: Install local package
+        run: python -m pip install -e .
+
       - name: Run Pytest with coverage
-        run: |
-          pytest --cov=src/ --cov-report xml:coverage.xml --cov-fail-under=30 .
+        run: pytest --cov=src/ --cov-report xml:coverage.xml --cov-fail-under=30 .
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -78,6 +80,7 @@ jobs:
           name: coverage-report
           path: coverage.xml
           retention-days: 7
+
 
   sonarqube:
     name: "SonarCloud Scan"

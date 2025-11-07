@@ -7,4 +7,5 @@ def test_import_root_module():
 
     # Et vérifier que Pipelines est bien accessible via src.features
     from src import features
+
     assert hasattr(features, "Pipelines")

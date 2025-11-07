@@ -104,10 +104,7 @@ class ImageLoader(BaseEstimator, TransformerMixin):
         images: list[Image.Image] = []
         self.failed_images_ = []
 
-        iterator = tqdm(
-            data_x,
-            desc="Loading images"
-            ) if self.verbose else data_x
+        iterator = tqdm(data_x, desc="Loading images") if self.verbose else data_x
 
         for path in iterator:
             img = self._load_single_image(path)
@@ -133,8 +130,6 @@ class ImageLoader(BaseEstimator, TransformerMixin):
                 )
 
         if not images:
-            raise ValueError(
-                "No valid images could be loaded from the provided paths"
-                )
+            raise ValueError("No valid images could be loaded from the provided paths")
 
         return images

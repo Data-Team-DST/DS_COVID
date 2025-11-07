@@ -6,9 +6,9 @@ from typing import Optional, Tuple, Union
 
 import numpy as np  # type: ignore
 from scipy import ndimage  # type: ignore
+from skimage.transform import resize  # type: ignore
 from sklearn.base import BaseEstimator, TransformerMixin  # type: ignore
 from tqdm import tqdm  # type: ignore
-from skimage.transform import resize 
 
 # Configuration du logger
 logger = logging.getLogger(__name__)
@@ -136,7 +136,8 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
 
     def _apply_zoom(self, img):
         """
-        Applique un zoom aléatoire à une image tout en conservant la taille originale.
+        Applique un zoom aléatoire à une image
+        tout en conservant la taille originale.
         """
         h, w, c = img.shape
 
@@ -154,20 +155,26 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         pad_w = max(w - new_w, 0)
 
         # Pad (hauteur, largeur, canaux)
-        npad = ((pad_h // 2, pad_h - pad_h // 2),
-                (pad_w // 2, pad_w - pad_w // 2),
-                (0, 0))  # pas de padding sur les canaux
+        npad = (
+            (pad_h // 2, pad_h - pad_h // 2),
+            (pad_w // 2, pad_w - pad_w // 2),
+            (0, 0),
+        )  # pas de padding sur les canaux
 
-        img_padded = np.pad(img_zoomed, pad_width=npad, mode='constant', constant_values=0)
+        img_padded = np.pad(
+            img_zoomed, pad_width=npad, mode="constant", constant_values=0
+        )
 
         # Si le zoom est supérieur à 1, on crop au centre
         if zoom_factor > 1:
             start_h = (new_h - h) // 2
             start_w = (new_w - w) // 2
-            img_padded = img_zoomed[start_h:start_h + h, start_w:start_w + w, :]
+            img_padded = img_zoomed[
+                start_h: start_h + h,
+                start_w: start_w + w, :
+                ]
 
         return img_padded
-
 
     def transform(self, data_x: np.ndarray, data_y=None) -> np.ndarray:
         """Transform images by applying augmentation.
@@ -395,8 +402,7 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
         iterator = (
             tqdm(
                 data_x,
-                desc=f"Cropping ({self.mode})"
-                ) if self.verbose else data_x
+                desc=f"Cropping ({self.mode})") if self.verbose else data_x
         )
 
         for img in iterator:
@@ -404,9 +410,10 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
             if pad_h > 0 or pad_w > 0:
                 if len(img.shape) == 2:
                     img = np.pad(
-                        img, (
-                            (pad_h, pad_h), (pad_w, pad_w)
-                            ), mode=self.pad_mode
+                        img,
+                        ((pad_h, pad_h),
+                         (pad_w, pad_w)),
+                        mode=self.pad_mode
                     )
                 else:
                     img = np.pad(
@@ -438,7 +445,8 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
             else:
                 img_cropped = img[
                     top: top + crop_height,
-                    left: left + crop_width, :
+                    left: left + crop_width,
+                    :
                     ]
 
             cropped.append(img_cropped)

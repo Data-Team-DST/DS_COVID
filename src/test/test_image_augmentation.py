@@ -1,4 +1,5 @@
 import numpy as np  # type: ignore
+
 from features.Pipelines.transformateurs.image_augmentation import (
     ImageAugmenter,
     ImageRandomCropper,
@@ -63,4 +64,3 @@ def test_image_random_cropper_too_small_warning(caplog):
         cropped = cropper.transform(small_image)
     assert cropped.shape == small_image.shape
     assert any("smaller than crop size" in msg for msg in caplog.messages)
-

@@ -108,3 +108,8 @@ jobs:
             -Dsonar.organization=data-team-dst-1
             -Dsonar.python.coverage.reportPaths=reports/coverage.xml
             -Dsonar.sources=src
+            -Dsonar.projectBaseDir=.
+            -Dsonar.coverage.exclusions=src/test/**,notebooks/**
+            -Dsonar.python.version=3.12
+            -Dsonar.verbose=true
+

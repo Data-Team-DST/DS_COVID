@@ -204,7 +204,7 @@ class ImageAnalyser(BaseTransform):
                 'mean_intensity': ['mean', 'std'],
                 'std_intensity': ['mean', 'std']
             }).round(2)
-            st.space()
+            st.write("")
             st.subheader("Statistiques d'Intensité par Label")
             st.space()
             st.dataframe(intensity_stats, width='content')

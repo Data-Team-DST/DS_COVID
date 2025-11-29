@@ -39,10 +39,10 @@ class BaseTransform(BaseEstimator, TransformerMixin):
         """
         Ajuste le transformateur aux données.
         """
-        with st.spinner(f"Ajustement du {self.__class__.__name__} en cours..."):
-            self.log(f"Ajustement du {self.__class__.__name__} en cours...")
+        with st.spinner(f"Fit de {self.__class__.__name__} en cours..."):
+            self.log(f"Fit de {self.__class__.__name__} en cours...")
             self.__is__fitted = True
-        st.success(f"{self.__class__.__name__} ajusté avec succès!")
+        st.success(f"{self.__class__.__name__} fité avec succès!")
         return self
 
     # @abstractmethod
@@ -50,9 +50,9 @@ class BaseTransform(BaseEstimator, TransformerMixin):
         """
         Transforme les données en utilisant le transformateur ajusté.
         """
-        with st.spinner(f"Transformation {self.__class__.__name__} en cours..."):
-            self.log(f"Transformation {self.__class__.__name__} en cours...")
-        st.success(f"Transformation {self.__class__.__name__} réussie!")
+        with st.spinner(f"Transform de {self.__class__.__name__} en cours..."):
+            self.log(f"Transform de {self.__class__.__name__} en cours...")
+        st.success(f"Transform de {self.__class__.__name__} réussie!")
         return X
 
     def progress(self, iterable: Iterable, desc: str = "Processing", total: Optional[int] = None) -> Iterable:

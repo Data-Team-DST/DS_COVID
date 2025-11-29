@@ -53,7 +53,10 @@ class TupleToDataFrame(BaseTransform):
             
             if self.use_streamlit:
                 st.subheader("✅ Aperçu des données converties")
-                st.dataframe(df.describe(include='all'))
+                # Afficher seulement les statistiques de base sans les chemins
+                st.write(f"**Nombre total d'entrées:** {len(df)}")
+                st.write(f"**Distribution des labels:**")
+                st.dataframe(df)
                 st.success(f"✅ Conversion réussie : {len(df)} entrées")
 
             return df

@@ -13,6 +13,7 @@ src_path = os.path.join(project_root, 'src')
 from features.Pipelines.transformateurs.BaseTransform import *
 from features.Pipelines.transformateurs.Image_path_loader import *
 from features.Pipelines.transformateurs.Image_Analyser import *
+from features.Pipelines.transformateurs.tuple_to_df import *
 
 save_dir_paths = os.path.join(project_root, 'models')
 
@@ -69,7 +70,7 @@ if launch_button and loaded_pipeline is not None:
         st.title(f"Exécution du pipeline : **{selected_pipeline}**")
         st.divider()
         with st.spinner(f"Exécution du pipeline : **{selected_pipeline}** en cours..."):
-            time.sleep(1)  # Simuler un délai pour l'effet visuel
+            # time.sleep(1)  # Simuler un délai pour l'effet visuel
             # st.success(f"Exécution du pipeline : **{selected_pipeline}**")
             # st.info("Chargement des données et exécution du pipeline en cours...")
             X = loaded_pipeline.fit_transform(X=None)

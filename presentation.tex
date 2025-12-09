@@ -18,6 +18,7 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows, positioning}
+\usepackage{pgf-pie}
 
 % Configuration listings
 \lstset{
@@ -398,8 +399,8 @@ DS_COVID/
         \vspace{0.3cm}
         
         \begin{block}{Performance}
-            ⚡⚡⚡ Très rapide\\
-            ⭐⭐⭐ Bonne précision
+            Vitesse: Très rapide\\
+            Précision: Bonne
         \end{block}
     \end{columns}
 \end{frame}
@@ -433,8 +434,8 @@ DS_COVID/
         \vspace{0.3cm}
         
         \begin{block}{Performance}
-            ⚡⚡ Vitesse moyenne\\
-            ⭐⭐⭐ Très interprétable
+            Vitesse: Moyenne\\
+            Interprétabilité: Excellente
         \end{block}
     \end{columns}
 \end{frame}
@@ -469,8 +470,8 @@ DS_COVID/
         \vspace{0.3cm}
         
         \begin{block}{Performance}
-            ⚡ Lent (nécessite background)\\
-            ⭐⭐⭐ Excellente précision
+            Vitesse: Lente (nécessite background)\\
+            Précision: Excellente
         \end{block}
     \end{columns}
 \end{frame}
@@ -483,12 +484,12 @@ DS_COVID/
             \hline
             \textbf{Critère} & \textbf{Grad-CAM} & \textbf{LIME} & \textbf{SHAP} \\
             \hline
-            Vitesse & ⚡⚡⚡ & ⚡⚡ & ⚡ \\
-            Précision & ⭐⭐⭐ & ⭐⭐ & ⭐⭐⭐ \\
-            Interprétabilité & ⭐⭐⭐ & ⭐⭐⭐ & ⭐⭐ \\
-            Model-agnostic & ❌ & ✅ & ✅ \\
-            Background data & ❌ & ❌ & ✅ \\
-            Batch processing & ✅ & ⚠️ & ⚠️ \\
+            Vitesse & +++ & ++ & + \\
+            Précision & +++ & ++ & +++ \\
+            Interprétabilité & +++ & +++ & ++ \\
+            Model-agnostic & Non & Oui & Oui \\
+            Background data & Non & Non & Oui \\
+            Batch processing & Oui & Partiel & Partiel \\
             \hline
         \end{tabular}
     \end{table}

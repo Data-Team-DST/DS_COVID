@@ -217,7 +217,7 @@ Si les caractères accentués ne s'affichent pas correctement :
 ```latex
 \usepackage[utf8]{inputenc}  % Déjà présent
 \usepackage[T1]{fontenc}     % Déjà présent
-\usepackage[french]{babel}   # Déjà présent
+\usepackage[french]{babel}   % Déjà présent
 ```
 
 ### Images manquantes

@@ -34,3 +34,5 @@ tzdata>=2025.2
 # Test
 pytest>=7.0.0
 pytest-cov>=4.0.0
+
+streamlit-extras>=0.7.8

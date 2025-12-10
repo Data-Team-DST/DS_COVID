@@ -181,3 +181,6 @@ doc/
 
 img_latex/
 COVID-19_Radiography_Dataset.zip
+/COVID-19_Radiography_Dataset
+test_kagglehub.py
+page/10_test.py

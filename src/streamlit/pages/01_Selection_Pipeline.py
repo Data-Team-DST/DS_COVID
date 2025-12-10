@@ -1,80 +1,362 @@
 import streamlit as st
 import os 
-import joblib
-import time
+import sys
+import pandas as pd
+import numpy as np
+from sklearn.pipeline import Pipeline
+
 # Ajouter le répertoire racine du projet au chemin Python
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-src_path = os.path.join(project_root, 'src')
+sys.path.insert(0, project_root)
 
-# print(f"Project root: {project_root}")
-# print(f"Source path: {src_path}")
+# Import des transformateurs V3 refactorisés
+# IMPORTANT: Importer AVANT joblib pour que les classes soient disponibles lors du unpickling
+from src.features.St_Pipeline.Transformateurs import (
+    # Loaders
+    ImagePathLoader,
+    TupleToDataFrame,
+    
+    # Preprocessing
+    ImageResizer,
+    ImageAugmenter,
+    ImageNormalizer,
+    ImageMasker,
+    ImageFlattener,
+    ImageRandomCropper,
+    ImageStandardScaler,
+    RGB_to_L,
+    
+    # Analyse et features
+    ImageAnalyser,
+    ImagePCA,
+    ImageHistogram,
+    
+    # Utilities
+    SaveTransformer,
+    VisualizeTransformer,
+    TrainTestSplitter,
+)
 
-# from src.features.Pipelines.transformateurs.BaseTransform import *
-from features.Pipelines.transformateurs.BaseTransform import *
-from features.Pipelines.transformateurs.Image_path_loader import *
-from features.Pipelines.transformateurs.Image_Analyser import *
-from features.Pipelines.transformateurs.tuple_to_df import *
+# Importer joblib APRÈS les transformateurs
+import joblib
 
+# Configuration des chemins
 save_dir_paths = os.path.join(project_root, 'models')
+data_dir = os.path.join(project_root, 'data', 'raw', 'COVID-19_Radiography_Dataset', 'COVID-19_Radiography_Dataset')
+
+# Créer le dossier models s'il n'existe pas
+os.makedirs(save_dir_paths, exist_ok=True)
 
 
-# Container Titre 
-container_Title = st.container(border=True)
-with container_Title:
-    st.title("Sélection Pipeline")
-    st.markdown("Bienvenue dans la page de sélection du pipeline ! Utilisez la barre latérale pour naviguer.")
+# Configuration de la page
+st.set_page_config(
+    page_title="Sélection Pipeline COVID-19",
+    page_icon="🔬",
+    layout="wide"
+)
+
+# ============================================================
+# CONTAINER TITRE
+# ============================================================
+container_title = st.container(border=True)
+with container_title:
+    st.title("🔬 Sélection et Exécution de Pipeline")
+    st.markdown("""
+    Bienvenue dans l'interface de sélection de pipeline V3 ! 
+    - **Créez** un nouveau pipeline personnalisé
+    - **Chargez** un pipeline existant
+    - **Exécutez** et visualisez les résultats
+    """)
+
+# ============================================================
+# SIDEBAR - CONFIGURATION
+# ============================================================
+with st.sidebar:
+    st.header("⚙️ Configuration")
     
-
-# container Sélection Pipeline
-container_Selection_Pipeline = st.container(border=True)
-with container_Selection_Pipeline:
-    
-    pkl_files = [ f for f in os.listdir(save_dir_paths) if f.endswith('.pkl')]
-    # st.write(pkl_files)
-
-    col1, col2 = st.columns([1,3])
-    if pkl_files:
-        with col1:
-            st.markdown("### Séléction du pipeline :")
-            selected_pipeline = st.selectbox("Sélectionnez un pipeline enregistré :", pkl_files)
-            st.success(f"Vous avez sélectionné le pipeline : **{selected_pipeline}**")
-
-
-        with col2:
-            st.markdown("### Détails du pipeline sélectionné :")
-            # Afficher les détails du pipeline sélectionné
-            job_to_load = os.path.join(save_dir_paths, selected_pipeline)
-            st.info(f"Chemin absolu du pipeline : {job_to_load}")
-
-            
-            try:
-                st.write(job_to_load)
-                loaded_pipeline = joblib.load(job_to_load)
-                st.code(loaded_pipeline)
-                                  
-            except Exception as e:
-                st.error(f"Erreur lors du chargement du pipeline : {e}")
-                loaded_pipeline = None
-        
-        with col1:
-            launch_button = st.button(f"Lancer Pipeline : {selected_pipeline}")
-        
-        
-            
+    # Vérification du répertoire de données
+    if os.path.exists(data_dir):
+        st.success(f"✅ Données trouvées")
+        labels = [d for d in os.listdir(data_dir) 
+                  if os.path.isdir(os.path.join(data_dir, d, 'images'))]
+        st.info(f"📊 Labels: {', '.join(labels)}")
     else:
-        st.warning(f"Aucun pipeline enregistré trouvé dans le dossier '{save_dir_paths}'. Veuillez enregistrer un pipeline avant de le sélectionner.")
+        st.error("❌ Répertoire de données introuvable")
+        st.stop()
+    
+    st.divider()
+    
+    # Mode de sélection
+    mode = st.radio(
+        "Mode de travail:",
+        ["📂 Charger un pipeline existant", "🆕 Créer un nouveau pipeline"],
+        index=0
+    )
 
-if launch_button and loaded_pipeline is not None:         
-    container_Execution_Pipe = st.container(border=True)
-    with container_Execution_Pipe:
-        st.title(f"Exécution du pipeline : **{selected_pipeline}**")
+# ============================================================
+# MODE 1: CHARGER UN PIPELINE EXISTANT
+# ============================================================
+if mode == "📂 Charger un pipeline existant":
+    pkl_files = [f for f in os.listdir(save_dir_paths) if f.endswith('.pkl')]
+    
+    if not pkl_files:
+        st.warning(f"⚠️ Aucun pipeline trouvé dans `{save_dir_paths}`")
+        st.info("💡 Créez un nouveau pipeline ou utilisez le notebook pour en générer.")
+        st.stop()
+    
+    # Container sélection
+    container_selection = st.container(border=True)
+    with container_selection:
+        col1, col2 = st.columns([1, 2])
+        
+        with col1:
+            st.markdown("### 📋 Sélection")
+            selected_pipeline = st.selectbox(
+                "Pipeline enregistré:",
+                pkl_files,
+                help="Sélectionnez un pipeline .pkl"
+            )
+            
+            st.success(f"✅ **{selected_pipeline}**")
+            
+            load_button = st.button("🔍 Charger et Analyser", use_container_width=True)
+        
+        with col2:
+            st.markdown("### 📄 Détails du Pipeline")
+            
+            if load_button:
+                pipeline_path = os.path.join(save_dir_paths, selected_pipeline)
+                
+                try:
+                    with st.spinner("Chargement du pipeline..."):
+                        loaded_pipeline = joblib.load(pipeline_path)
+                        st.session_state.loaded_pipeline = loaded_pipeline
+                        st.session_state.pipeline_name = selected_pipeline
+                    
+                    st.success("✅ Pipeline chargé avec succès!")
+                    
+                    # Afficher les étapes
+                    st.markdown("**Étapes du pipeline:**")
+                    for i, (name, transformer) in enumerate(loaded_pipeline.steps, 1):
+                        st.code(f"{i}. {name}: {transformer.__class__.__name__}")
+                    
+                except Exception as e:
+                    st.error(f"❌ Erreur de chargement: {e}")
+                    st.session_state.loaded_pipeline = None
+    
+    # Exécution du pipeline chargé
+    if 'loaded_pipeline' in st.session_state and st.session_state.loaded_pipeline is not None:
         st.divider()
-        with st.spinner(f"Exécution du pipeline : **{selected_pipeline}** en cours..."):
-            # time.sleep(1)  # Simuler un délai pour l'effet visuel
-            # st.success(f"Exécution du pipeline : **{selected_pipeline}**")
-            # st.info("Chargement des données et exécution du pipeline en cours...")
-            X = loaded_pipeline.fit_transform(X=None)
-            st.divider()
-            st.success(f"Exécution du pipeline : **{selected_pipeline}** terminée avec succès!")
-            # st.info(f"Résultat de la transformation : {X.__class__} avec {len(X)} éléments.")             
+        
+        container_exec = st.container(border=True)
+        with container_exec:
+            st.markdown(f"### 🚀 Exécution: **{st.session_state.pipeline_name}**")
+            
+            col_exec1, col_exec2 = st.columns([1, 3])
+            
+            with col_exec1:
+                exec_button = st.button("▶️ Exécuter Pipeline", use_container_width=True, type="primary")
+            
+            with col_exec2:
+                if exec_button:
+                    progress_bar = st.progress(0)
+                    status_text = st.empty()
+                    
+                    try:
+                        status_text.text("📊 Chargement des données...")
+                        progress_bar.progress(20)
+                        
+                        status_text.text("🔄 Transformation en cours...")
+                        progress_bar.progress(40)
+                        
+                        # Exécution
+                        result = st.session_state.loaded_pipeline.fit_transform(None)
+                        
+                        progress_bar.progress(100)
+                        status_text.text("✅ Transformation terminée!")
+                        
+                        # Affichage des résultats
+                        st.success(f"✅ Pipeline exécuté avec succès!")
+                        
+                        # Analyser le résultat
+                        if isinstance(result, pd.DataFrame):
+                            st.info(f"📊 Résultat: DataFrame ({result.shape[0]} lignes, {result.shape[1]} colonnes)")
+                            
+                            with st.expander("Voir les données"):
+                                st.dataframe(result.head(10))
+                                
+                                # Statistiques
+                                if 'label' in result.columns:
+                                    st.markdown("**Distribution des labels:**")
+                                    label_counts = result['label'].value_counts()
+                                    st.bar_chart(label_counts)
+                        
+                        elif isinstance(result, np.ndarray):
+                            st.info(f"📊 Résultat: Numpy Array {result.shape}")
+                            st.text(f"Min: {result.min():.4f} | Max: {result.max():.4f} | Mean: {result.mean():.4f}")
+                        
+                        elif isinstance(result, dict):
+                            st.info(f"📊 Résultat: Dictionnaire (splits)")
+                            for key, value in result.items():
+                                if isinstance(value, tuple):
+                                    st.text(f"  - {key}: {len(value[0])} samples")
+                        
+                        else:
+                            st.info(f"📊 Résultat: {type(result).__name__}")
+                        
+                        # Sauvegarder dans session state
+                        st.session_state.pipeline_result = result
+                        
+                    except Exception as e:
+                        st.error(f"❌ Erreur d'exécution: {e}")
+                        import traceback
+                        with st.expander("Voir le traceback"):
+                            st.code(traceback.format_exc())
+
+# ============================================================
+# MODE 2: CRÉER UN NOUVEAU PIPELINE
+# ============================================================
+else:
+    container_create = st.container(border=True)
+    with container_create:
+        st.markdown("### 🆕 Création de Pipeline Personnalisé")
+        
+        # Configuration du pipeline
+        st.markdown("#### 1️⃣ Configuration générale")
+        col_config1, col_config2 = st.columns(2)
+        
+        with col_config1:
+            pipeline_name = st.text_input(
+                "Nom du pipeline:",
+                value="custom_pipeline",
+                help="Nom du fichier .pkl"
+            )
+            img_size = st.select_slider(
+                "Taille des images:",
+                options=[32, 64, 96, 128, 224, 256],
+                value=128
+            )
+        
+        with col_config2:
+            use_masks = st.checkbox("Utiliser les masques", value=False)
+            use_augmentation = st.checkbox("Augmentation de données", value=False)
+        
+        st.divider()
+        
+        # Sélection des transformateurs
+        st.markdown("#### 2️⃣ Sélection des transformateurs")
+        
+        col_trans1, col_trans2, col_trans3 = st.columns(3)
+        
+        with col_trans1:
+            st.markdown("**Preprocessing**")
+            do_resize = st.checkbox("ImageResizer", value=True)
+            do_normalize = st.checkbox("ImageNormalizer", value=True)
+            do_grayscale = st.checkbox("RGB → Grayscale", value=True)
+        
+        with col_trans2:
+            st.markdown("**Features**")
+            do_flatten = st.checkbox("ImageFlattener", value=False)
+            do_pca = st.checkbox("ImagePCA", value=False)
+            do_histogram = st.checkbox("ImageHistogram", value=False)
+            
+            if do_pca:
+                n_components = st.slider("Composantes PCA:", 10, 100, 50)
+            if do_histogram:
+                n_bins = st.slider("Bins histogram:", 8, 64, 32)
+        
+        with col_trans3:
+            st.markdown("**Utilities**")
+            do_split = st.checkbox("Train/Test Split", value=False)
+            do_save = st.checkbox("SaveTransformer", value=False)
+            
+            if do_split:
+                test_size = st.slider("Test size:", 0.1, 0.4, 0.2, 0.05)
+        
+        st.divider()
+        
+        # Construction du pipeline
+        st.markdown("#### 3️⃣ Pipeline à créer")
+        
+        # Construire la liste des étapes
+        pipeline_steps = [
+            ('loader', ImagePathLoader(root_dir=data_dir, verbose=True)),
+            ('tuple_to_df', TupleToDataFrame(verbose=True)),
+            ('analyzer', ImageAnalyser(
+                load_images=True,
+                analyze_masks=use_masks,
+                verbose=True
+            )),
+        ]
+        
+        if do_resize:
+            pipeline_steps.append(('resizer', ImageResizer(img_size=(img_size, img_size), verbose=True)))
+        
+        if do_normalize:
+            pipeline_steps.append(('normalizer', ImageNormalizer(verbose=True)))
+        
+        if use_augmentation:
+            pipeline_steps.append(('augmenter', ImageAugmenter(
+                flip_horizontal=True,
+                rotation_range=15,
+                brightness_range=0.2,
+                probability=0.5,
+                verbose=True
+            )))
+        
+        if use_masks:
+            pipeline_steps.append(('masker', ImageMasker(verbose=True)))
+        
+        if do_grayscale:
+            pipeline_steps.append(('gray', RGB_to_L(verbose=True)))
+        
+        if do_flatten:
+            pipeline_steps.append(('flattener', ImageFlattener(verbose=True)))
+        
+        if do_histogram:
+            pipeline_steps.append(('histogram', ImageHistogram(bins=n_bins if do_histogram else 32, verbose=True)))
+        
+        if do_pca and do_flatten:
+            pipeline_steps.append(('pca', ImagePCA(n_components=n_components if do_pca else 50, verbose=True)))
+        
+        if do_split:
+            pipeline_steps.append(('splitter', TrainTestSplitter(
+                test_size=test_size if do_split else 0.2,
+                random_state=42,
+                verbose=True
+            )))
+        
+        if do_save:
+            pipeline_steps.append(('saver', SaveTransformer(
+                save_dir='outputs',
+                prefix=pipeline_name,
+                verbose=True
+            )))
+        
+        # Afficher l'aperçu
+        st.code("\n".join([f"{i+1}. {name}: {step.__class__.__name__}" 
+                           for i, (name, step) in enumerate(pipeline_steps)]))
+        
+        # Boutons d'action
+        col_action1, col_action2 = st.columns(2)
+        
+        with col_action1:
+            create_button = st.button("🔧 Créer le Pipeline", use_container_width=True, type="primary")
+        
+        with col_action2:
+            if create_button:
+                try:
+                    # Créer le pipeline
+                    new_pipeline = Pipeline(pipeline_steps)
+                    
+                    # Sauvegarder
+                    pipeline_path = os.path.join(save_dir_paths, f"{pipeline_name}.pkl")
+                    joblib.dump(new_pipeline, pipeline_path)
+                    
+                    st.success(f"✅ Pipeline créé et sauvegardé: `{pipeline_name}.pkl`")
+                    st.session_state.created_pipeline = new_pipeline
+                    st.session_state.created_pipeline_name = pipeline_name
+                    
+                except Exception as e:
+                    st.error(f"❌ Erreur de création: {e}")             
     

@@ -10,6 +10,7 @@ the Jupyter notebooks, organized into logical categories:
 - Utilities: Visualization and saving transformers
 """
 
-from . import Pipelines  # noqa: F401
+# Les transformateurs V3 sont dans St_Pipeline/Transformateurs
+# Ils sont importés directement par les modules qui en ont besoin
 
-__all__ = ["Pipelines"]
+__all__ = []

@@ -22,6 +22,12 @@ from .SaveTransformer import SaveTransformer
 from .VisualizeTransformer import VisualizeTransformer
 from .TrainTestSplitter import TrainTestSplitter
 
+# Nouveaux transformateurs V4
+from .DatasetStatistics import DatasetStatistics
+from .ImageComparisonVisualizer import ImageComparisonVisualizer
+from .PCAVisualizer import PCAVisualizer
+from .HistogramVisualizer import HistogramVisualizer
+
 __all__ = [
     # Classes de base
     'BaseTransform',
@@ -51,4 +57,10 @@ __all__ = [
     'SaveTransformer',
     'VisualizeTransformer',
     'TrainTestSplitter',
+    
+    # Nouveaux transformateurs V4
+    'DatasetStatistics',
+    'ImageComparisonVisualizer',
+    'PCAVisualizer',
+    'HistogramVisualizer',
 ]

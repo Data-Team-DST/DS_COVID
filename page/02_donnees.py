@@ -178,11 +178,14 @@ def run():
         return
     detected_root = find_dataset_root(dataset_root)
     st.write(f"Racine détectée : `{detected_root}`")
+    
 
     # Classes
     classes = sorted([p.name for p in detected_root.iterdir() if looks_like_images(p)])
     if not classes: st.error("Aucune classe détectée."); return
     st.write(f"Classes détectées : {classes}")
+    st.session_state["detected_root"] = str(detected_root)
+    st.session_state["classes"] = classes
 
     # UI controls
     col1, col2, col3 = st.columns([2,1,1])

@@ -130,6 +130,23 @@ if mode == "📂 Charger un pipeline existant":
                 try:
                     with st.spinner("Chargement du pipeline..."):
                         loaded_pipeline = joblib.load(pipeline_path)
+            
+                        # Activer le mode Streamlit sur tous les transformateurs (récursif pour nested pipelines)
+                        def enable_streamlit_recursive(pipeline_obj):
+                            """Active use_streamlit=True récursivement sur tous les transformateurs."""
+                            if isinstance(pipeline_obj, Pipeline):
+                                for name, transformer in pipeline_obj.steps:
+                                    # Si c'est un nested pipeline, récurser
+                                    if isinstance(transformer, Pipeline):
+                                        enable_streamlit_recursive(transformer)
+                                    # Sinon, activer use_streamlit
+                                    elif hasattr(transformer, 'use_streamlit'):
+                                        transformer.use_streamlit = True
+                            elif hasattr(pipeline_obj, 'use_streamlit'):
+                                pipeline_obj.use_streamlit = True
+                        
+                        enable_streamlit_recursive(loaded_pipeline)
+            
                         st.session_state.loaded_pipeline = loaded_pipeline
                         st.session_state.pipeline_name = selected_pipeline
                     
@@ -159,21 +176,49 @@ if mode == "📂 Charger un pipeline existant":
             
             with col_exec2:
                 if exec_button:
-                    progress_bar = st.progress(0)
-                    status_text = st.empty()
+                    # Import du pipeline executor (direct, pas via __init__)
+                    import sys
+                    import os
+                    utils_path = os.path.join(project_root, 'src', 'utils')
+                    if utils_path not in sys.path:
+                        sys.path.insert(0, utils_path)
+                    from pipeline_executor import StreamlitPipelineExecutor
                     
                     try:
-                        status_text.text("📊 Chargement des données...")
-                        progress_bar.progress(20)
+                        # Créer l'exécuteur de pipeline
+                        executor = StreamlitPipelineExecutor(st.session_state.loaded_pipeline)
+                        total_steps = executor.get_total_steps()
                         
-                        status_text.text("🔄 Transformation en cours...")
-                        progress_bar.progress(40)
+                        # Barre de progression globale
+                        st.markdown("### 📊 Progression du Pipeline")
+                        overall_progress = st.progress(0)
+                        overall_status = st.empty()
                         
-                        # Exécution
-                        result = st.session_state.loaded_pipeline.fit_transform(None)
+                        st.divider()
+                        st.markdown("### 🔄 Exécution des Étapes")
                         
-                        progress_bar.progress(100)
-                        status_text.text("✅ Transformation terminée!")
+                        # Exécuter étape par étape avec UI
+                        result = None
+                        for step_idx, step_name, intermediate_result in executor.execute_with_ui(
+                            X=None,
+                            show_intermediate=False,
+                            show_step_progress=True
+                        ):
+                            # Mettre à jour la progression globale
+                            progress = (step_idx + 1) / total_steps
+                            overall_progress.progress(progress)
+                            overall_status.text(
+                                f"Progression globale: {int(progress * 100)}% "
+                                f"({step_idx + 1}/{total_steps} étapes complétées)"
+                            )
+                            
+                            result = intermediate_result
+                        
+                        # Finalisation
+                        overall_progress.progress(1.0)
+                        overall_status.success("✅ Toutes les étapes terminées!")
+                        
+                        st.divider()
                         
                         # Affichage des résultats
                         st.success(f"✅ Pipeline exécuté avec succès!")
@@ -280,20 +325,21 @@ else:
         
         # Construire la liste des étapes
         pipeline_steps = [
-            ('loader', ImagePathLoader(root_dir=data_dir, verbose=True)),
-            ('tuple_to_df', TupleToDataFrame(verbose=True)),
+            ('loader', ImagePathLoader(root_dir=data_dir, verbose=True, use_streamlit=True)),
+            ('tuple_to_df', TupleToDataFrame(verbose=True, use_streamlit=True)),
             ('analyzer', ImageAnalyser(
                 load_images=True,
                 analyze_masks=use_masks,
-                verbose=True
+                verbose=True,
+                use_streamlit=True
             )),
         ]
         
         if do_resize:
-            pipeline_steps.append(('resizer', ImageResizer(img_size=(img_size, img_size), verbose=True)))
+            pipeline_steps.append(('resizer', ImageResizer(img_size=(img_size, img_size), verbose=True, use_streamlit=True)))
         
         if do_normalize:
-            pipeline_steps.append(('normalizer', ImageNormalizer(verbose=True)))
+            pipeline_steps.append(('normalizer', ImageNormalizer(verbose=True, use_streamlit=True)))
         
         if use_augmentation:
             pipeline_steps.append(('augmenter', ImageAugmenter(
@@ -301,36 +347,39 @@ else:
                 rotation_range=15,
                 brightness_range=0.2,
                 probability=0.5,
-                verbose=True
+                verbose=True,
+                use_streamlit=True
             )))
         
         if use_masks:
-            pipeline_steps.append(('masker', ImageMasker(verbose=True)))
+            pipeline_steps.append(('masker', ImageMasker(verbose=True, use_streamlit=True)))
         
         if do_grayscale:
-            pipeline_steps.append(('gray', RGB_to_L(verbose=True)))
+            pipeline_steps.append(('gray', RGB_to_L(verbose=True, use_streamlit=True)))
         
         if do_flatten:
-            pipeline_steps.append(('flattener', ImageFlattener(verbose=True)))
+            pipeline_steps.append(('flattener', ImageFlattener(verbose=True, use_streamlit=True)))
         
         if do_histogram:
-            pipeline_steps.append(('histogram', ImageHistogram(bins=n_bins if do_histogram else 32, verbose=True)))
+            pipeline_steps.append(('histogram', ImageHistogram(bins=n_bins if do_histogram else 32, verbose=True, use_streamlit=True)))
         
         if do_pca and do_flatten:
-            pipeline_steps.append(('pca', ImagePCA(n_components=n_components if do_pca else 50, verbose=True)))
+            pipeline_steps.append(('pca', ImagePCA(n_components=n_components if do_pca else 50, verbose=True, use_streamlit=True)))
         
         if do_split:
             pipeline_steps.append(('splitter', TrainTestSplitter(
                 test_size=test_size if do_split else 0.2,
                 random_state=42,
-                verbose=True
+                verbose=True,
+                use_streamlit=True
             )))
         
         if do_save:
             pipeline_steps.append(('saver', SaveTransformer(
                 save_dir='outputs',
                 prefix=pipeline_name,
-                verbose=True
+                verbose=True,
+                use_streamlit=True
             )))
         
         # Afficher l'aperçu

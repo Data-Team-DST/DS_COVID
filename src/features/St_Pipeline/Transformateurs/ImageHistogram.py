@@ -55,15 +55,33 @@ class ImageHistogram(BaseTransform):
             self._log(f"Calcul des histogrammes ({self.bins} bins) pour {len(X)} images")
             
             histos = []
-            for idx, row in tqdm(X.iterrows(), total=len(X),
-                                desc=f"[{self.__class__.__name__}] Histogrammes",
-                                disable=not self.verbose):
-                img = row['image_array']
-                if img is not None:
-                    histo = np.histogram(img.flatten(), bins=self.bins, range=(0, 1))[0]
-                    histos.append(histo)
-                else:
-                    histos.append(np.zeros(self.bins))
+            total = len(X)
+            
+            if self.use_streamlit and self._progress_bar is not None:
+                # Mode Streamlit
+                for idx, (_, row) in enumerate(X.iterrows()):
+                    img = row['image_array']
+                    if img is not None:
+                        histo = np.histogram(img.flatten(), bins=self.bins, range=(0, 1))[0]
+                        histos.append(histo)
+                    else:
+                        histos.append(np.zeros(self.bins))
+                    
+                    if idx % 100 == 0 or idx == total - 1:
+                        progress = (idx + 1) / total
+                        self._update_progress(progress, f"Histogramme {idx + 1}/{total}")
+                self._clear_progress()
+            else:
+                # Mode console avec tqdm
+                for idx, row in tqdm(X.iterrows(), total=total,
+                                    desc=f"[{self.__class__.__name__}] Histogrammes",
+                                    disable=not self.verbose):
+                    img = row['image_array']
+                    if img is not None:
+                        histo = np.histogram(img.flatten(), bins=self.bins, range=(0, 1))[0]
+                        histos.append(histo)
+                    else:
+                        histos.append(np.zeros(self.bins))
             
             return np.array(histos)
         

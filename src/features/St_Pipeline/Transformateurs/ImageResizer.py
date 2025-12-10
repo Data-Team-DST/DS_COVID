@@ -69,15 +69,35 @@ class ImageResizer(BaseTransform):
             
             X_transformed = X.copy()
             resized_images = []
+            total = len(X)
             
-            for idx, row in tqdm(X.iterrows(), total=len(X),
-                                desc=f"[{self.__class__.__name__}] Redimensionnement",
-                                disable=not self.verbose):
-                img = row['image_array']
-                if img is not None:
-                    resized_images.append(self._resize_image(img))
-                else:
-                    resized_images.append(None)
+            # Choisir entre tqdm (console) et Streamlit progress
+            if self.use_streamlit and self._progress_bar is not None:
+                # Mode Streamlit avec barre de progression
+                for idx, (_, row) in enumerate(X.iterrows()):
+                    img = row['image_array']
+                    if img is not None:
+                        resized_images.append(self._resize_image(img))
+                    else:
+                        resized_images.append(None)
+                    
+                    # Mise à jour de la progression (tous les 10 items pour performance)
+                    if idx % 10 == 0 or idx == total - 1:
+                        progress = (idx + 1) / total
+                        self._update_progress(progress, f"Redimensionné {idx + 1}/{total} images")
+                
+                # Nettoyer la barre de progression
+                self._clear_progress()
+            else:
+                # Mode console avec tqdm
+                for idx, row in tqdm(X.iterrows(), total=total,
+                                    desc=f"[{self.__class__.__name__}] Redimensionnement",
+                                    disable=not self.verbose):
+                    img = row['image_array']
+                    if img is not None:
+                        resized_images.append(self._resize_image(img))
+                    else:
+                        resized_images.append(None)
             
             X_transformed['image_array'] = resized_images
             
@@ -88,9 +108,23 @@ class ImageResizer(BaseTransform):
             self._log(f"Redimensionnement de {len(X)} images en {self.img_size} (liste)")
             
             resized = []
-            for img in tqdm(X, desc=f"[{self.__class__.__name__}] Redimensionnement",
-                           disable=not self.verbose):
-                resized.append(self._resize_image(img))
+            total = len(X)
+            
+            if self.use_streamlit and self._progress_bar is not None:
+                # Mode Streamlit
+                for idx, img in enumerate(X):
+                    resized.append(self._resize_image(img))
+                    
+                    if idx % 10 == 0 or idx == total - 1:
+                        progress = (idx + 1) / total
+                        self._update_progress(progress, f"Redimensionné {idx + 1}/{total} images")
+                
+                self._clear_progress()
+            else:
+                # Mode console avec tqdm
+                for img in tqdm(X, desc=f"[{self.__class__.__name__}] Redimensionnement",
+                               disable=not self.verbose):
+                    resized.append(self._resize_image(img))
             
             return np.array(resized)
         
@@ -99,9 +133,23 @@ class ImageResizer(BaseTransform):
             self._log(f"Redimensionnement de {X.shape[0]} images en {self.img_size} (numpy array)")
             
             resized = []
-            for img in tqdm(X, desc=f"[{self.__class__.__name__}] Redimensionnement",
-                           disable=not self.verbose):
-                resized.append(self._resize_image(img))
+            total = X.shape[0]
+            
+            if self.use_streamlit and self._progress_bar is not None:
+                # Mode Streamlit
+                for idx, img in enumerate(X):
+                    resized.append(self._resize_image(img))
+                    
+                    if idx % 10 == 0 or idx == total - 1:
+                        progress = (idx + 1) / total
+                        self._update_progress(progress, f"Redimensionné {idx + 1}/{total} images")
+                
+                self._clear_progress()
+            else:
+                # Mode console avec tqdm
+                for img in tqdm(X, desc=f"[{self.__class__.__name__}] Redimensionnement",
+                               disable=not self.verbose):
+                    resized.append(self._resize_image(img))
             
             return np.array(resized)
         

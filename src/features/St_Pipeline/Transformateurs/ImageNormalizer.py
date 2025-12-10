@@ -54,15 +54,31 @@ class ImageNormalizer(BaseTransform):
             
             X_transformed = X.copy()
             norm_images = []
+            total = len(X)
             
-            for idx, row in tqdm(X.iterrows(), total=len(X),
-                                desc=f"[{self.__class__.__name__}] Normalisation",
-                                disable=not self.verbose):
-                img = row['image_array']
-                if img is not None:
-                    norm_images.append(self._normalize_image(img))
-                else:
-                    norm_images.append(None)
+            if self.use_streamlit and self._progress_bar is not None:
+                # Mode Streamlit
+                for idx, (_, row) in enumerate(X.iterrows()):
+                    img = row['image_array']
+                    if img is not None:
+                        norm_images.append(self._normalize_image(img))
+                    else:
+                        norm_images.append(None)
+                    
+                    if idx % 100 == 0 or idx == total - 1:
+                        progress = (idx + 1) / total
+                        self._update_progress(progress, f"Normalisé {idx + 1}/{total}")
+                self._clear_progress()
+            else:
+                # Mode console avec tqdm
+                for idx, row in tqdm(X.iterrows(), total=total,
+                                    desc=f"[{self.__class__.__name__}] Normalisation",
+                                    disable=not self.verbose):
+                    img = row['image_array']
+                    if img is not None:
+                        norm_images.append(self._normalize_image(img))
+                    else:
+                        norm_images.append(None)
             
             X_transformed['image_array'] = norm_images
             

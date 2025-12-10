@@ -93,22 +93,39 @@ class ImagePathLoader(BaseTransform):
         
         self._log(f"Labels trouvés : {labels_list}")
         
-        # Parcourir chaque label avec tqdm
-        for label in tqdm(labels_list, desc=f"[{self.__class__.__name__}] Scan labels", 
-                         disable=not self.verbose):
-            class_img_dir = os.path.join(self.root_dir, label, 'images')
-            class_mask_dir = os.path.join(self.root_dir, label, 'masks')
-            
-            # Parcourir les images du label
-            for img_path in glob.glob(os.path.join(class_img_dir, '*.png')):
-                filename = os.path.basename(img_path)
-                mask_path = os.path.join(class_mask_dir, filename)
+        # Parcourir chaque label avec progression
+        total_labels = len(labels_list)
+        if self.use_streamlit and self._progress_bar is not None:
+            # Mode Streamlit
+            for idx, label in enumerate(labels_list):
+                class_img_dir = os.path.join(self.root_dir, label, 'images')
+                class_mask_dir = os.path.join(self.root_dir, label, 'masks')
                 
-                # Vérifier que le masque existe
-                if os.path.exists(mask_path):
-                    image_paths.append(img_path)
-                    mask_paths.append(mask_path)
-                    labels.append(label.lower())
+                for img_path in glob.glob(os.path.join(class_img_dir, '*.png')):
+                    filename = os.path.basename(img_path)
+                    mask_path = os.path.join(class_mask_dir, filename)
+                    if os.path.exists(mask_path):
+                        image_paths.append(img_path)
+                        mask_paths.append(mask_path)
+                        labels.append(label.lower())
+                
+                progress = (idx + 1) / total_labels
+                self._update_progress(progress, f"Scanné {idx + 1}/{total_labels} labels")
+            self._clear_progress()
+        else:
+            # Mode console avec tqdm
+            for label in tqdm(labels_list, desc=f"[{self.__class__.__name__}] Scan labels", 
+                             disable=not self.verbose):
+                class_img_dir = os.path.join(self.root_dir, label, 'images')
+                class_mask_dir = os.path.join(self.root_dir, label, 'masks')
+                
+                for img_path in glob.glob(os.path.join(class_img_dir, '*.png')):
+                    filename = os.path.basename(img_path)
+                    mask_path = os.path.join(class_mask_dir, filename)
+                    if os.path.exists(mask_path):
+                        image_paths.append(img_path)
+                        mask_paths.append(mask_path)
+                        labels.append(label.lower())
         
         # Stocker l'état (attributs avec underscore = fitted)
         self.image_paths_ = image_paths

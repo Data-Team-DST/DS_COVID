@@ -146,6 +146,11 @@ class BaseTransform(ABC):
         self.verbose = verbose
         self.use_streamlit = use_streamlit
         self._logger = None
+        
+        # Containers Streamlit pour progression intra-transformateur (Phase 2)
+        self._progress_container = None
+        self._progress_bar = None
+        self._status_text = None
     
     @property
     def logger(self) -> TransformLogger:
@@ -230,6 +235,86 @@ class BaseTransform(ABC):
             self.logger.error(message)
         else:
             self.logger.info(message)
+    
+    def set_progress_container(self, container: Any) -> None:
+        """
+        Injection d'un container Streamlit pour le reporting de progression.
+        
+        Cette méthode permet au StreamlitPipelineExecutor d'injecter un container
+        où le transformateur peut afficher sa progression en temps réel.
+        
+        Args:
+            container: Container Streamlit (st.empty() ou st.container())
+        
+        Note:
+            Les containers ne sont PAS sauvegardés lors de la sérialisation pickle.
+            Ils sont injectés dynamiquement à l'exécution.
+        """
+        self._progress_container = container
+        
+        # Créer les widgets de progression si Streamlit est actif
+        if container and self.use_streamlit:
+            try:
+                import streamlit as st
+                # st.empty() ne peut contenir qu'un seul élément à la fois
+                # On va alterner entre progress bar et texte dans le même container
+                # Pour l'instant, initialiser avec une progress bar
+                self._progress_bar = container
+                self._status_text = None  # On utilisera le même container pour le texte
+                self._last_text = ""
+            except Exception as e:
+                # En cas d'erreur (ex: pas dans contexte Streamlit), ignorer
+                self._progress_bar = None
+                self._status_text = None
+    
+    def _update_progress(self, value: float, text: str = "") -> None:
+        """
+        Met à jour la barre de progression Streamlit.
+        
+        Cette méthode peut être appelée dans les boucles de traitement pour
+        afficher la progression en temps réel dans l'interface Streamlit.
+        
+        Args:
+            value: Valeur de progression entre 0.0 et 1.0
+            text: Texte de statut à afficher (optionnel)
+        
+        Example:
+            for i, item in enumerate(items):
+                # Traiter item
+                progress = (i + 1) / len(items)
+                self._update_progress(progress, f"Traité {i+1}/{len(items)}")
+        """
+        # Clamper la valeur entre 0 et 1
+        clamped_value = min(max(value, 0.0), 1.0)
+        
+        # Mettre à jour la barre de progression avec texte
+        if self._progress_bar is not None:
+            try:
+                # Utiliser progress() avec texte si disponible
+                if text:
+                    self._progress_bar.progress(clamped_value, text=text)
+                else:
+                    self._progress_bar.progress(clamped_value)
+            except Exception:
+                pass  # Ignorer les erreurs (widget détruit, etc.)
+    
+    def _clear_progress(self) -> None:
+        """
+        Efface les widgets de progression après l'exécution.
+        
+        Appeler cette méthode à la fin de _process() pour nettoyer l'interface.
+        """
+        if self._progress_bar is not None:
+            try:
+                self._progress_bar.empty()
+            except Exception:
+                pass
+        
+        if self._status_text is not None:
+            try:
+                self._status_text.empty()
+            except Exception:
+                pass
     
     def visualize(self, X_before: Any, X_after: Any, n_samples: int = 3) -> None:
         """

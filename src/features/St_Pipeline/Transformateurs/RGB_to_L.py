@@ -65,15 +65,31 @@ class RGB_to_L(BaseTransform):
             
             X_transformed = X.copy()
             gray_images = []
+            total = len(X)
             
-            for idx, row in tqdm(X.iterrows(), total=len(X),
-                                desc=f"[{self.__class__.__name__}] RGB → L",
-                                disable=not self.verbose):
-                img = row['image_array']
-                if img is not None:
-                    gray_images.append(self._convert_image(img))
-                else:
-                    gray_images.append(None)
+            if self.use_streamlit and self._progress_bar is not None:
+                # Mode Streamlit
+                for idx, (_, row) in enumerate(X.iterrows()):
+                    img = row['image_array']
+                    if img is not None:
+                        gray_images.append(self._convert_image(img))
+                    else:
+                        gray_images.append(None)
+                    
+                    if idx % 100 == 0 or idx == total - 1:
+                        progress = (idx + 1) / total
+                        self._update_progress(progress, f"Converti {idx + 1}/{total}")
+                self._clear_progress()
+            else:
+                # Mode console avec tqdm
+                for idx, row in tqdm(X.iterrows(), total=total,
+                                    desc=f"[{self.__class__.__name__}] RGB → L",
+                                    disable=not self.verbose):
+                    img = row['image_array']
+                    if img is not None:
+                        gray_images.append(self._convert_image(img))
+                    else:
+                        gray_images.append(None)
             
             X_transformed['image_array'] = gray_images
             

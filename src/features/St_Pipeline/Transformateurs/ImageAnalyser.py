@@ -91,21 +91,43 @@ class ImageAnalyser(BaseTransform):
         mask_dims = []
         file_sizes = []
         
-        for idx, row in tqdm(X.iterrows(), total=len(X),
-                            desc=f"[{self.__class__.__name__}] Analyse métadonnées",
-                            disable=not self.verbose):
-            try:
-                # Analyse de l'image (métadonnées uniquement)
-                with Image.open(row['image_path']) as img:
-                    image_dims.append(img.size)  # (width, height)
-                    file_sizes.append(os.path.getsize(row['image_path']))
+        total = len(X)
+        if self.use_streamlit and self._progress_bar is not None:
+            # Mode Streamlit
+            for idx, (_, row) in enumerate(X.iterrows()):
+                try:
+                    with Image.open(row['image_path']) as img:
+                        image_dims.append(img.size)
+                        file_sizes.append(os.path.getsize(row['image_path']))
+                    
+                    if self.analyze_masks and 'mask_path' in row and pd.notna(row['mask_path']):
+                        with Image.open(row['mask_path']) as mask:
+                            mask_dims.append(mask.size)
+                except Exception as e:
+                    if self.verbose:
+                        self._log(f"Erreur: {e}", level="warning")
                 
-                # Analyse du masque
-                if self.analyze_masks and 'mask_path' in row and pd.notna(row['mask_path']):
-                    with Image.open(row['mask_path']) as mask:
-                        mask_dims.append(mask.size)
-            except Exception as e:
-                self._log(f"Erreur: {row['image_path']}: {e}", level="warning")
+                if idx % 100 == 0 or idx == total - 1:
+                    progress = (idx + 1) / total
+                    self._update_progress(progress, f"Analysé {idx + 1}/{total}")
+            self._clear_progress()
+        else:
+            # Mode console avec tqdm
+            for idx, row in tqdm(X.iterrows(), total=total,
+                                desc=f"[{self.__class__.__name__}] Analyse métadonnées",
+                                disable=not self.verbose):
+                try:
+                    # Analyse de l'image (métadonnées uniquement)
+                    with Image.open(row['image_path']) as img:
+                        image_dims.append(img.size)  # (width, height)
+                        file_sizes.append(os.path.getsize(row['image_path']))
+                    
+                    # Analyse du masque
+                    if self.analyze_masks and 'mask_path' in row and pd.notna(row['mask_path']):
+                        with Image.open(row['mask_path']) as mask:
+                            mask_dims.append(mask.size)
+                except Exception as e:
+                    self._log(f"Erreur: {row['image_path']}: {e}", level="warning")
         
         # Statistiques des dimensions
         self.stats_['image_dimensions'] = Counter(image_dims)
@@ -162,36 +184,66 @@ class ImageAnalyser(BaseTransform):
         std_intensities = []
         channels_info = []
         
-        for idx, row in tqdm(X.iterrows(), total=len(X),
-                            desc=f"[{self.__class__.__name__}] Chargement images",
-                            disable=not self.verbose):
-            try:
-                # Charger l'image
-                img = Image.open(row['image_path'])
-                img_array = np.array(img)
-                images_array.append(img_array)
-                
-                # Statistiques de l'image
-                mean_intensities.append(img_array.mean())
-                std_intensities.append(img_array.std())
-                channels_info.append(
-                    img_array.shape[-1] if len(img_array.shape) == 3 else 1
-                )
-                
-                # Charger le masque si demandé
-                if (self.analyze_masks and 'mask_path' in row 
-                    and pd.notna(row['mask_path'])):
-                    mask = Image.open(row['mask_path'])
-                    masks_array.append(np.array(mask))
-                else:
+        total = len(X)
+        if self.use_streamlit and self._progress_bar is not None:
+            # Mode Streamlit
+            for idx, (_, row) in enumerate(X.iterrows()):
+                try:
+                    img = Image.open(row['image_path'])
+                    img_array = np.array(img)
+                    images_array.append(img_array)
+                    mean_intensities.append(img_array.mean())
+                    std_intensities.append(img_array.std())
+                    channels_info.append(img_array.shape[-1] if len(img_array.shape) == 3 else 1)
+                    
+                    if self.analyze_masks and 'mask_path' in row and pd.notna(row['mask_path']):
+                        mask = Image.open(row['mask_path'])
+                        masks_array.append(np.array(mask))
+                    else:
+                        masks_array.append(None)
+                except Exception as e:
+                    images_array.append(None)
                     masks_array.append(None)
-            except Exception as e:
-                self._log(f"Erreur: {row['image_path']}: {e}", level="warning")
-                images_array.append(None)
-                masks_array.append(None)
-                mean_intensities.append(np.nan)
-                std_intensities.append(np.nan)
-                channels_info.append(np.nan)
+                    mean_intensities.append(None)
+                    std_intensities.append(None)
+                    channels_info.append(None)
+                
+                if idx % 50 == 0 or idx == total - 1:
+                    progress = (idx + 1) / total
+                    self._update_progress(progress, f"Chargé {idx + 1}/{total}")
+            self._clear_progress()
+        else:
+            # Mode console avec tqdm
+            for idx, row in tqdm(X.iterrows(), total=total,
+                                desc=f"[{self.__class__.__name__}] Chargement images",
+                                disable=not self.verbose):
+                try:
+                    # Charger l'image
+                    img = Image.open(row['image_path'])
+                    img_array = np.array(img)
+                    images_array.append(img_array)
+                    
+                    # Statistiques de l'image
+                    mean_intensities.append(img_array.mean())
+                    std_intensities.append(img_array.std())
+                    channels_info.append(
+                        img_array.shape[-1] if len(img_array.shape) == 3 else 1
+                    )
+                    
+                    # Charger le masque si demandé
+                    if (self.analyze_masks and 'mask_path' in row 
+                        and pd.notna(row['mask_path'])):
+                        mask = Image.open(row['mask_path'])
+                        masks_array.append(np.array(mask))
+                    else:
+                        masks_array.append(None)
+                except Exception as e:
+                    self._log(f"Erreur: {row['image_path']}: {e}", level="warning")
+                    images_array.append(None)
+                    masks_array.append(None)
+                    mean_intensities.append(np.nan)
+                    std_intensities.append(np.nan)
+                    channels_info.append(np.nan)
         
         # Enrichir le DataFrame
         X_transformed['image_array'] = images_array

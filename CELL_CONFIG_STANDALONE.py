@@ -11,14 +11,13 @@ INSTRUCTIONS:
 4. Les variables sont prêtes à l'emploi !
 
 Cette cellule est 100% autonome et fonctionne partout :
-✅ Google Colab (clone + installe automatiquement)
-✅ WSL / Linux Local
-✅ Tout environnement Jupyter
+✅ Google Colab (clone repo + mount Drive automatiquement)
+✅ Jupyter Local (notebook en local)
 
 APRÈS EXÉCUTION, VOUS POUVEZ UTILISER:
-- config: Objet de configuration (config.batch_size, config.data_dir, etc.)
-- ENV: Environnement détecté ('colab', 'wsl', 'local')
-- Tous les imports des transformers
+- project_root, data_dir, categories: Chemins et configuration
+- ENV: Environnement détecté ('colab' ou 'local')
+- Tous les transformateurs importés et prêts à l'emploi
 
 """
 
@@ -37,13 +36,12 @@ from pathlib import Path
 # =============================================================================
 
 def detect_environment():
-    """Détecte l'environnement (colab, wsl, local)"""
+    """Détecte l'environnement : colab ou local"""
     try:
         import google.colab
         return "colab"
     except ImportError:
-        is_wsl = os.path.exists('/proc/version') and 'microsoft' in open('/proc/version').read().lower()
-        return "wsl" if is_wsl else "local"
+        return "local"
 
 ENV = detect_environment()
 print(f"🌍 Environnement: {ENV.upper()}")
@@ -74,32 +72,30 @@ if ENV == "colab":
         subprocess.run(['git', 'checkout', 'rafael2'], capture_output=True)
     
     # ✅ Colab a déjà tous les packages nécessaires
-    print("✅ Utilisation des packages Colab natifs:")
-    print("   • NumPy, Pandas, Matplotlib")
-    print("   • scikit-learn, scipy")
-    print("   • Pillow, tqdm")
-
+    print("✅ Utilisation des packages Colab natifs")
     
-    # Optionnel : Montage Google Drive pour le dataset
-    try:
-        print("💾 Montage Google Drive...")
-        from google.colab import drive
-        drive.mount('/content/drive')
-        
-        # Vérifier si le dataset est disponible sur Drive
-        drive_dataset = Path('/content/drive/MyDrive/DS_COVID/archive_covid.zip')
-        if drive_dataset.exists():
-            print("📦 Extraction dataset depuis Drive...")
-            os.makedirs('./data/raw/', exist_ok=True)
-            subprocess.run(['unzip', '-o', '-q', str(drive_dataset), '-d', './data/raw/'])
-            print("✅ Dataset extrait")
-        else:
-            print(f"⚠️ Dataset non trouvé sur Drive: {drive_dataset}")
-            print("   Vous pouvez télécharger le dataset manuellement")
-    except Exception as e:
-        print(f"⚠️ Drive non monté: {e}")
+    # Montage Google Drive pour le dataset
+    print("\n💾 Montage Google Drive...")
+    from google.colab import drive
+    drive.mount('/content/drive', force_remount=False)
     
-    print("✅ Bootstrap Colab terminé")
+    # Vérifier le dataset sur Drive
+    drive_dataset = Path('/content/drive/MyDrive/DS_COVID/archive_covid.zip')
+    local_dataset = Path('./data/raw/COVID-19_Radiography_Dataset/COVID-19_Radiography_Dataset')
+    
+    if local_dataset.exists():
+        print("✅ Dataset déjà extrait localement")
+    elif drive_dataset.exists():
+        print("📦 Extraction dataset depuis Drive...")
+        os.makedirs('./data/raw/', exist_ok=True)
+        subprocess.run(['unzip', '-o', '-q', str(drive_dataset), '-d', './data/raw/'], check=True)
+        print("✅ Dataset extrait")
+    else:
+        print(f"⚠️ Dataset non trouvé sur Drive: {drive_dataset}")
+        print("   💡 Téléchargez depuis Kaggle et uploadez sur Drive")
+        print("   https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database")
+    
+    print("\n✅ Bootstrap Colab terminé")
 
 
 # =============================================================================
@@ -109,13 +105,11 @@ if ENV == "colab":
 # Déterminer project_root selon l'environnement
 if ENV == "colab":
     project_root = Path('/content/DS_COVID_ORGA')
-elif ENV == "wsl":
-    project_root = Path('/home/cepa/DST/projet_DS/DS_COVID_ORGA')
 else:  # local
-    # Depuis un notebook dans notebooks/
+    # Depuis un notebook dans notebooks/ ou à la racine
     project_root = Path.cwd().parent if Path.cwd().name == 'notebooks' else Path.cwd()
 
-# Ajouter le projet au sys.path pour les imports
+# Ajouter au sys.path pour les imports
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
     print(f"✅ Chemin projet ajouté: {project_root}")
@@ -123,9 +117,9 @@ if str(project_root) not in sys.path:
 # Configuration manuelle (pas de fichier config.py dans ce projet)
 data_dir = project_root / 'data' / 'raw' / 'COVID-19_Radiography_Dataset' / 'COVID-19_Radiography_Dataset'
 categories = ['COVID', 'Lung_Opacity', 'Normal', 'Viral Pneumonia']
-img_size = (299, 299)
-batch_size = 32
-epochs = 10
+img_size = (299, 299) if ENV == "colab" else (128, 128)  # Plus grand en colab
+batch_size = 128 if ENV == "colab" else 32  # Plus grand batch en colab
+epochs = 50 if ENV == "colab" else 10  # Moins d'époques en local pour tests rapides
 
 print(f"📂 Dataset configuré: {data_dir}")
 print(f"🏷️ Classes: {', '.join(categories)}")

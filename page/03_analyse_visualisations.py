@@ -19,6 +19,11 @@ try:
 except Exception:
     TORCH_AVAILABLE = False
 
+if TORCH_AVAILABLE:
+    import torch
+    torch.set_num_threads(1)   # limite threads CPU si problème de CPU contention
+
+
 try:
     import umap
     UMAP_AVAILABLE = True
@@ -245,27 +250,50 @@ def run_full_dataset_scan(root: Path, classes: List[str], include_masks: bool = 
     return results
 
 # ---------------- Embeddings (optional) ----------------
-def extract_embeddings(paths: List[str], device: str = "cpu") -> np.ndarray:
-    """Extrait embeddings via un backbone ResNet18 (si torch disponible)."""
+def extract_embeddings(paths: List[str], device: str = "cpu", batch_size: int = 16) -> np.ndarray:
+    """Extrait embeddings via un backbone ResNet18 (si torch disponible).
+    Batché, safe pour CPU. Retourne array shape (N, feat_dim).
+    """
     if not TORCH_AVAILABLE:
         raise RuntimeError("PyTorch non disponible.")
+    import torch
+    from torchvision import models, transforms as T
+
+    # modèle léger (ResNet18) sans fc
     model = models.resnet18(pretrained=True)
-    model = torch.nn.Sequential(*list(model.children())[:-1])  # remove FC
+    model = torch.nn.Sequential(*list(model.children())[:-1])  # output (B,512,1,1)
     model.eval()
     model.to(device)
-    transform = T.Compose([T.Resize((224,224)), T.ToTensor(),
-                           T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])])
-    feats = []
-    with torch.no_grad():
-        for p in paths:
+
+    transform = T.Compose([
+        T.Resize((224,224)),
+        T.ToTensor(),
+        T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])
+    ])
+
+    feats_list = []
+    # process in batches to avoid OOM on CPU
+    for i in range(0, len(paths), batch_size):
+        batch_paths = paths[i:i+batch_size]
+        imgs = []
+        for p in batch_paths:
             try:
-                img = Image.open(p).convert("RGB")
-                t = transform(img).unsqueeze(0).to(device)
-                out = model(t).squeeze().cpu().numpy()
-                feats.append(out.reshape(-1))
+                im = Image.open(p).convert("RGB")
+                imgs.append(transform(im))
             except Exception:
-                feats.append(np.zeros((512,), dtype=float))
-    return np.vstack(feats)
+                # if image unreadable, push zero tensor
+                imgs.append(torch.zeros((3,224,224), dtype=torch.float32))
+        x = torch.stack(imgs, dim=0).to(device)
+        with torch.no_grad():
+            out = model(x)  # shape (B, feat, 1, 1)
+            out = out.reshape(out.size(0), -1).cpu().numpy()  # (B, feat_dim)
+        feats_list.append(out)
+    if feats_list:
+        return np.vstack(feats_list)
+    else:
+        # fallback empty
+        return np.zeros((0, 512), dtype=float)
+
 
 # ---------------- UI ----------------
 def run():
@@ -534,8 +562,8 @@ def run():
         # pick up to 200 images for embedding to keep light
         emb_paths = [e["path"] for e in per_image][:200]
         if TORCH_AVAILABLE:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            feats = extract_embeddings(emb_paths, device=device)
+            device = "cpu"
+            feats = extract_embeddings(emb_paths, device=device, batch_size=8)
             if UMAP_AVAILABLE:
                 reducer = umap.UMAP(n_components=2, random_state=42)
                 emb2 = reducer.fit_transform(feats)

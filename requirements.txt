@@ -43,3 +43,7 @@ streamlit-extras>=0.7.8
 
 # Kaggle helper (optional)
 kagglehub>=0.3.13
+
+# Torch for embeddings (optional)
+torch>=2.9.1
+torchvision>=0.24.1

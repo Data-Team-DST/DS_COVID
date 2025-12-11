@@ -87,8 +87,8 @@ if ENV == "colab":
         print("✅ Dataset déjà extrait localement")
     elif drive_dataset.exists():
         print("📦 Extraction dataset depuis Drive...")
-        os.makedirs('./data/raw/', exist_ok=True)
-        subprocess.run(['unzip', '-o', '-q', str(drive_dataset), '-d', './data/raw/'], check=True)
+        os.makedirs('./data/raw/COVID-19_Radiography_Dataset/', exist_ok=True)
+        subprocess.run(['unzip', '-o', '-q', str(drive_dataset), '-d', './data/raw/COVID-19_Radiography_Dataset/'], check=True)
         print("✅ Dataset extrait")
     else:
         print(f"⚠️ Dataset non trouvé sur Drive: {drive_dataset}")

@@ -115,14 +115,14 @@ if str(project_root) not in sys.path:
     print(f"✅ Chemin projet ajouté: {project_root}")
 
 # Configuration manuelle (pas de fichier config.py dans ce projet)
-data_dir = project_root / 'data' / 'raw' / 'COVID-19_Radiography_Dataset' / 'COVID-19_Radiography_Dataset'
-categories = ['COVID', 'Lung_Opacity', 'Normal', 'Viral Pneumonia']
-img_size = (299, 299) if ENV == "colab" else (128, 128)  # Plus grand en colab
-batch_size = 128 if ENV == "colab" else 32  # Plus grand batch en colab
-epochs = 50 if ENV == "colab" else 10  # Moins d'époques en local pour tests rapides
+DATA_DIR = project_root / 'data' / 'raw' / 'COVID-19_Radiography_Dataset' / 'COVID-19_Radiography_Dataset'
+CATEGORIES = ['COVID', 'Lung_Opacity', 'Normal', 'Viral Pneumonia']
+IMG_SIZE = (299, 299) if ENV == "colab" else (128, 128)  # Plus grand en colab
+BATCH_SIZE = 128 if ENV == "colab" else 32  # Plus grand batch en colab
+EPOCHS = 50 if ENV == "colab" else 10  # Moins d'époques en local pour tests rapides
 
-print(f"📂 Dataset configuré: {data_dir}")
-print(f"🏷️ Classes: {', '.join(categories)}")
+print(f"📂 Dataset configuré: {DATA_DIR}")
+print(f"🏷️ Classes: {', '.join(CATEGORIES)}")
 
 
 # =============================================================================
@@ -176,13 +176,13 @@ print("\n" + "=" * 70)
 print("✅ CONFIGURATION PRÊTE - DS_COVID Project")
 print("=" * 70)
 print(f"📂 Projet: {project_root}")
-print(f"📊 Dataset: {data_dir}")
-print(f"🏷️ Classes: {', '.join(categories)}")
-print(f"🎛️ Images: {img_size}")
-print(f"🔧 Batch: {batch_size} | Époques: {epochs}")
-print(f"📐 Dataset accessible: {'✅' if data_dir.exists() else '❌'}")
-if not data_dir.exists():
-    print(f"   ⚠️ Le dataset doit être placé dans: {data_dir}")
+print(f"📊 Dataset: {DATA_DIR}")
+print(f"🏷️ Classes: {', '.join(CATEGORIES)}")
+print(f"🎛️ Images: {IMG_SIZE}")
+print(f"🔧 Batch: {BATCH_SIZE} | Époques: {EPOCHS}")
+print(f"📐 Dataset accessible: {'✅' if DATA_DIR.exists() else '❌'}")
+if not DATA_DIR.exists():
+    print(f"   ⚠️ Le dataset doit être placé dans: {DATA_DIR}")
     if ENV == "colab":
         print(f"   💡 Uploadez archive_covid.zip sur Google Drive ou téléchargez directement")
 print("=" * 70)

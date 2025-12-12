@@ -120,6 +120,7 @@ CATEGORIES = ['COVID', 'Lung_Opacity', 'Normal', 'Viral Pneumonia']
 IMG_SIZE = (299, 299) if ENV == "colab" else (128, 128)  # Plus grand en colab
 BATCH_SIZE = 128 if ENV == "colab" else 32  # Plus grand batch en colab
 EPOCHS = 50 if ENV == "colab" else 10  # Moins d'époques en local pour tests rapides
+MAX_SAMPLES_PER_CLASS = None if ENV == "colab" else 100 # Pour tests rapides, None pour tout utiliser
 
 print(f"📂 Dataset configuré: {DATA_DIR}")
 print(f"🏷️ Classes: {', '.join(CATEGORIES)}")
@@ -160,6 +161,22 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow import keras
+import pandas as pd
+from collections import Counter
+from tqdm import tqdm
+import warnings
+warnings.filterwarnings('ignore')
+
+# Imports ML pour les métriques et modèles
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    accuracy_score, balanced_accuracy_score, f1_score,
+    classification_report, confusion_matrix, precision_score, recall_score
+)
+
+# Configuration supplémentaire pour les plots
+plt.style.use('seaborn-v0_8-darkgrid')
+sns.set_palette("husl")
 
 # =============================================================================
 # CONFIGURATION MATPLOTLIB

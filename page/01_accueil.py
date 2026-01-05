@@ -49,25 +49,27 @@ GLOSSARY_LONG_FR = {
     "CXR": (
         "La radiographie thoracique (CXR) est un examen d'imagerie de projection, "
         "généralement réalisé en vues frontale et/ou latérale, permettant d'examiner rapidement "
-        "les poumons, le cœur et la cage thoracique. "
+        "les poumons, le cœur et la cage thoracique, à l'aide de rayons X. "
         "Elle est largement disponible, peu coûteuse et rapide à effectuer, ce qui la rend adaptée "
         "au triage initial des patients suspectés d'atteinte pulmonaire. "
         "Même si sa sensibilité est inférieure à celle de la tomodensitométrie pour certaines lésions, "
         "la CXR demeure une étape clinique essentielle dans de nombreux flux de diagnostic."
     ),
     "CT": (
-        "La tomodensitométrie (CT) produit des images en coupes successives du thorax avec une résolution spatiale élevée. "
+        "La tomodensitométrie (CT) produit des images en coupes successives du thorax avec une résolution spatiale élevée, également "
+        "à l'aide de rayons X. "
         "Elle permet une exploration très détaillée des structures pulmonaires et cardiaques, détectant souvent "
         "des anomalies que la radiographie simple peut manquer. "
         "Son emploi est toutefois limité par la disponibilité de l'appareillage, le coût et l'exposition "
         "accumulée aux radiations ionisantes pour le patient."
     ),
     "RT-PCR": (
-        "La RT-PCR est une méthode moléculaire qui convertit l'ARN viral en ADN complémentaire puis amplifie "
+        "La RT-PCR est une méthode moléculaire qui convertit l'ARN viral en ADN complémentaire (transcription inverse) puis amplifie "
         "des séquences cibles afin de détecter la présence du virus. "
-        "C'est la méthode de référence pour le diagnostic de la COVID-19 en raison de sa sensibilité analytique élevée. "
-        "Ses limites pratiques incluent le temps de traitement, la dépendance aux conditions d'échantillonnage et "
-        "la nécessité d'infrastructures de laboratoire."
+        "C'est la méthode de référence pour le diagnostic de la COVID-19 en raison de sa sensibilité analytique \"moyenne/élevée\" "
+        "(seulement 70\\% en conditions réelles selon certaines études, loin des 95\\% théoriques, en conditions optimales). "
+        "Ses limites pratiques incluent le coût, le temps de traitement, les ruptures de stock et pénuries, la dépendance aux conditions d'échantillonnage et "
+        "la nécessité d'infrastructures de laboratoire et de personnel qualifié."
     ),
     "AUC": (
         "L'aire sous la courbe ROC (AUC) résume la performance discriminante d'un classifieur indépendamment "
@@ -98,17 +100,20 @@ GLOSSARY_LONG_FR = {
 # Définitions longues EN
 GLOSSARY_LONG_EN = {
     "CXR": (
-        "Chest X-Ray (CXR) is a projection radiograph acquired in frontal and/or lateral views to visualize the lungs, heart and thoracic cage. "
+        "Chest X-Ray (CXR) is a projection radiograph acquired in frontal and/or lateral views to visualize the lungs, heart and thoracic cage, using X-rays. "
         "It is fast, widely available and cost-effective, making it ideal for initial screening and triage in many clinical settings. "
         "While less sensitive than CT for certain lesions, CXR remains an essential first-line imaging modality in routine care."
     ),
     "CT": (
-        "Computed Tomography (CT) provides cross-sectional imaging with high spatial resolution, enabling detailed assessment of pulmonary parenchyma. "
+        "Computed Tomography (CT) provides cross-sectional imaging with high spatial resolution, also using X-rays, enabling detailed assessment of pulmonary parenchyma. "
         "CT is highly sensitive for detecting small consolidations and interstitial disease, but requires specialized equipment and involves higher radiation exposure."
     ),
     "RT-PCR": (
-        "Reverse Transcription Polymerase Chain Reaction (RT-PCR) is a molecular assay converting viral RNA to DNA and amplifying target sequences for detection. "
-        "RT-PCR is the reference standard for diagnosing SARS-CoV-2 due to its high analytical sensitivity, though it requires laboratory infrastructure and time to return results."
+        "Reverse Transcription Polymerase Chain Reaction (RT-PCR) is a molecular assay converting viral RNA to DNA (reverse transcription) and amplifying target sequences for detection. "
+        "RT-PCR is the reference standard for diagnosing SARS-CoV-2 due to its \"medium/high\" analytical sensitivity "
+        "(only 70\\% in real-world conditions according to some studies, far from the theoretical 95\\% in optimal conditions). "
+        "Its practical limitations include cost, processing time, stock shortages and supply disruptions, dependence on sampling conditions, and "
+        "the need for laboratory infrastructure and qualified personnel."
     ),
     "AUC": (
         "Area Under the Receiver Operating Characteristic Curve (AUC-ROC) quantifies a classifier's discrimination ability across all thresholds. "
@@ -180,18 +185,60 @@ def run():
 
     st.divider()
 
-    # Hero avec tooltips
+    # Contexte étendu avec problématique et solutions
     left, right = st.columns([3, 1])
     with left:
-        hero = (
+        st.markdown("### 📊 Contexte de l'épidémie COVID-19")
+        
+        # Bilan mondial
+        st.markdown(
             "<div class='project-hero'>"
-            "<strong>Contexte</strong>: Utiliser "
-            "<abbr title='Chest X-Ray'>CXR</abbr> + ML/DL pour accélérer la détection lorsque "
-            "<abbr title='Reverse Transcription PCR'>RT-PCR</abbr> / <abbr title='Computed Tomography'>CT</abbr> sont indisponibles ou lentes. "
-            "<br><br><strong>But</strong>: fournir une solution interprétable et reproductible pour la démonstration et le POC."
-            "</div>"
+            "<strong>🌍 Bilan mondial</strong><br>"
+            "• 3 ans d'épidémie mondiale<br>"
+            "• Plus de <strong>700 millions</strong> de cas confirmés<br>"
+            "• Plus de <strong>7 millions</strong> de décès<br>"
+            "• Type spécifique de pneumonie virale (<em>Viral Pneumonia</em>) causée par le virus <strong>SARS-CoV-2</strong>"
+            "</div>", 
+            unsafe_allow_html=True
         )
-        st.markdown(hero, unsafe_allow_html=True)
+        
+        st.markdown("")
+        
+        # Problème 1 → Solution 1
+        st.markdown(
+            "<div class='project-hero'>"
+            "<strong>⚠️ Problème 1 : Limites des tests <abbr title='Reverse Transcription PCR'>RT-PCR</abbr></strong><br>"
+            "• Tests moléculaires <strong>lents</strong> (délais de traitement importants)<br>"
+            "• Sensibilité <strong>variable</strong> (~70% en conditions réelles vs 95% théoriques)<br>"
+            "• <strong>Pénuries de stocks</strong> et dépendance aux laboratoires<br>"
+            "<br>"
+            "<strong>✅ Solution 1 : Imagerie médicale complémentaire</strong><br>"
+            "Utiliser des méthodes d'imagerie telles que la <abbr title='Chest X-Ray'>CXR</abbr> (radiographie thoracique) "
+            "ou la <abbr title='Computed Tomography'>CT</abbr> (tomodensitométrie) pour un diagnostic plus rapide et accessible."
+            "</div>",
+            unsafe_allow_html=True
+        )
+        
+        st.markdown("")
+        
+        # Problème 2 → Solution 2
+        st.markdown(
+            "<div class='project-hero'>"
+            "<strong>⚠️ Problème 2 : Difficulté du diagnostic visuel</strong><br>"
+            "Même un radiologue expérimenté a du mal à <strong>distinguer</strong> un cas de COVID-19 "
+            "d'un autre type de pneumonie sur une image radiographique, en raison de la similarité des patterns visuels.<br>"
+            "<br>"
+            "<strong>⚠️ Problème 2.1 : Surcharge des radiologues</strong><br>"
+            "Pendant l'épidémie, les radiologues sont <strong>surchargés</strong> et n'ont pas le temps "
+            "de lire toutes les radiographies avec l'attention nécessaire, créant un goulot d'étranglement diagnostique.<br>"
+            "<br>"
+            "<strong>✅ Solution 2 : Intelligence artificielle</strong><br>"
+            "Utiliser <strong>ML/DL</strong> pour accélérer la détection des cas positifs depuis les images "
+            "et fournir une solution <strong>interprétable</strong> et <strong>reproductible</strong> "
+            "pour la démonstration et le POC (Proof of Concept)."
+            "</div>",
+            unsafe_allow_html=True
+        )
 
     with right:
         st.markdown(

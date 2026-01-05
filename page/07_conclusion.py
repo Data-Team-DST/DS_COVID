@@ -1,16 +1,17 @@
 # Theming metadata:
 # - Preferred: streamlit-extras mandatory; inherits global dark theme.
 # - Palette: navy/dark background, high-contrast highlights; sans-serif font.
-# - File status: executive summary interactive template — synthèse, recommandations et plan d'action clair, orienté métiers.
+# - File status: executive summary — synthèse fondée sur analyses 1–3 (EDA & visualisations).
 
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
+
 
 def run():
     # Header / hero
     colored_header(
         label="Executive Summary & Recommendations",
-        description="Synthèse projet, KPIs clés, priorisation des actions et plan de production.",
+        description="Synthèse décisionnelle fondée sur l'analyse des données et des visualisations (sections 1–3).",
         color_name="blue-70"
     )
     st.divider()
@@ -18,54 +19,81 @@ def run():
     # 1. Topic overview & context
     st.markdown(
         "## 1. Topic overview & context\n\n"
-        "Bref rappel du périmètre du projet et des objectifs métiers : pourquoi ce projet a été lancé et quelles questions il visait à résoudre."
+        "Ce projet vise à évaluer la faisabilité d’un système d’analyse automatique de radiographies thoraciques "
+        "à partir d’un dataset public (COVID-19 Radiography Database).\n\n"
+        "L’objectif n’est pas de produire un outil médical final, mais de déterminer si les données disponibles "
+        "présentent des signaux visuels suffisamment exploitables pour un **POC de classification**, "
+        "et d’identifier les limites méthodologiques dès les premières étapes."
     )
     st.divider()
 
     # 2. Data adequacy & limitations
     st.markdown(
         "## 2. Data adequacy & limitations\n\n"
-        "Synthèse sur l'adéquation des données : volumes, qualité, granularité. Mentionner les limitations critiques qui ont été résolues ou restant à surveiller."
+        "Cette section synthétise l’adéquation des données au regard des analyses exploratoires menées."
     )
     st.text_area(
-        "Résumé data",
-        value="- Data quality check completed\n- Gaps identified for feature X\n- Hold-out set validated",
-        height=80,
+        "Synthèse données",
+        value=(
+            "- Volume conséquent (>21 000 images), suffisant pour une analyse exploratoire robuste\n"
+            "- Déséquilibre marqué entre classes (classe *Normal* fortement majoritaire)\n"
+            "- Images majoritairement en faux-RGB (grayscale dupliqué sur 3 canaux)\n"
+            "- Qualité visuelle globalement homogène (exposition, contraste, entropie)\n"
+            "- Dataset adapté à un POC exploratoire, mais insuffisant pour un usage clinique sans enrichissement"
+        ),
+        height=130,
         key="conclusion_data"
     )
     st.divider()
 
     # 3. Key insights (visual summary)
     st.markdown(
-        "## 3. Key insights (visual summary)\n\n"
-        "Mettre en avant 2–4 figures ou tableaux clés qui supportent les conclusions métier. Ajouter placeholders pour figures ou liens vers les sections détaillées."
+        "## 3. Key insights (from visual analysis)\n\n"
+        "Les analyses visuelles et statistiques mettent en évidence plusieurs enseignements clés :"
     )
-    st.columns([1,1])
-    st.info("Placeholder figures : KPI trends, feature impact, error distributions, segmentation results.")
+    st.markdown(
+        "- **Déséquilibre structurel des classes**, susceptible d’introduire un biais modèle sans stratégie corrective.\n"
+        "- **Similarités visuelles inter-classes**, confirmant que la classification n’est pas triviale.\n"
+        "- **Homogénéité globale des niveaux de luminosité et de contraste**, limitant les risques de fuite triviale.\n"
+        "- **Présence généralisée de faux-RGB**, conforme aux pratiques en imagerie médicale mais à prendre en compte."
+    )
+    st.info(
+        "Ces constats justifient une approche prudente : modèles robustes, métriques adaptées et interprétation encadrée."
+    )
     st.divider()
 
-    # 4. Preprocessing impact
+    # 4. Preprocessing impact (fondé sur ce qui est déjà observé)
     st.markdown(
-        "## 4. Preprocessing impact\n\n"
-        "Rappel succinct des transformations majeures qui ont eu un impact sur les résultats métier (ex: imputations, filtrages spécifiques)."
+        "## 4. Preprocessing impact (observed so far)\n\n"
+        "Les analyses exploratoires permettent déjà d’anticiper l’impact de certains prétraitements."
     )
     st.text_area(
-        "Transformations clés",
-        value="- Filtrage données post-2019\n- Normalisation images\n- Feature selection",
-        height=80,
+        "Prétraitements clés identifiés",
+        value=(
+            "- Normalisation des intensités nécessaire pour stabiliser l’apprentissage\n"
+            "- Vérification fake-RGB indispensable mais non bloquante\n"
+            "- Aucune transformation lourde justifiée à ce stade sans modèle entraîné\n"
+            "- Prétraitements doivent rester simples pour préserver l’interprétabilité"
+        ),
+        height=110,
         key="conclusion_preproc"
     )
     st.divider()
 
-    # 5. Model summary & results
+    # 5. Model summary & results (positionnement réaliste)
     st.markdown(
-        "## 5. Model summary & results\n\n"
-        "Annonce du modèle retenu avec métriques clefs de manière concise (ex: AUC, RMSE, accuracy). Lier directement aux KPIs métiers."
+        "## 5. Model perspective & expected outcomes\n\n"
+        "À ce stade du projet, aucun modèle final n’est présenté volontairement."
     )
     st.text_area(
-        "Modèle retenu et KPIs",
-        value="- Best model: CNN lung X-ray classifier\n- Accuracy: 93%, Sensitivity: 91%\n- KPI impact: détection précoce de pneumonie",
-        height=80,
+        "Positionnement modèle",
+        value=(
+            "- Modèles envisagés : CNN standards pour classification multi-classes\n"
+            "- Objectif : évaluer la séparabilité globale, pas un diagnostic automatisé\n"
+            "- Valeur principale : aide à l’exploration et à la priorisation des cas\n"
+            "- Toute performance devra être interprétée à la lumière des biais identifiés"
+        ),
+        height=120,
         key="conclusion_model"
     )
     st.divider()
@@ -73,12 +101,17 @@ def run():
     # 6. Key considerations & risks
     st.markdown(
         "## 6. Key considerations & risks\n\n"
-        "Points d'attention majeurs : conditions d'utilisation, limites pratiques, risques identifiés (drift, biais, sous-populations)."
+        "Plusieurs points de vigilance doivent être explicitement pris en compte."
     )
     st.text_area(
-        "Risques / limites",
-        value="- Drift possible sur nouvelles cliniques\n- Limité aux images frontal-view\n- Besoin d'anonymisation stricte",
-        height=80,
+        "Risques et limites",
+        value=(
+            "- Biais liés au déséquilibre des classes\n"
+            "- Généralisation limitée à d’autres contextes cliniques\n"
+            "- Absence de GPU en environnement Streamlit Cloud (calculs lourds à externaliser)\n"
+            "- Usage strictement exploratoire hors cadre réglementaire médical"
+        ),
+        height=120,
         key="conclusion_risks"
     )
     st.divider()
@@ -86,37 +119,41 @@ def run():
     # 7. Prioritized recommendations (Top 3)
     st.markdown(
         "## 7. Prioritized recommendations (Top 3)\n\n"
-        "Formuler actions concrètes avec responsables et KPI impacté."
+        "Actions recommandées à l’issue des analyses 1–3 :"
     )
     st.markdown(
-        "1. **Action immédiate** : Déploiement pilote sur hôpital X – Responsable: PO – KPI: réduction délai diagnostic\n"
-        "2. **Action moyen terme** : Collecte images supplémentaires et amélioration du dataset – Plan: Data Owner & DS team\n"
-        "3. **Action long terme** : Mise en place pipeline MLOps / Feature store – Plan: Infra & DS Ops"
+        "1. **Court terme** — Consolider un POC reproductible basé sur les analyses actuelles.\n"
+        "2. **Moyen terme** — Rééquilibrer et enrichir le dataset avant tout entraînement sérieux.\n"
+        "3. **Long terme** — Externaliser les calculs lourds (embeddings, modèles) hors Streamlit."
     )
     st.divider()
 
     # 8. Future perspectives
     st.markdown(
         "## 8. Future perspectives\n\n"
-        "Liste priorisée des actions ou études à mener avec plus de temps ou de données."
+        "Pistes d’évolution identifiées pour la suite du projet :"
     )
     st.text_area(
-        "Backlog priorisé (3–6 items)",
-        value="- Test cross-hospital generalization\n- Augmentation data pour pathologies rares\n- Exploration modèles hybrides CNN+Transformer",
-        height=120,
+        "Backlog priorisé",
+        value=(
+            "- Analyse des erreurs critiques (faux négatifs)\n"
+            "- Études de robustesse inter-sources\n"
+            "- Intégration de signaux non visuels (métadonnées cliniques)\n"
+            "- Comparaison CNN classiques vs approches plus légères"
+        ),
+        height=140,
         key="conclusion_backlog"
     )
     st.divider()
 
-    # 9. CI/CD & production plan
+    # 9. CI/CD & production plan (réaliste)
     st.markdown(
-        "## 9. CI/CD & production plan\n\n"
-        "Plan de mise en production avec étapes clés, rôles, SLA, et monitoring. Relier directement aux artefacts produits et tests automatisés."
+        "## 9. CI/CD & production considerations\n\n"
+        "Toute mise en production devra respecter une séparation claire entre calcul et visualisation."
     )
     st.markdown(
-        "- **Deliverables** : modèles pickled/h5, métriques CSV/JSON, rapport d'évaluation\n"
-        "- **Monitoring** : performance, dérive, latence\n"
-        "- **Runbook déploiement** : checklist pré-déploiement, tests end-to-end, plan rollback"
+        "- **Offline** : calcul des features, embeddings, modèles (GPU/local)\n"
+        "- **Online (Streamlit)** : visualisation, audit, exploration\n"
+        "- **Artefacts** : métriques versionnées, rapports, jeux d’échantillons figés\n"
+        "- **Monitoring** : dérive des données, cohérence des distributions"
     )
-
-# STATUS: page/07_conclusion.py — intégrale, Streamlit Extras obligatoire, executive-ready interactive conclusion template, liaison directe résultats → problématique métier, priorisation actions et plan de production.

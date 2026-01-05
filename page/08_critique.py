@@ -1,16 +1,21 @@
 # Theming metadata:
 # - Preferred: streamlit-extras mandatory; inherits global dark theme.
 # - Palette: navy/dark background, high-contrast highlights; sans-serif font.
-# - File status: honest critique & lessons-learned interactive template — document limits, biases, prioritized fixes, future directions.
+# - File status: honest critique & lessons-learned interactive template —
+#   document limits, biases, prioritized fixes, future directions.
 
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
+
 
 def run():
     # Header / hero
     colored_header(
         label="Critical Review & Lessons Learned",
-        description="Documenter limites, biais, risques, backlog priorisé et recommandations futures.",
+        description=(
+            "Analyse critique du projet : limites méthodologiques, biais identifiés, "
+            "risques pour l’interprétation et axes d’amélioration priorisés."
+        ),
         color_name="blue-70"
     )
     st.divider()
@@ -18,19 +23,30 @@ def run():
     # 1. Topic overview & context
     st.markdown(
         "## 1. Topic overview & context\n\n"
-        "Cadre critique : rappeler les ambitions initiales vs réalisations, ce qui a fonctionné et ce qui a été limité par contraintes techniques, temps ou data."
+        "Cette section confronte les objectifs initiaux du projet aux résultats réellement obtenus. "
+        "L’ambition était de conduire une analyse exploratoire approfondie de radiographies thoraciques "
+        "COVID afin d’identifier des signaux visuels discriminants et d’évaluer la faisabilité d’outils "
+        "d’aide à la classification.\n\n"
+        "Certaines analyses avancées (embeddings profonds, explicabilité temps réel) ont été limitées "
+        "par des contraintes de calcul, d’infrastructure cloud et de temps."
     )
     st.divider()
 
     # 2. Data critique
     st.markdown(
         "## 2. Data critique\n\n"
-        "Documenter biais détectés, lacunes, limitations d'accès ou qualité, et impact sur les analyses."
+        "Analyse critique du dataset utilisé : biais potentiels, limites structurelles "
+        "et conséquences sur l’interprétation des résultats."
     )
     st.text_area(
-        "Problèmes data identifiés",
-        value="- Biais sur sous-populations\n- Manque de données pour certaines pathologies\n- Échantillon non équilibré",
-        height=100,
+        "Limites et biais des données",
+        value=(
+            "- Déséquilibre marqué entre les classes (classe \"Normal\" sur-représentée).\n"
+            "- Faible volumétrie pour certaines classes rares (ex: Viral Pneumonia).\n"
+            "- Absence de métadonnées cliniques (âge, sexe, hôpital, type de machine).\n"
+            "- Agrégation de sources hétérogènes pouvant introduire des biais d’acquisition."
+        ),
+        height=140,
         key="critique_data"
     )
     st.divider()
@@ -38,12 +54,17 @@ def run():
     # 3. Analyses & visualizations
     st.markdown(
         "## 3. Analyses & visualizations\n\n"
-        "Limites dans l’analyse : granularité, échantillonnage, tests statistiques non effectués, visualisations manquantes ou non reproductibles."
+        "Limites liées aux analyses exploratoires et aux visualisations produites."
     )
     st.text_area(
-        "Limites analyses",
-        value="- Manque tests de robustesse cross-site\n- Graphiques simplifiés pour rapidité\n- Analyse de séries temporelles limitée",
-        height=100,
+        "Limites analytiques",
+        value=(
+            "- Analyses majoritairement descriptives, sans tests statistiques formels.\n"
+            "- Visualisations utiles pour l’exploration mais non suffisantes pour inférences causales.\n"
+            "- Certaines métriques (ex: similarité inter-classes) reposent sur des heuristiques.\n"
+            "- Absence de validation croisée inter-datasets ou inter-sites."
+        ),
+        height=140,
         key="critique_analysis"
     )
     st.divider()
@@ -51,12 +72,17 @@ def run():
     # 4. Preprocessing & rationale
     st.markdown(
         "## 4. Preprocessing & rationale\n\n"
-        "Risques induits par le preprocessing (leakage, perte d’information). Actions prises pour limiter ces risques et leçons apprises."
+        "Discussion critique des choix de preprocessing et des risques associés."
     )
     st.text_area(
-        "Risques preprocessing",
-        value="- Possibilité de leakage sur certaines features\n- Imputation median vs mean discutée\n- Documentation des étapes manquante",
-        height=80,
+        "Risques liés au preprocessing",
+        value=(
+            "- Redimensionnement des images pouvant entraîner une perte de détails fins.\n"
+            "- Normalisation globale susceptible de lisser certains signaux pathologiques.\n"
+            "- Choix guidés par contraintes de calcul plutôt que par validation clinique.\n"
+            "- Documentation initiale des étapes perfectible."
+        ),
+        height=120,
         key="critique_preproc"
     )
     st.divider()
@@ -64,12 +90,17 @@ def run():
     # 5. Model critique
     st.markdown(
         "## 5. Model critique\n\n"
-        "Sensibilité et robustesse : variance entre folds, performance par segment, hyperparamètres sensibles."
+        "Limites observées ou anticipées sur les modèles de classification."
     )
     st.text_area(
         "Limites modèles",
-        value="- Variance élevée sur petits sous-groupes\n- Certaines classes rares mal prédites\n- Besoin de validation externe",
-        height=100,
+        value=(
+            "- Sensibilité élevée aux classes rares.\n"
+            "- Risque d’overfitting sur un dataset déséquilibré.\n"
+            "- Absence de validation externe sur des données indépendantes.\n"
+            "- Robustesse non évaluée face à des variations d’acquisition."
+        ),
+        height=130,
         key="critique_model_perf"
     )
     st.divider()
@@ -77,12 +108,17 @@ def run():
     # 6. Best model analysis
     st.markdown(
         "## 6. Best model analysis\n\n"
-        "Vulnérabilités identifiées : drift potentiel, fairness issues, tests complémentaires nécessaires avant production."
+        "Vulnérabilités potentielles du meilleur modèle identifié dans le cadre exploratoire."
     )
     st.text_area(
-        "Vulnérabilités & tests requis",
-        value="- Drift sur nouvelles cliniques\n- Fairness check manquant pour certaines classes\n- Tests adverses à planifier",
-        height=100,
+        "Vulnérabilités & tests manquants",
+        value=(
+            "- Risque de drift visuel lié à de nouveaux appareils ou protocoles d’imagerie.\n"
+            "- Absence d’explicabilité robuste exploitable en production.\n"
+            "- Fairness non évaluée faute de métadonnées patient.\n"
+            "- Tests de robustesse et scénarios adverses non réalisés."
+        ),
+        height=140,
         key="critique_model"
     )
     st.divider()
@@ -90,12 +126,17 @@ def run():
     # 7. Conclusions & business relevance
     st.markdown(
         "## 7. Conclusions & business relevance\n\n"
-        "Risques résiduels pour le déploiement et recommandations de mitigation immédiate."
+        "Conséquences des limites identifiées pour un usage métier ou clinique."
     )
     st.text_area(
-        "Risques résiduels & mitigations",
-        value="- Monitorer métriques critiques post-déploiement\n- Plan de rollback prêt\n- Alertes sur performances critiques",
-        height=100,
+        "Risques pour l’usage réel",
+        value=(
+            "- Usage limité à des fins exploratoires ou pédagogiques.\n"
+            "- Non adapté à une aide au diagnostic sans supervision médicale.\n"
+            "- Nécessité de garde-fous forts avant toute mise en production.\n"
+            "- Interprétation des résultats à contextualiser systématiquement."
+        ),
+        height=130,
         key="critique_conclusion"
     )
     st.divider()
@@ -103,12 +144,16 @@ def run():
     # 8. Critique & future perspectives
     st.markdown(
         "## 8. Critique & future perspectives\n\n"
-        "Plan d’action pour corriger les points faibles, prioriser quick wins vs R&D, estimer effort/impact, et identifier opportunités pour améliorations futures."
+        "Axes d’amélioration identifiés, priorisés selon effort et impact."
     )
     st.text_area(
-        "Plan d'action (priorisé)",
-        value="- Quick wins: nettoyer features manquantes, enrichir dataset\n- Moyen terme: tests fairness + augmentation données\n- Long terme: pipeline MLOps complet, modèles hybrides",
-        height=140,
+        "Plan d’action priorisé",
+        value=(
+            "- Quick wins : rééquilibrage du dataset, ajout de tests statistiques simples.\n"
+            "- Moyen terme : calcul d’embeddings profonds hors-ligne, analyses de similarité robustes.\n"
+            "- Long terme : pipeline MLOps, validation multi-centres, intégration d’explicabilité."
+        ),
+        height=150,
         key="critique_plan"
     )
     st.divider()
@@ -116,11 +161,15 @@ def run():
     # 9. CI/CD & production controls
     st.markdown(
         "## 9. CI/CD & production controls\n\n"
-        "Ajouter contrôles pour détecter régressions, drift, dérive, garantir rollbacks sûrs. Inclure tests adverses et fairness dans le pipeline de gating."
+        "Recommandations pour un éventuel passage en production."
     )
     st.markdown(
-        "- **Recommandations** : intégrer tests éthiques, fairness, robustness et alerting automatisé dans pipeline de CI/CD.\n"
-        "- **Artifacts** : logs QA, snapshots métriques, reports d’audit."
+        "- **Monitoring** : performance, dérive des données, dérive des prédictions.\n"
+        "- **Qualité** : tests automatiques, versioning des datasets et modèles.\n"
+        "- **Sécurité** : plan de rollback, audits réguliers, traçabilité des décisions."
     )
 
-# STATUS: page/08_critique.py — intégrale, Streamlit Extras obligatoire, interactive critique template ready for committee review; links directly limitations → improvements → future perspectives.
+
+# STATUS: page/08_critique.py — intégrale, revue critique honnête et professionnelle,
+# alignée avec les analyses exploratoires (pages 1–3),
+# prête à évoluer avec les sections modèles et MLOps (pages 4–6).

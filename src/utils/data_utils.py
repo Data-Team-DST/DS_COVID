@@ -30,10 +30,11 @@ from sklearn.utils.class_weight import compute_class_weight
 # pylint: disable=import-error,no-name-in-module
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from features.Pipelines.transformateurs.image_loaders import ImageLoader
-from features.Pipelines.transformateurs.image_preprocessing import (
-    ImageMasker,
+# Import des transformateurs V3
+from src.features.St_Pipeline.Transformateurs import (
+    ImagePathLoader,
     ImageResizer,
+    ImageMasker,
 )
 
 # Configure logger
@@ -139,16 +140,18 @@ def create_preprocessing_pipeline(
         print("PREPROCESSING PIPELINE")
         print("=" * 70)
 
-    steps = [
-        ("load", ImageLoader(color_mode=color_mode, verbose=verbose)),
-        ("resize", ImageResizer(img_size=img_size, verbose=verbose)),
-    ]
-
-    # Add masker if mask paths provided
-    if mask_paths is not None and len(mask_paths) > 0:
-        steps.append(("mask", ImageMasker(mask_paths=mask_paths, verbose=verbose)))
-
-    pipeline = Pipeline(steps)
+    # NOTE: Cette fonction est dépréciée - utiliser les nouveaux transformateurs V3 à la place
+    # Voir: src.features.St_Pipeline.Transformateurs
+    
+    raise DeprecationWarning(
+        "create_preprocessing_pipeline() est obsolète. "
+        "Utilisez les transformateurs V3 dans src.features.St_Pipeline.Transformateurs:\n"
+        "  Pipeline([\n"
+        "    ('loader', ImagePathLoader(root_dir=...)),\n"
+        "    ('resizer', ImageResizer(img_size=...)),\n"
+        "    ('normalizer', ImageNormalizer()),\n"
+        "  ])"
+    )
 
     if verbose:
         print(f"\n✅ Pipeline créée avec {len(steps)} étapes")

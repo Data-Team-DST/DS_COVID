@@ -243,19 +243,14 @@ class ImageAugmenter(BaseTransform):
         
         # Zoom
         if self.zoom_range is not None:
-            from skimage.transform import resize
+            import cv2
             zoom_factor = self.rng_.uniform(self.zoom_range[0], self.zoom_range[1])
             h, w = img_aug.shape[:2]
             new_h, new_w = int(h * zoom_factor), int(w * zoom_factor)
             
             if zoom_factor != 1.0:
                 # Redimensionner
-                if len(img_aug.shape) == 3:
-                    img_zoomed = resize(img_aug, (new_h, new_w, img_aug.shape[2]), 
-                                       anti_aliasing=True, preserve_range=True)
-                else:
-                    img_zoomed = resize(img_aug, (new_h, new_w), 
-                                       anti_aliasing=True, preserve_range=True)
+                img_zoomed = cv2.resize(img_aug, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 
                 # Padding ou crop pour revenir à la taille originale
                 if zoom_factor > 1.0:
@@ -275,8 +270,11 @@ class ImageAugmenter(BaseTransform):
         
         # S'assurer que la forme est préservée
         if img_aug.shape != target_shape:
-            from skimage.transform import resize
-            img_aug = resize(img_aug, target_shape, preserve_range=True, anti_aliasing=True)
+            import cv2
+            if len(target_shape) == 3:
+                img_aug = cv2.resize(img_aug, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_LINEAR)
+            else:
+                img_aug = cv2.resize(img_aug, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_LINEAR)
         
         return img_aug.astype(img.dtype)
     

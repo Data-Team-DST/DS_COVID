@@ -25,7 +25,7 @@ import pandas as pd
 from tqdm import tqdm
 from PIL import Image
 from scipy import ndimage
-from skimage.transform import resize
+import cv2
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
@@ -596,12 +596,7 @@ class ImageAugmenter(BaseTransform):
             
             if zoom_factor != 1.0:
                 # Resize
-                if len(img_aug.shape) == 3:
-                    img_zoomed = resize(img_aug, (new_h, new_w, img_aug.shape[2]), 
-                                       anti_aliasing=True, preserve_range=True)
-                else:
-                    img_zoomed = resize(img_aug, (new_h, new_w), 
-                                       anti_aliasing=True, preserve_range=True)
+                img_zoomed = cv2.resize(img_aug, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
                 
                 # Padding or crop to return to original size
                 if zoom_factor > 1.0:
@@ -621,7 +616,10 @@ class ImageAugmenter(BaseTransform):
         
         # Ensure shape is preserved
         if img_aug.shape != target_shape:
-            img_aug = resize(img_aug, target_shape, preserve_range=True, anti_aliasing=True)
+            if len(target_shape) == 3:
+                img_aug = cv2.resize(img_aug, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_LINEAR)
+            else:
+                img_aug = cv2.resize(img_aug, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_LINEAR)
         
         return img_aug.astype(img.dtype)
     

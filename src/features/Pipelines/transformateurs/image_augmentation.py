@@ -6,7 +6,7 @@ from typing import Optional, Tuple, Union
 
 import numpy as np  # type: ignore
 from scipy import ndimage  # type: ignore
-from skimage.transform import resize  # type: ignore
+import cv2  # type: ignore
 from sklearn.base import BaseEstimator, TransformerMixin  # type: ignore
 from tqdm import tqdm  # type: ignore
 
@@ -141,7 +141,7 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         new_h, new_w = int(h * zoom_factor), int(w * zoom_factor)
 
         # Redimensionne l'image
-        img_zoomed = resize(img, (new_h, new_w, c), anti_aliasing=True)
+        img_zoomed = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
         # Calcul du padding nécessaire pour revenir à la taille originale
         pad_h = max(h - new_h, 0)

@@ -57,8 +57,16 @@ class ImageLoader(BaseEstimator, TransformerMixin):
         self.n_images_loaded_: int = 0
         self.failed_images_: list[str] = []
 
-    def fit(self):
-        """Fit the transformer (no-op for image loading)."""
+    def fit(self, data_x, *_):
+        """Fit the transformer (no-op for image loading).
+        
+        Args:
+            data_x: Liste de chemins (capturée mais non utilisée pour le chargement)
+            *_: y et autres arguments sklearn ignorés (pas de supervised learning)
+        
+        Returns:
+            self: Pour chaînage dans un pipeline sklearn
+        """
         return self
 
     def _validate_path(self, path: Union[str, Path]) -> bool:

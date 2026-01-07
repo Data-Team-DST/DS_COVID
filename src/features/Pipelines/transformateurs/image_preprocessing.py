@@ -14,13 +14,34 @@ from tqdm import tqdm  # type: ignore
 # Logger
 logger = logging.getLogger(__name__)
 
-# Pillow resampling compatibility
+# =============================================================================
+# Configuration du rééchantillonnage (resampling filters)
+# =============================================================================
+# Le rééchantillonnage détermine comment calculer les nouvelles valeurs de pixels
+# lors du redimensionnement d'une image. C'est crucial pour la qualité visuelle.
+#
+# Pillow 10+ a déplacé les constantes de rééchantillonnage dans un sous-module
+# `Image.Resampling`. Les versions antérieures les avaient directement dans `Image`.
+# Ce bloc assure la compatibilité entre les versions.
+
 try:
-    resampling = Image.resampling  # type: ignore[attr-defined]
+    # Pillow >= 10.0: utilise Image.Resampling.LANCZOS
+    resampling = Image.Resampling
 except AttributeError:  # pragma: no cover
+    # Pillow < 10.0: utilise Image.LANCZOS directement
     resampling = Image
 
+# LANCZOS: Filtre de haute qualité (windowed sinc) recommandé pour réduire la taille
+# - Meilleure qualité visuelle (préserve les détails fins)
+# - Plus lent que NEAREST ou BILINEAR
+# - Idéal pour images médicales où la précision compte
+# Note: Les filtres Pillow sont des constantes INT (enum) : NEAREST=0, LANCZOS=1, etc.
 RESAMPLE_LANCZOS = getattr(resampling, "LANCZOS", getattr(Image, "LANCZOS", 1))
+
+# NEAREST: Algorithme du plus proche voisin
+# - Plus rapide mais qualité moindre (effet de pixellisation)
+# - Utilisé pour les masques binaires (évite l'interpolation de valeurs 0/1)
+# - Pas adapté aux images photographiques
 resample_nearest = getattr(resampling, "NEAREST", getattr(Image, "NEAREST", 0))
 
 
@@ -39,8 +60,13 @@ class ImageResizer(BaseEstimator, TransformerMixin):
 
         Args:
             img_size: Target size (width, height) for resized images.
-            resample: Resampling filter to use.
-            preserve_aspect_ratio: Whether to preserve the aspect ratio.
+            resample: Filtre de rééchantillonnage à utiliser lors du redimensionnement.
+                - LANCZOS (défaut): Haute qualité, préserve les détails (images médicales)
+                - BILINEAR: Compromis vitesse/qualité
+                - NEAREST: Rapide mais pixellisé (pour masques uniquement)
+                Le rééchantillonnage calcule les nouvelles valeurs de pixels lors du resize.
+            preserve_aspect_ratio: Si True, conserve les proportions originales
+                et ajoute du padding noir. Si False, déforme l'image pour matcher img_size.
             verbose: Whether to log processing information.
         """
         self.img_size = img_size
@@ -51,21 +77,43 @@ class ImageResizer(BaseEstimator, TransformerMixin):
         self.n_images_processed_: int = 0
 
     def fit(self, *_: Any) -> ImageResizer:
-        """No-op fit to keep sklearn API compatible."""
+        """No-op fit to keep sklearn API compatible.
+        
+        Args:
+            *_: Arguments ignorés (X, y, etc.). Le *_ capture tous les arguments
+                positionnels mais ne les utilise pas. Convention sklearn : fit(X, y)
+                mais ici on n'a pas besoin de y (pas de supervised learning).
+        """
         return self
 
     def _resize_with_aspect_ratio(self, img: Image.Image) -> Image.Image:
-        """Resize an image while preserving its aspect ratio."""
+        """Resize an image while preserving its aspect ratio.
+        
+        Stratégie:
+        1. Calcule le ratio de redimensionnement (le plus petit des 2 dimensions)
+        2. Redimensionne l'image à la nouvelle taille calculée (avec LANCZOS)
+        3. Crée une image noire de la taille cible
+        4. Colle l'image redimensionnée au centre (padding noir sur les bords)
+        
+        Exemple: Image 300×400 → 256×256
+        - ratio = min(256/300, 256/400) = 0.64
+        - new_size = (192, 256)
+        - padding horizontal de 32px de chaque côté
+        """
         ratio = min(
             self.img_size[0] / img.size[0],
             self.img_size[1] / img.size[1],
         )
         new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+        # Redimensionnement avec le filtre spécifié (LANCZOS par défaut)
         img_resized = img.resize(new_size, self.resample)
 
-        new_img = Image.new(img.mode, self.img_size, color=0)
+        # Création du canvas noir de la taille cible
+        new_img = Image.new(img.mode, self.img_size, color=0) # color=0 pour noir
+        # Calcul de la position de centrage
         paste_x = (self.img_size[0] - new_size[0]) // 2
         paste_y = (self.img_size[1] - new_size[1]) // 2
+        # Collage de l'image redimensionnée au centre
         new_img.paste(img_resized, (paste_x, paste_y))
         return new_img
 
@@ -140,7 +188,12 @@ class ImageNormalizer(BaseEstimator, TransformerMixin):
         }
 
     def fit(self, data_x: list[np.ndarray] | np.ndarray, *_: Any) -> ImageNormalizer:
-        """Fit normalizer on data (compute global stats if needed)."""
+        """Fit normalizer on data (compute global stats if needed).
+        
+        Args:
+            data_x: Images sur lesquelles calculer les statistiques globales
+            *_: y et autres arguments sklearn ignorés (pas de labels nécessaires)
+        """
         if not self.per_image:
             arr = np.array(data_x, dtype=np.float32)
             if self.method in ("minmax", "custom"):
@@ -268,7 +321,11 @@ class ImageMasker(BaseEstimator, TransformerMixin):
         self.n_images_masked_: int = 0
 
     def fit(self, *_):
-        """No-op fit to keep sklearn API compatible."""
+        """No-op fit to keep sklearn API compatible.
+        
+        Args:
+            *_: X, y et autres arguments sklearn capturés mais ignorés
+        """
         if not self.mask_paths:
             logger.warning("No mask paths provided")
         return self
@@ -301,6 +358,8 @@ class ImageMasker(BaseEstimator, TransformerMixin):
                 mask = Image.open(mask_path).convert("L")
                 if self.resize_masks:
                     target_size = (img.shape[1], img.shape[0])
+                    # NEAREST: Évite l'interpolation sur les masques binaires (0/1)
+                    # LANCZOS créerait des valeurs intermédiaires (0.3, 0.7...) non désirées
                     mask = mask.resize(target_size, resample_nearest)
 
                 mask_arr = (np.array(mask) / 255.0) > self.mask_threshold
@@ -341,6 +400,7 @@ class ImageFlattener(BaseEstimator, TransformerMixin):
 
         Args:
             data_x: Array of images.
+            *_: y et autres arguments sklearn ignorés
 
         Returns:
             Self.
@@ -423,6 +483,7 @@ class ImageBinarizer(BaseEstimator, TransformerMixin):
 
         Args:
             data_x: Array of images.
+            *_: y et autres arguments sklearn ignorés
 
         Returns:
             Self.

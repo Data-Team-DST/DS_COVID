@@ -204,6 +204,41 @@ def run():
         
         st.markdown("")
         
+        # Caractéristiques radiologiques du COVID-19
+        st.markdown(
+            "<div class='project-hero'>"
+            "<strong>🔬 Signes radiologiques typiques du COVID-19 sur CXR</strong><br>"
+            "Sur une radiographie thoracique, une pneumonie COVID-19 présente généralement :<br>"
+            "• <strong>Zones blanches floues (opacités en verre dépoli ou linéaires)</strong> visibles des <strong>deux côtés des poumons</strong>, "
+            "souvent en <strong>périphérie</strong> (vers l'extérieur) ou à l'<strong>arrière</strong> des poumons<br>, "
+            "qui masquent les marquages pulmonaires normaux (vaisseaux sanguins, etc) <br>"
+            "• Localisation surtout dans la <strong>partie basse des poumons</strong> (lobes inférieurs)<br>"
+            "• <strong>Début de la maladie</strong> : zones floues légères et diffuses<br>"
+            "• <strong>Stade avancé</strong> : zones deviennent plus denses et blanches (consolidation = poumon rempli de liquide/cellules inflammatoires)<br>"
+            "<br>"
+            "⚠️ <strong>Problème clé</strong> : ces signes ressemblent beaucoup à d'autres pneumonies virales, "
+            "rendant le diagnostic visuel très difficile même pour un expert."
+            "</div>",
+            unsafe_allow_html=True
+        )
+        
+        # Affichage de l'image avec légende
+        from pathlib import Path
+        img_path = Path(__file__).parent / "images" / "covid_cxr_1.jpg"
+        if img_path.exists():
+            st.image(
+                str(img_path),
+                caption="Figure 1 — Opacité en verre dépoli. Radiographie thoracique postéro-antérieure d'un patient atteint de pneumonie COVID-19. "
+                        "Les caractéristiques incluent une opacité en verre dépoli dans les zones moyennes et inférieures des deux poumons, "
+                        "principalement en périphérie (flèches blanches) avec préservation des marquages pulmonaires. "
+                        "Une opacité linéaire (zone blanche allongée et fine) est visible à la périphérie de la zone moyenne gauche (flèche noire).",
+                use_column_width=True
+            )
+        else:
+            st.info("💡 Image de démonstration non disponible. Placez 'covid_cxr_example.png' dans page/images/")
+        
+        st.markdown("")
+        
         # Problème 1 → Solution 1
         st.markdown(
             "<div class='project-hero'>"

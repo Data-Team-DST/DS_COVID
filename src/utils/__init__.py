@@ -22,7 +22,7 @@ from .data_utils import (
     create_data_generators,
     create_preprocessing_pipeline,
     create_transfer_learning_generators,
-    load_dataset,
+    load_dataset_paths_and_labels,
     prepare_train_val_test_split,
 )
 
@@ -57,7 +57,7 @@ from .visualization_utils import (
 
 __all__ = [
     # Data
-    "load_dataset",
+    "load_dataset_paths_and_labels",
     "create_preprocessing_pipeline",
     "prepare_train_val_test_split",
     "compute_class_weights",

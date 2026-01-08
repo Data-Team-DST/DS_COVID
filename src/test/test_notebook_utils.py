@@ -19,7 +19,7 @@ from utils import (
     create_preprocessing_pipeline,
     evaluate_model,
     get_preprocessing_function,
-    load_dataset,
+    load_dataset_paths_and_labels,
     plot_confusion_matrix,
     plot_training_curves,
     prepare_train_val_test_split,
@@ -52,13 +52,14 @@ def sample_model():
 # Test Data Loading & Preprocessing
 def test_load_dataset():
     """Test dataset loading function."""
-    # Call with non-existing dir; should return empty lists
-    image_paths, _mask_paths, _labels, labels_int = load_dataset(
-        Path("nonexistent"), categories=["cat1"], verbose=False
-    )
-
-    assert isinstance(image_paths, list)
-    assert isinstance(labels_int, np.ndarray)
+    # Call with non-existing dir; should raise ValueError
+    try:
+        image_paths, _mask_paths, _labels, labels_int = load_dataset_paths_and_labels(
+            Path("nonexistent"), class_names=["cat1"], verbose=False
+        )
+        assert False, "Should have raised ValueError for empty dataset"
+    except ValueError:
+        pass  # Expected behavior
 
 
 def test_create_preprocessing_pipeline():

@@ -13,6 +13,7 @@ Date: November 2025
 """
 
 import logging
+import random
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -40,78 +41,145 @@ from features.Pipelines.transformateurs.image_preprocessing import (
 logger = logging.getLogger(__name__)
 
 
-# pylint: disable=too-many-locals
-def load_dataset(
-    data_dir: Path,
-    categories: List[str],
+# pylint: disable=too-many-locals,too-many-arguments,too-many-positional-arguments
+def load_dataset_paths_and_labels(   # reviewed
+    dataset_root_dir: Path,
+    class_names: List[str],
     n_images_per_class: Optional[int] = None,
     load_masks: bool = False,
+    random_sampling: bool = False,
+    random_seed: int = 42,
+    shuffle: bool = False,
     verbose: bool = True,
 ) -> Tuple[List[Path], List[Path], List[str], np.ndarray]:
     """
     Load image paths and labels from dataset directory.
 
     Args:
-        data_dir: Root directory of the dataset
-        categories: List of category names
-        n_images_per_class: Maximum number of images per class (None = all)
+        dataset_root_dir: Root directory of the dataset
+        class_names: List of class names
+        n_images_per_class: Number of images per class (None = all images)
         load_masks: If True, also load mask paths
+        random_sampling: If True, randomly sample images (with seed for reproducibility)
+                        If False, take first N images (sorted order, deterministic)
+        random_seed: Random seed for sampling reproducibility (only used if random_sampling=True or shuffle=True)
+        shuffle: If True, shuffle all data after loading (maintains image/mask/label correspondence)
         verbose: Print loading information
 
     Returns:
         Tuple of (image_paths, mask_paths, labels, labels_int)
         If load_masks=False, mask_paths will be empty list
+        
+    Examples:
+        >>> # Déterministe : 100 premières images par classe
+        >>> classes = ['COVID', 'Normal', 'Viral Pneumonia']
+        >>> imgs, masks, lbls, lbls_int = load_dataset_paths_and_labels(
+        ...     data_dir, classes, n_images_per_class=100
+        ... )
+        
+        >>> # Aléatoire équilibré : 100 images random par classe
+        >>> imgs, masks, lbls, lbls_int = load_dataset_paths_and_labels(
+        ...     data_dir, classes, n_images_per_class=100, random_sampling=True, random_seed=42
+        ... )
+        
+        >>> # Tout le dataset mélangé
+        >>> imgs, masks, lbls, lbls_int = load_dataset_paths_and_labels(
+        ...     data_dir, classes, n_images_per_class=None, shuffle=True, random_seed=42
+        ... )
     """
     if verbose:
         print("=" * 70)
         print("CHARGEMENT DES DONNÉES")
         print("=" * 70)
 
+    # Set random seed if needed
+    if random_sampling or shuffle:
+        random.seed(random_seed)
+
     image_paths = []
     mask_paths = []
     labels = []
     labels_int = []
 
-    for idx, cat in enumerate(categories):
-        cat_path = data_dir / cat / "images"
+    for idx, cls in enumerate(class_names):
+        cls_path = dataset_root_dir / cls / "images"
 
-        if not cat_path.exists():
-            logger.warning("Category path not found: %s", cat_path)
+        if not cls_path.exists():
+            if verbose:
+                print(f"  ⚠️ Chemin de classe introuvable: {cls_path}")
             continue
 
-        imgs = sorted(list(cat_path.glob("*.png")))
-
-        if n_images_per_class:
-            imgs = imgs[:n_images_per_class]
+        # Get all images for this class
+        imgs = sorted(list(cls_path.glob("*.png"))) 
+        
+        # Sample images if requested
+        if n_images_per_class is not None:
+            if random_sampling:
+                # Random sampling with seed for reproducibility
+                num_to_sample = min(n_images_per_class, len(imgs))
+                imgs = random.sample(imgs, num_to_sample)
+                if num_to_sample < n_images_per_class and verbose:
+                    print(f"  ⚠️ {cls}: seulement {num_to_sample}/{n_images_per_class} images disponibles")
+            else:
+                # Deterministic: take first N
+                imgs = imgs[:n_images_per_class]
 
         if load_masks:
             # Load corresponding masks
-            mask_cat_path = data_dir / cat / "masks"
+            mask_cls_path = dataset_root_dir / cls / "masks"
             for img_path in imgs:
-                mask_path = mask_cat_path / img_path.name
+                mask_path = mask_cls_path / img_path.name # Masks have same filename
                 if mask_path.exists():
                     image_paths.append(img_path)
                     mask_paths.append(mask_path)
-                    labels.append(cat)
+                    labels.append(cls)
                     labels_int.append(idx)
         else:
             # Load only images
             image_paths.extend(imgs)
-            labels.extend([cat] * len(imgs))
+            labels.extend([cls] * len(imgs))
             labels_int.extend([idx] * len(imgs))
 
         if verbose:
             suffix = " (avec masques)" if load_masks else ""
-            print(f"  {cat:20s}: {len(imgs):4d} images{suffix}")
+            mode = " [aléatoire]" if random_sampling else " [séquentiel]"
+            print(f"  {cls:20s}: {len(imgs):4d} images{suffix}{mode}")
+
+    # Validate that dataset is not empty
+    if not image_paths:
+        raise ValueError(
+            f"Aucune image trouvée dans {dataset_root_dir}. "
+            f"Vérifiez que les classes {class_names} existent et contiennent des images."
+        )
+
+    # Shuffle all data together (maintains correspondence)
+    if shuffle:
+        # Optimized shuffle using indices (avoids zip/unzip overhead)
+        indices = list(range(len(image_paths)))
+        random.shuffle(indices)
+        
+        image_paths = [image_paths[i] for i in indices]
+        labels = [labels[i] for i in indices]
+        labels_int = [labels_int[i] for i in indices]
+        
+        if load_masks:
+            mask_paths = [mask_paths[i] for i in indices]
+        
+        if verbose:
+            print(f"\n  🔀 Données mélangées (seed={random_seed})")
 
     labels_int = np.array(labels_int)
 
     if verbose:
         print(f"\n  Total: {len(image_paths)} images")
-        print(f"  Classes: {len(categories)}")
+        print(f"  Classes: {len(class_names)}")
         print(f"  Distribution: {np.bincount(labels_int)}")
         if load_masks:
             print(f"\n✅ Chemins des masques récupérés: {len(mask_paths)}")
+        if random_sampling:
+            print(f"  🎲 Échantillonnage aléatoire activé (seed={random_seed})")
+        if shuffle:
+            print(f"  🔀 Mélange activé (seed={random_seed})")
 
     return image_paths, mask_paths, labels, labels_int
 
@@ -156,30 +224,44 @@ def create_preprocessing_pipeline(
     return pipeline
 
 
-# pylint: disable=too-many-arguments,too-many-positional-arguments
+# pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
 def prepare_train_val_test_split(
     images: np.ndarray,
     labels_int: np.ndarray,
-    num_classes: int,
+    num_classes: Optional[int] = None,
     test_size: float = 0.15,
     val_size: float = 0.15,
     random_seed: int = 42,
     verbose: bool = True,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[
+    np.ndarray, np.ndarray, np.ndarray,
+    np.ndarray, np.ndarray, np.ndarray,
+    np.ndarray, np.ndarray, np.ndarray
+]:
     """
     Split data into train/validation/test sets with one-hot encoding.
 
     Args:
         images: Array of images
-        labels_int: Integer labels
-        num_classes: Number of classes
+        labels_int: Integer labels (0-indexed)
+        num_classes: Number of classes (auto-computed if None)
         test_size: Proportion of test set
         val_size: Proportion of validation set (from total)
         random_seed: Random seed for reproducibility
         verbose: Print split information
 
     Returns:
-        Tuple of (x_train, x_val, x_test, y_train_cat, y_val_cat, y_test_cat)
+        Tuple of (x_train, x_val, x_test, 
+                  y_train_cat, y_val_cat, y_test_cat,
+                  y_train, y_val, y_test)
+        
+    Examples:
+        >>> # Split automatique avec num_classes calculé
+        >>> x_tr, x_v, x_te, y_tr_cat, y_v_cat, y_te_cat, y_tr, y_v, y_te = prepare_train_val_test_split(
+        ...     images, labels_int, verbose=True
+        ... )
+        >>> # Utiliser y_tr pour compute_class_weights
+        >>> weights = compute_class_weights(y_tr, class_names)
     """
     if verbose:
         print("=" * 70)
@@ -188,30 +270,60 @@ def prepare_train_val_test_split(
 
     # Validate input consistency
     if len(images) != len(labels_int):
-        error_msg = (
-            f"⚠️  ERREUR: Nombre d'images ({len(images)}) != nombre de labels ({len(labels_int)})\n"
-            f"   Différence: {abs(len(images) - len(labels_int))} échantillon(s)\n"
+        raise ValueError(
+            f"Incohérence: {len(images)} images mais {len(labels_int)} labels. "
+            f"Différence: {abs(len(images) - len(labels_int))} échantillon(s)."
         )
-        print(error_msg)
+    
+    # Auto-compute num_classes if not provided
+    if num_classes is None:
+        num_classes = int(labels_int.max()) + 1
+        if verbose:
+            print(f"  Nombre de classes détecté automatiquement: {num_classes}")
+    
+    # Validate num_classes consistency
+    actual_num_classes = int(labels_int.max()) + 1
+    if num_classes < actual_num_classes:
+        raise ValueError(
+            f"num_classes={num_classes} mais labels contiennent des valeurs jusqu'à {labels_int.max()}. "
+            f"Minimum requis: {actual_num_classes}"
+        )
+    
+    if verbose and num_classes > actual_num_classes:
+        print(f"  ⚠️  num_classes={num_classes} mais seulement {actual_num_classes} classes présentes dans les données")
 
     # First split: train+val vs test
-    x_train_val, x_test, y_train_val, y_test = train_test_split(
-        images,
-        labels_int,
-        test_size=test_size,
-        random_state=random_seed,
-        stratify=labels_int,
-    )
+    try:
+        x_train_val, x_test, y_train_val, y_test = train_test_split(
+            images,
+            labels_int,
+            test_size=test_size,
+            random_state=random_seed,
+            stratify=labels_int,
+        )
+    except ValueError as e:
+        raise ValueError(
+            f"Échec du split stratifié (test). Vérifiez que chaque classe a au moins 2 échantillons. "
+            f"Erreur: {e}"
+        ) from e
+
+    # Train+val now contains (1 - test_size) of data
 
     # Second split: train vs val
     val_size_adjusted = val_size / (1 - test_size)
-    x_train, x_val, y_train, y_val = train_test_split(
-        x_train_val,
-        y_train_val,
-        test_size=val_size_adjusted,
-        random_state=random_seed,
-        stratify=y_train_val,
-    )
+    try:
+        x_train, x_val, y_train, y_val = train_test_split(
+            x_train_val,
+            y_train_val,
+            test_size=val_size_adjusted,
+            random_state=random_seed,
+            stratify=y_train_val,
+        )
+    except ValueError as e:
+        raise ValueError(
+            f"Échec du split stratifié (val). Essayez de réduire val_size ou augmentez le dataset. "
+            f"Erreur: {e}"
+        ) from e
 
     # One-hot encoding
     y_train_cat = keras.utils.to_categorical(y_train, num_classes=num_classes)
@@ -219,25 +331,26 @@ def prepare_train_val_test_split(
     y_test_cat = keras.utils.to_categorical(y_test, num_classes=num_classes)
 
     if verbose:
-        print(f"\nTrain set: {x_train.shape[0]} images")
+        print(f"\nTrain set: {x_train.shape[0]} images ({x_train.shape[0]/len(images)*100:.1f}%)")
         print(f"  Distribution: {np.bincount(y_train)}")
-        print(f"\nValidation set: {x_val.shape[0]} images")
+        print(f"\nValidation set: {x_val.shape[0]} images ({x_val.shape[0]/len(images)*100:.1f}%)")
         print(f"  Distribution: {np.bincount(y_val)}")
-        print(f"\nTest set: {x_test.shape[0]} images")
+        print(f"\nTest set: {x_test.shape[0]} images ({x_test.shape[0]/len(images)*100:.1f}%)")
         print(f"  Distribution: {np.bincount(y_test)}")
+        print(f"\n✅ Split effectué avec succès (seed={random_seed})")
 
-    return x_train, x_val, x_test, y_train_cat, y_val_cat, y_test_cat
+    return x_train, x_val, x_test, y_train_cat, y_val_cat, y_test_cat, y_train, y_val, y_test
 
 
 def compute_class_weights(
-    y_train: np.ndarray, categories: List[str], verbose: bool = True
+    y_train: np.ndarray, classes: List[str], verbose: bool = True
 ) -> Dict[int, float]:
     """
     Compute balanced class weights.
 
     Args:
         y_train: Training labels (integer)
-        categories: List of category names
+        classes: List of class names
         verbose: Print weight information
 
     Returns:
@@ -256,8 +369,8 @@ def compute_class_weights(
 
     if verbose:
         print("\nPoids de classe:")
-        for i, cat in enumerate(categories):
-            print(f"  {cat:20s}: {class_weights[i]:.3f}")
+        for i, cls in enumerate(classes):
+            print(f"  {cls:20s}: {class_weights[i]:.3f}")
         print("\n✅ Class weighting activé pour un apprentissage équilibré")
 
     return class_weights

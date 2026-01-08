@@ -180,8 +180,7 @@ doc/
 # latex
 
 img_latex/
-# EDA Pipeline outputs
-outputs/
 COVID-19_Radiography_Dataset.zip
-page/10_test.py
+/COVID-19_Radiography_Dataset
 test_kagglehub.py
+page/10_test.py

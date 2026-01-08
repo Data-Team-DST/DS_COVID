@@ -51,21 +51,21 @@ def run():
     st.markdown("""
     **SVM** : C (régularisation), max itérations
     
-    **Random Forest** : nb arbres, profondeur max, critères division
+    **Random Forest** : nb arbres, profondeur max
     """)
     chemin_global = Path(__file__).parent.parent
     st.write(f"Chemin global du projet : {chemin_global}")
     st.info("**Les différents hyperparamètres ont été sauvegardés dans un fichier.json**")
     chemin_absolu = rf"{chemin_global}/page/parametres.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
-    st.image(str(image_path), caption="Les hyperparamètres", use_column_width=True)
+    st.image(str(image_path), caption="Les hyperparamètres", use_column_width=False)
     st.markdown("### **Résultats de la matrice de confusion pour les modèles SVM et Random Forest avec Grid Search**")
     chemin_absolu_1 = rf"{chemin_global}/page/grid_search_randomforest.png"
     image_path_1 = Path(chemin_absolu_1).relative_to(Path.cwd())
-    st.image(str(image_path_1), caption="Matrice de confusion random forest", use_column_width=True)
+    st.image(str(image_path_1), caption="Matrice de confusion random forest", use_column_width=False)
     chemin_absolu_2 = rf"{chemin_global}/page/grid_search_svm.png"
     image_path_2 = Path(chemin_absolu_2).relative_to(Path.cwd())
-    st.image(str(image_path_2), caption="Matrice de confusion SVM", use_column_width=True)
+    st.image(str(image_path_2), caption="Matrice de confusion SVM", use_column_width=False)
     st.info("**Les hyperparamètres optimaux identifiés par Grid Search ont permis daméliorer significativement les performances de base des modèles.**")
 
     st.markdown("### **Interprétabilité**")

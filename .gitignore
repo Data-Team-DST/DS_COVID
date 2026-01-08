@@ -171,3 +171,6 @@ env_windows/pyvenv.cfg
 # Docs
 
 doc/
+COVID-19_Radiography_Dataset.zip
+page/10_test.py
+test_kagglehub.py

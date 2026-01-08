@@ -71,14 +71,14 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         self.seed = seed
         self.verbose = verbose
 
-    def fit(self, data_x, data_y=None):
+    def fit(self, X, y=None):
         """Fit the transformer by initializing random state.
 
         Parameters
         ----------
-        data_x : array-like
+        X : array-like
             Input data (unused)
-        data_y : array-like, optional
+        y : array-like, optional
             Target data (unused)
 
         Returns
@@ -166,14 +166,14 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
 
         return img_padded
 
-    def transform(self, data_x: np.ndarray, data_y=None) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Transform images by applying augmentation.
 
         Parameters
         ----------
-        data_x : np.ndarray
+        X : np.ndarray
             Images to augment
-        data_y : array-like, optional
+        y : array-like, optional
             Target data (unused)
 
         Returns
@@ -182,12 +182,12 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
             Augmented images with same shape as input
         """
         if not hasattr(self, "rng_"):
-            self.fit(data_x)
+            self.fit(X)
 
         if self.verbose:
-            logger.info(f"Augmenting {len(data_x)} images (p={self.probability})...")
+            logger.info(f"Augmenting {len(X)} images (p={self.probability})...")
 
-        data_array = np.array(data_x)
+        data_array = np.array(X)
         original_shape = data_array.shape
         data_aug = []
         n_augmented = 0
@@ -221,8 +221,8 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
 
         if self.verbose:
             logger.info(
-                f"Augmentation completed: {n_augmented}/{len(data_x)} "
-                f"images augmented ({n_augmented/len(data_x)*100:.1f}%)"
+                f"Augmentation completed: {n_augmented}/{len(X)} "
+                f"images augmented ({n_augmented/len(X)*100:.1f}%)"
             )
 
         result = np.array(data_aug)
@@ -281,14 +281,14 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
         self.seed = seed
         self.verbose = verbose
 
-    def fit(self, data_x, data_y=None):
+    def fit(self, X, y=None):
         """Fit the transformer by initializing random state.
 
         Parameters
         ----------
-        data_x : array-like
+        X : array-like
             Input data (unused)
-        data_y : array-like, optional
+        y : array-like, optional
             Target data (unused)
 
         Returns
@@ -345,14 +345,14 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
 
         return top, left
 
-    def transform(self, data_x: np.ndarray, data_y=None) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Transform images by applying random cropping.
 
         Parameters
         ----------
-        data_x : np.ndarray
+        X : np.ndarray
             Images to crop
-        data_y : array-like, optional
+        y : array-like, optional
             Target data (unused)
 
         Returns
@@ -361,11 +361,11 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
             Cropped images
         """
         if not hasattr(self, "rng_"):
-            self.fit(data_x)
+            self.fit(X)
 
         if self.verbose:
             logger.info(
-                f"Cropping {len(data_x)} images to {self.crop_size}"
+                f"Cropping {len(X)} images to {self.crop_size}"
                 f" (mode: {self.mode})..."
             )
 
@@ -380,7 +380,7 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
             pad_h, pad_w = self.padding
 
         iterator = (
-            tqdm(data_x, desc=f"Cropping ({self.mode})") if self.verbose else data_x
+            tqdm(X, desc=f"Cropping ({self.mode})") if self.verbose else X
         )
 
         for img in iterator:
@@ -423,7 +423,7 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
         self.n_images_cropped_ = n_cropped
 
         if self.verbose:
-            logger.info(f"Cropping completed: {n_cropped}/{len(data_x)} images cropped")
+            logger.info(f"Cropping completed: {n_cropped}/{len(X)} images cropped")
             if cropped:
                 logger.info(f"Output shape: {cropped[0].shape}")
 

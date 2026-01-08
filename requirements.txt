@@ -5,6 +5,7 @@ pandas>=2.2.0,<3.0.0
 
 # Machine Learning
 scikit-learn>=1.5.0,<2.0.0
+scikit-image>=0.20.0,<1.0.0
 
 # Deep Learning (optional - install only where compatible)
 # tensorflow is heavy; keep comment if you don't need it on Streamlit cloud

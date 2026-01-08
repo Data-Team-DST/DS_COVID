@@ -1,93 +1,11 @@
 """Application Streamlit standalone pour tester le ImageLoader."""
 
-import random
 from pathlib import Path
 
 import streamlit as st
 
 from src.features.Pipelines.transformateurs.image_loaders import ImageLoader
-
-
-def get_random_images_paths_and_labels(
-    dataset_base: Path,
-    class_names: list[str] | str,
-    num_samples_per_class: int,
-    seed: int = 42,
-) -> tuple[list[Path], list[str]]:
-    """
-    Sélectionne aléatoirement des images du dataset avec distribution équilibrée.
-    
-    Args:
-        dataset_base: Chemin racine du dataset
-        class_names: Nom(s) de classe(s) ('COVID', 'Normal', etc. ou liste de ceux-ci, ou 'all' pour toutes les classes)
-        num_samples_per_class: Nombre d'images à sélectionner par classe (distribution équilibrée)
-        seed: Seed pour la génération aléatoire
-    
-    Returns:
-        tuple: (liste des chemins d'images, liste des labels correspondants)
-        Les images sont mélangées aléatoirement après sélection
-    
-    Examples:
-        >>> # Une seule classe : 10 images COVID
-        >>> paths, labels = get_random_images_paths_and_labels(base, "COVID", 10, seed=42)
-        >>> # Plusieurs classes : 10 images de chaque = 20 total
-        >>> paths, labels = get_random_images_paths_and_labels(base, ["COVID", "Normal"], 10, seed=42)
-        >>> # Toutes les classes : 10 images de chaque = 40 total
-        >>> paths, labels = get_random_images_paths_and_labels(base, "all", 10, seed=42)
-    """
-    
-    
-    # Normaliser l'entrée : toujours travailler avec une liste
-    if isinstance(class_names, str):
-        if class_names.lower() == "all":
-            class_names = ["COVID", "Normal", "Lung_Opacity", "Viral Pneumonia"]
-        else:
-            class_names = [class_names]
-    
-    # Collecter les images PAR CLASSE pour garantir l'équilibre
-    all_selected: list[tuple[Path, str]] = []
-    
-    for class_name in class_names:
-        class_dir = dataset_base / class_name / "images"
-        
-        if not class_dir.exists():
-            st.warning(f"⚠️ Classe '{class_name}' introuvable dans {class_dir}")
-            continue
-        
-        images = list(class_dir.glob("*.png")) # Toutes les images de la classe 
-        
-        if not images:
-            st.warning(f"⚠️ Aucune image trouvée pour la classe '{class_name}'")
-            continue
-        
-        # Si num_samples_per_class est None, prendre TOUTES les images
-        if num_samples_per_class is None:
-            selected_for_class = images
-            st.info(f"📊 Classe '{class_name}': {len(selected_for_class)} images (TOUTES)")
-        else:
-            # Sélectionner exactement num_samples_per_class images de cette classe
-            num_to_sample = min(num_samples_per_class, len(images))
-            selected_for_class = random.sample(images, num_to_sample)
-            
-            if num_to_sample < num_samples_per_class:
-                st.warning(
-                    f"⚠️ Classe '{class_name}': seulement {num_to_sample}/{num_samples_per_class} images disponibles"
-                )
-        
-        # Ajouter (chemin, classe) pour chaque image sélectionnée
-        all_selected.extend([(img, class_name) for img in selected_for_class])
-    
-    if not all_selected:
-        raise ValueError(f"Aucune image trouvée pour les classes : {class_names}")
-    
-    # Mélanger aléatoirement l'ensemble pour éviter d'avoir toutes les classes groupées
-    random.shuffle(all_selected)
-    
-    # Séparer chemins et classes
-    image_paths = [item[0] for item in all_selected]
-    image_classes = [item[1] for item in all_selected]
-    
-    return image_paths, image_classes
+from src.utils.data_utils import load_dataset_paths_and_labels
 
 
 def main():
@@ -197,21 +115,29 @@ def main():
     if st.button("🚀 Charger les images avec ImageLoader", type="primary"):
         with st.spinner("Chargement en cours..."):
             try:
-                # Utiliser la fonction refactorisée avec distribution équilibrée
+                # Déterminer les classes à charger
                 if dataset_class == "Toutes":
-                    selected_images, image_classes = get_random_images_paths_and_labels(
-                        dataset_base, "all", nb_images_per_class, seed=random_seed
-                    )
-                    # Compter les images par classe pour vérification
-                    from collections import Counter
-                    class_counts = Counter(image_classes)
-                    count_str = ", ".join([f"{cls}: {cnt}" for cls, cnt in sorted(class_counts.items())])
-                    st.info(f"📁 {len(selected_images)} images chargées | Distribution: {count_str}")
+                    class_names = ["COVID", "Normal", "Lung_Opacity", "Viral Pneumonia"]
                 else:
-                    selected_images, image_classes = get_random_images_paths_and_labels(
-                        dataset_base, dataset_class, nb_images_per_class, seed=random_seed
-                    )
-                    st.info(f"📁 {len(selected_images)} images de la classe {dataset_class}")
+                    class_names = [dataset_class]
+                
+                # Utiliser load_dataset_paths_and_labels de data_utils
+                selected_images, _, image_classes, _ = load_dataset_paths_and_labels(
+                    dataset_root_dir=dataset_base,
+                    class_names=class_names,
+                    n_images_per_class=nb_images_per_class,
+                    load_masks=False,
+                    random_sampling=True,
+                    random_seed=random_seed,
+                    shuffle=True,
+                    verbose=False  # On gère l'affichage dans Streamlit
+                )
+                
+                # Afficher la distribution
+                from collections import Counter
+                class_counts = Counter(image_classes)
+                count_str = ", ".join([f"{cls}: {cnt}" for cls, cnt in sorted(class_counts.items())])
+                st.info(f"📁 {len(selected_images)} images chargées | Distribution: {count_str}")
 
                 # Initialisation du loader
                 loader = ImageLoader(

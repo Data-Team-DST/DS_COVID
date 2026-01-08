@@ -132,7 +132,17 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         Applique un zoom aléatoire à une image
         tout en conservant la taille originale.
         """
-        h, w, c = img.shape
+        # Ne rien faire si zoom_range n'est pas défini
+        if self.zoom_range is None:
+            return img
+            
+        # Gérer à la fois grayscale (2D) et couleur (3D)
+        if img.ndim == 2:
+            h, w = img.shape
+            is_grayscale = True
+        else:
+            h, w, c = img.shape
+            is_grayscale = False
 
         # Choix aléatoire du facteur de zoom
         zoom_factor = np.random.uniform(self.zoom_range[0], self.zoom_range[1])
@@ -141,18 +151,27 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         new_h, new_w = int(h * zoom_factor), int(w * zoom_factor)
 
         # Redimensionne l'image
-        img_zoomed = resize(img, (new_h, new_w, c), anti_aliasing=True)
+        if is_grayscale:
+            img_zoomed = resize(img, (new_h, new_w), anti_aliasing=True)
+        else:
+            img_zoomed = resize(img, (new_h, new_w, c), anti_aliasing=True)
 
         # Calcul du padding nécessaire pour revenir à la taille originale
         pad_h = max(h - new_h, 0)
         pad_w = max(w - new_w, 0)
 
-        # Pad (hauteur, largeur, canaux)
-        npad = (
-            (pad_h // 2, pad_h - pad_h // 2),
-            (pad_w // 2, pad_w - pad_w // 2),
-            (0, 0),
-        )  # pas de padding sur les canaux
+        # Pad (hauteur, largeur) ou (hauteur, largeur, canaux)
+        if is_grayscale:
+            npad = (
+                (pad_h // 2, pad_h - pad_h // 2),
+                (pad_w // 2, pad_w - pad_w // 2),
+            )
+        else:
+            npad = (
+                (pad_h // 2, pad_h - pad_h // 2),
+                (pad_w // 2, pad_w - pad_w // 2),
+                (0, 0),
+            )  # pas de padding sur les canaux
 
         img_padded = np.pad(
             img_zoomed, pad_width=npad, mode="constant", constant_values=0

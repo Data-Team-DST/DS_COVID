@@ -180,15 +180,7 @@ doc/
 # latex
 
 img_latex/
-
-# LaTeX auxiliary files
-*.aux
-*.log
-*.nav
-*.out
-*.snm
-*.toc
-*.vrb
-*.fdb_latexmk
-*.fls
-*.synctex.gz
+COVID-19_Radiography_Dataset.zip
+/COVID-19_Radiography_Dataset
+test_kagglehub.py
+page/10_test.py

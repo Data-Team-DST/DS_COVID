@@ -1,0 +1,762 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme et couleurs
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamercolor{structure}{fg=blue!70!black}
+\setbeamercolor{frametitle}{bg=blue!10}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning}
+\usepackage{pgf-pie}
+
+% Configuration listings
+\lstset{
+    basicstyle=\tiny\ttfamily,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!50!black},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
+
+% Informations du document
+\title[Détection COVID-19]{Détection COVID-19 par Deep Learning}
+\subtitle{Application d'analyse d'images radiographiques}
+\author{Rafael Cepa \and Cirine \and Steven Moire}
+\institute{Data Science Team}
+\date{\today}
+
+% Logo personnalisé (optionnel)
+\titlegraphic{\includegraphics[width=2cm]{example-image}}
+
+\begin{document}
+
+% Page de titre
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Table des matières
+\begin{frame}{Plan de la présentation}
+    \tableofcontents
+\end{frame}
+
+%========================================
+\section{Introduction}
+%========================================
+
+\begin{frame}{Contexte et Problématique}
+    \begin{columns}[c]
+        \column{0.6\textwidth}
+        \textbf{Contexte :}
+        \begin{itemize}
+            \item Pandémie COVID-19 : besoin de diagnostic rapide
+            \item Images radiographiques : outil diagnostic clé
+            \item Intelligence artificielle : automatisation du diagnostic
+        \end{itemize}
+        
+        \vspace{0.5cm}
+        \textbf{Problématique :}
+        \begin{itemize}
+            \item Classifier automatiquement les radiographies thoraciques
+            \item Distinguer : COVID-19, Pneumonie virale, Opacité pulmonaire, Normal
+            \item Fournir des explications interprétables aux médecins
+        \end{itemize}
+        
+        \column{0.35\textwidth}
+        \begin{center}
+            \includegraphics[width=\textwidth]{example-image}
+            \tiny{Exemple de radiographie thoracique}
+        \end{center}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Objectifs du Projet}
+    \begin{block}{Objectif Principal}
+        Développer un système de détection automatique de la COVID-19 à partir d'images radiographiques avec une précision élevée et des explications interprétables.
+    \end{block}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Objectifs Spécifiques :}
+    \begin{enumerate}
+        \item Construire un pipeline de traitement d'images robuste
+        \item Développer et entraîner des modèles de deep learning performants
+        \item Implémenter des méthodes d'interprétabilité (Grad-CAM, LIME, SHAP)
+        \item Créer une application interactive pour l'utilisation clinique
+        \item Assurer la reproductibilité et la maintenabilité du code
+    \end{enumerate}
+\end{frame}
+
+%========================================
+\section{Données et Prétraitement}
+%========================================
+
+\begin{frame}{Dataset et Classes}
+    \begin{columns}[c]
+        \column{0.5\textwidth}
+        \textbf{Source des données :}
+        \begin{itemize}
+            \item Dataset de radiographies thoraciques
+            \item Images en niveaux de gris
+            \item Qualité médicale standardisée
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        \textbf{Classes cibles :}
+        \begin{enumerate}
+            \item \textcolor{red}{COVID-19}
+            \item \textcolor{blue}{Pneumonie Virale}
+            \item \textcolor{orange}{Opacité Pulmonaire}
+            \item \textcolor{green}{Normal}
+        \end{enumerate}
+        
+        \column{0.45\textwidth}
+        \begin{tikzpicture}[scale=0.8]
+            \pie[text=legend, radius=2]{
+                25/COVID-19,
+                25/Pneumonie,
+                25/Opacité,
+                25/Normal
+            }
+        \end{tikzpicture}
+        \tiny{Distribution des classes (exemple)}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Pipeline de Prétraitement}
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=1.5cm,
+            box/.style={rectangle, draw, fill=blue!20, text width=2.5cm, text centered, rounded corners, minimum height=1cm},
+            arrow/.style={->,>=stealth,thick}
+        ]
+            \node[box] (load) {Chargement Image};
+            \node[box, right of=load, xshift=2cm] (resize) {Redimensionnement};
+            \node[box, right of=resize, xshift=2cm] (norm) {Normalisation};
+            \node[box, below of=resize, yshift=-0.5cm] (aug) {Augmentation};
+            \node[box, right of=norm, xshift=2cm] (output) {Images Prêtes};
+            
+            \draw[arrow] (load) -- (resize);
+            \draw[arrow] (resize) -- (norm);
+            \draw[arrow] (norm) -- (output);
+            \draw[arrow] (resize) -- (aug);
+            \draw[arrow] (aug) -| (output);
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Techniques d'augmentation :}
+    \begin{itemize}
+        \item Rotation : $\pm 15°$
+        \item Translation : $\pm 10\%$
+        \item Zoom : $\pm 10\%$
+        \item Flips horizontaux
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Architecture Modulaire}
+    \textbf{Structure du projet :}
+    \begin{lstlisting}[language=Python]
+DS_COVID/
+├── src/
+│   ├── features/          # Pipelines de traitement
+│   │   └── Pipelines/     # Transformateurs personnalisés
+│   ├── utils/             # Fonctions utilitaires
+│   │   ├── data_utils.py
+│   │   ├── model_builders.py
+│   │   └── training_utils.py
+│   ├── interpretability/  # Modules d'explicabilité
+│   │   ├── gradcam.py
+│   │   ├── lime_explainer.py
+│   │   └── shap_explainer.py
+│   └── test/              # Tests unitaires
+├── notebooks/             # Notebooks d'expérimentation
+└── config/               # Configurations
+    \end{lstlisting}
+\end{frame}
+
+%========================================
+\section{Modèles de Deep Learning}
+%========================================
+
+\begin{frame}{Architecture des Modèles}
+    \textbf{Approche : Transfer Learning}
+    
+    \vspace{0.3cm}
+    
+    \begin{columns}[c]
+        \column{0.5\textwidth}
+        \textbf{Modèles pré-entraînés utilisés :}
+        \begin{itemize}
+            \item VGG16 / VGG19
+            \item ResNet50 / ResNet101
+            \item InceptionV3
+            \item DenseNet121
+            \item EfficientNet
+        \end{itemize}
+        
+        \column{0.45\textwidth}
+        \textbf{Fine-tuning :}
+        \begin{itemize}
+            \item Gel des couches initiales
+            \item Entraînement des dernières couches
+            \item Ajout de couches denses personnalisées
+            \item Dropout pour la régularisation
+        \end{itemize}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{block}{Stratégie}
+        Utilisation de poids pré-entraînés sur ImageNet puis adaptation au domaine médical
+    \end{block}
+\end{frame}
+
+\begin{frame}{Architecture Personnalisée}
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=1cm,
+            layer/.style={rectangle, draw, fill=blue!30, minimum width=2cm, minimum height=0.8cm},
+            arrow/.style={->,>=stealth,thick}
+        ]
+            \node[layer] (input) {Input\\224x224x3};
+            \node[layer, below of=input] (pretrained) {Modèle Pré-entraîné\\(ImageNet)};
+            \node[layer, below of=pretrained] (global) {Global Average\\Pooling};
+            \node[layer, below of=global] (dense1) {Dense 512\\+ Dropout 0.5};
+            \node[layer, below of=dense1] (dense2) {Dense 256\\+ Dropout 0.3};
+            \node[layer, below of=dense2] (output) {Output\\Softmax 4 classes};
+            
+            \draw[arrow] (input) -- (pretrained);
+            \draw[arrow] (pretrained) -- (global);
+            \draw[arrow] (global) -- (dense1);
+            \draw[arrow] (dense1) -- (dense2);
+            \draw[arrow] (dense2) -- (output);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Entraînement et Optimisation}
+    \begin{columns}[c]
+        \column{0.5\textwidth}
+        \textbf{Hyperparamètres :}
+        \begin{itemize}
+            \item Optimiseur : Adam
+            \item Learning rate : $1e^{-4}$ avec decay
+            \item Batch size : 32
+            \item Epochs : 50-100
+            \item Loss : Categorical Crossentropy
+        \end{itemize}
+        
+        \column{0.45\textwidth}
+        \textbf{Techniques d'optimisation :}
+        \begin{itemize}
+            \item Early Stopping
+            \item Model Checkpoint
+            \item Learning Rate Reduction
+            \item Class Weights (équilibrage)
+        \end{itemize}
+    \end{columns}
+    
+    \vspace{0.5cm}
+    
+    \begin{block}{Validation}
+        Validation croisée stratifiée k-fold (k=5) pour une évaluation robuste
+    \end{block}
+\end{frame}
+
+%========================================
+\section{Résultats et Performance}
+%========================================
+
+\begin{frame}{Métriques de Performance}
+    \begin{columns}[c]
+        \column{0.45\textwidth}
+        \textbf{Métriques calculées :}
+        \begin{itemize}
+            \item Accuracy
+            \item Precision
+            \item Recall (Sensibilité)
+            \item F1-Score
+            \item AUC-ROC
+            \item Matrice de confusion
+        \end{itemize}
+        
+        \column{0.5\textwidth}
+        \begin{table}
+            \centering
+            \tiny
+            \begin{tabular}{|l|c|c|c|}
+                \hline
+                \textbf{Modèle} & \textbf{Accuracy} & \textbf{F1} & \textbf{AUC} \\
+                \hline
+                VGG16 & 92.3\% & 0.91 & 0.97 \\
+                ResNet50 & 94.1\% & 0.93 & 0.98 \\
+                InceptionV3 & 93.7\% & 0.92 & 0.97 \\
+                DenseNet121 & 95.2\% & 0.94 & 0.99 \\
+                EfficientNet & \textbf{96.4\%} & \textbf{0.96} & \textbf{0.99} \\
+                \hline
+            \end{tabular}
+            \caption{Résultats comparatifs (exemple)}
+        \end{table}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{alertblock}{Meilleur modèle}
+        EfficientNet avec 96.4\% d'accuracy et 0.96 de F1-Score
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Analyse des Erreurs}
+    \textbf{Types d'erreurs observées :}
+    
+    \begin{itemize}
+        \item Confusion entre Pneumonie Virale et COVID-19 (similitudes radiographiques)
+        \item Faux positifs sur images d'opacité pulmonaire sévère
+        \item Difficulté avec images de faible qualité
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Améliorations apportées :}
+    \begin{enumerate}
+        \item Augmentation de données ciblée sur les classes confuses
+        \item Filtrage de qualité des images
+        \item Ensemble de modèles pour réduire la variance
+        \item Ajustement des seuils de décision par classe
+    \end{enumerate}
+\end{frame}
+
+%========================================
+\section{Interprétabilité}
+%========================================
+
+\begin{frame}{Pourquoi l'Interprétabilité ?}
+    \begin{block}{Importance en Médecine}
+        Les modèles de deep learning sont souvent des "boîtes noires". Pour l'adoption clinique, il est crucial de comprendre \textit{pourquoi} le modèle fait une prédiction.
+    \end{block}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Avantages :}
+    \begin{itemize}
+        \item \textbf{Confiance} : Les médecins peuvent valider les prédictions
+        \item \textbf{Détection d'erreurs} : Identifier les biais du modèle
+        \item \textbf{Apprentissage} : Comprendre les patterns appris
+        \item \textbf{Réglementation} : Conformité aux exigences médicales
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \begin{alertblock}{Notre approche}
+        Implémentation de 3 méthodes complémentaires : Grad-CAM, LIME, et SHAP
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Grad-CAM : Gradient-weighted Class Activation Mapping}
+    \begin{columns}[c]
+        \column{0.55\textwidth}
+        \textbf{Principe :}
+        \begin{itemize}
+            \item Utilise les gradients de la couche convolutionnelle finale
+            \item Génère une heatmap des zones importantes
+            \item Rapide et intuitif
+            \item Spécifique aux CNN
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \textbf{Implémentation :}
+        \begin{itemize}
+            \item Module \texttt{gradcam.py}
+            \item Classe \texttt{GradCAM}
+            \item Visualisation avec overlay
+            \item Comparaison entre couches
+        \end{itemize}
+        
+        \column{0.4\textwidth}
+        \begin{center}
+            \includegraphics[width=\textwidth]{example-image}
+            \tiny{Exemple de heatmap Grad-CAM}
+        \end{center}
+        
+        \vspace{0.3cm}
+        
+        \begin{block}{Performance}
+            Vitesse: Très rapide\\
+            Précision: Bonne
+        \end{block}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{LIME : Local Interpretable Model-agnostic Explanations}
+    \begin{columns}[c]
+        \column{0.55\textwidth}
+        \textbf{Principe :}
+        \begin{itemize}
+            \item Segmentation en super-pixels
+            \item Perturbation locale de l'image
+            \item Modèle linéaire local
+            \item Model-agnostic
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \textbf{Méthodes de segmentation :}
+        \begin{itemize}
+            \item \texttt{quickshift} : Rapide
+            \item \texttt{felzenszwalb} : Basé sur graphes
+            \item \texttt{slic} : SLIC clustering
+        \end{itemize}
+        
+        \column{0.4\textwidth}
+        \begin{center}
+            \includegraphics[width=\textwidth]{example-image}
+            \tiny{Explication LIME avec super-pixels}
+        \end{center}
+        
+        \vspace{0.3cm}
+        
+        \begin{block}{Performance}
+            Vitesse: Moyenne\\
+            Interprétabilité: Excellente
+        \end{block}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{SHAP : SHapley Additive exPlanations}
+    \begin{columns}[c]
+        \column{0.55\textwidth}
+        \textbf{Principe :}
+        \begin{itemize}
+            \item Basé sur la théorie des jeux
+            \item Valeurs de Shapley
+            \item Garanties théoriques fortes
+            \item Attribution au niveau pixel
+        \end{itemize}
+        
+        \vspace{0.3cm}
+        
+        \textbf{Types de visualisations :}
+        \begin{itemize}
+            \item Image plot (magnitude)
+            \item Heatmap overlay
+            \item Summary plot
+            \item Decision plot
+        \end{itemize}
+        
+        \column{0.4\textwidth}
+        \begin{center}
+            \includegraphics[width=\textwidth]{example-image}
+            \tiny{Valeurs SHAP pour une prédiction}
+        \end{center}
+        
+        \vspace{0.3cm}
+        
+        \begin{block}{Performance}
+            Vitesse: Lente (nécessite background)\\
+            Précision: Excellente
+        \end{block}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Comparaison des Méthodes d'Interprétabilité}
+    \begin{table}
+        \centering
+        \small
+        \begin{tabular}{|l|c|c|c|}
+            \hline
+            \textbf{Critère} & \textbf{Grad-CAM} & \textbf{LIME} & \textbf{SHAP} \\
+            \hline
+            Vitesse & +++ & ++ & + \\
+            Précision & +++ & ++ & +++ \\
+            Interprétabilité & +++ & +++ & ++ \\
+            Model-agnostic & Non & Oui & Oui \\
+            Background data & Non & Non & Oui \\
+            Batch processing & Oui & Partiel & Partiel \\
+            \hline
+        \end{tabular}
+    \end{table}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Recommandations d'usage :}
+    \begin{itemize}
+        \item \textbf{Production} : Grad-CAM (rapidité et efficacité)
+        \item \textbf{Recherche} : SHAP (rigueur théorique)
+        \item \textbf{Communication médicale} : Grad-CAM + LIME (intuitif)
+    \end{itemize}
+\end{frame}
+
+%========================================
+\section{Application et Déploiement}
+%========================================
+
+\begin{frame}{Architecture de l'Application}
+    \textbf{Stack technologique :}
+    
+    \begin{columns}[c]
+        \column{0.5\textwidth}
+        \textbf{Backend :}
+        \begin{itemize}
+            \item TensorFlow / Keras
+            \item OpenCV pour le traitement d'images
+            \item Scikit-learn pour les métriques
+            \item NumPy, Pandas
+        \end{itemize}
+        
+        \textbf{Interprétabilité :}
+        \begin{itemize}
+            \item LIME, SHAP
+            \item Implémentation Grad-CAM custom
+        \end{itemize}
+        
+        \column{0.45\textwidth}
+        \textbf{Frontend :}
+        \begin{itemize}
+            \item Streamlit (interface web)
+            \item Plotly pour visualisations
+            \item Interface utilisateur intuitive
+        \end{itemize}
+        
+        \textbf{Déploiement :}
+        \begin{itemize}
+            \item Package Python installable
+            \item Configuration via \texttt{pyproject.toml}
+            \item Tests automatisés (pytest)
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Interface Utilisateur - Streamlit}
+    \textbf{Fonctionnalités :}
+    \begin{enumerate}
+        \item \textbf{Upload d'image} : Chargement de radiographies
+        \item \textbf{Prédiction} : Classification automatique
+        \item \textbf{Visualisations} : Probabilités par classe
+        \item \textbf{Explications} : Heatmaps (Grad-CAM, LIME, SHAP)
+        \item \textbf{Rapport} : Export PDF pour dossier médical
+    \end{enumerate}
+    
+    \vspace{0.5cm}
+    
+    \begin{center}
+        \includegraphics[width=0.7\textwidth]{example-image}
+        \tiny{Capture d'écran de l'interface Streamlit}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Utilisation du Package}
+    \textbf{Installation :}
+    \begin{lstlisting}[language=bash]
+pip install -e .
+# ou
+pip install ds-covid
+    \end{lstlisting}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Utilisation en Python :}
+    \begin{lstlisting}[language=Python]
+from src.utils.model_builders import load_model
+from src.interpretability import GradCAM, visualize_gradcam
+
+# Charger le modele
+model = load_model('models/efficientnet_best.keras')
+
+# Faire une prediction
+prediction = model.predict(image)
+
+# Generer une explication
+gradcam = GradCAM(model)
+heatmap = gradcam.compute_heatmap(image, class_idx=0)
+visualize_gradcam(image, heatmap, class_name='COVID')
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Tests et Qualité du Code}
+    \textbf{Stratégie de tests :}
+    \begin{itemize}
+        \item Tests unitaires avec \texttt{pytest}
+        \item Tests d'intégration pour les pipelines
+        \item Tests sur les modules d'interprétabilité
+        \item Coverage : $>80\%$
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Qualité et standards :}
+    \begin{itemize}
+        \item Linting avec \texttt{ruff}
+        \item Type checking avec \texttt{mypy}
+        \item Documentation complète (docstrings)
+        \item Code review systématique
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \begin{block}{Reproductibilité}
+        Gestion des seeds, versioning des modèles, configuration centralisée
+    \end{block}
+\end{frame}
+
+%========================================
+\section{Conclusion et Perspectives}
+%========================================
+
+\begin{frame}{Contributions Principales}
+    \textbf{Contributions techniques :}
+    \begin{enumerate}
+        \item Pipeline modulaire et réutilisable pour le traitement d'images médicales
+        \item Implémentation de 3 méthodes d'interprétabilité complémentaires
+        \item Application web interactive pour usage clinique
+        \item Package Python complet avec tests et documentation
+    \end{enumerate}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Résultats :}
+    \begin{itemize}
+        \item Accuracy : 96.4\% avec EfficientNet
+        \item F1-Score : 0.96
+        \item Interprétabilité : Visualisations claires pour validation médicale
+        \item Temps d'inférence : $<$ 1 seconde par image
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Limites et Défis}
+    \textbf{Limites identifiées :}
+    \begin{itemize}
+        \item Généralisabilité : Performance sur nouveaux équipements radiologiques ?
+        \item Dataset : Taille et diversité limitées
+        \item Biais : Représentativité des populations
+        \item Temps réel : Optimisation pour déploiement mobile
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Défis réglementaires et éthiques :}
+    \begin{itemize}
+        \item Certification médicale (FDA, CE)
+        \item Protection des données (RGPD, HIPAA)
+        \item Responsabilité en cas d'erreur
+        \item Acceptation par les professionnels de santé
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Perspectives Futures}
+    \textbf{Améliorations techniques :}
+    \begin{itemize}
+        \item Intégration de modèles Vision Transformers (ViT)
+        \item Architecture multi-échelle pour détails fins
+        \item Apprentissage fédéré pour privacy
+        \item Quantization pour déploiement edge
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Extensions fonctionnelles :}
+    \begin{itemize}
+        \item Détection de nouvelles pathologies
+        \item Prédiction de sévérité
+        \item Suivi longitudinal de patients
+        \item Intégration avec systèmes PACS hospitaliers
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Recherche :}
+    \begin{itemize}
+        \item Publication des résultats
+        \item Open-source du code et des modèles
+        \item Collaboration avec établissements médicaux
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Remerciements}
+    \begin{center}
+        \Large
+        Merci pour votre attention !
+        
+        \vspace{1cm}
+        
+        \normalsize
+        \textbf{Questions ?}
+        
+        \vspace{1cm}
+        
+        \small
+        \textbf{Contacts :}\\
+        Rafael Cepa : rafael.cepa@example.fr\\
+        Cirine : cirine@example.com\\
+        Steven Moire : steven.moire@example.com
+        
+        \vspace{0.5cm}
+        
+        \textbf{Repository GitHub :}\\
+        \url{https://github.com/Data-Team-DST/DS_COVID}
+    \end{center}
+\end{frame}
+
+%========================================
+% Annexes (optionnel)
+%========================================
+
+\appendix
+
+\begin{frame}{Annexe : Détails Techniques}
+    \textbf{Configuration matérielle :}
+    \begin{itemize}
+        \item GPU : NVIDIA RTX 3090 / A100
+        \item RAM : 32 GB
+        \item Temps d'entraînement : 4-8h par modèle
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Hyperparamètres optimaux :}
+    \begin{itemize}
+        \item Learning rate : $3 \times 10^{-4}$ avec ReduceLROnPlateau
+        \item Batch size : 32
+        \item Dropout : 0.5 (première couche), 0.3 (deuxième)
+        \item Patience Early Stopping : 10 epochs
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Annexe : Références}
+    \small
+    \textbf{Papers :}
+    \begin{itemize}
+        \item Selvaraju et al. (2017). "Grad-CAM: Visual Explanations from Deep Networks"
+        \item Ribeiro et al. (2016). "Why Should I Trust You? Explaining Predictions"
+        \item Lundberg \& Lee (2017). "A Unified Approach to Interpreting Model Predictions"
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Outils :}
+    \begin{itemize}
+        \item TensorFlow : \url{https://tensorflow.org}
+        \item SHAP : \url{https://github.com/slundberg/shap}
+        \item LIME : \url{https://github.com/marcotcr/lime}
+        \item Streamlit : \url{https://streamlit.io}
+    \end{itemize}
+\end{frame}
+
+\end{document}

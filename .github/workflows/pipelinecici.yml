@@ -1,0 +1,132 @@
+name: CI/CD
+
+on:
+  push:
+    paths-ignore:
+      - ".checkmarx/scan_results/*"
+    branches:
+      - '**'
+  pull_request:
+    paths-ignore:
+      - ".checkmarx/scan_results/*"
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  lint:
+    name: "Lint code"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          fi
+          python -m pip install pylint
+
+      - name: Lint per subfolder (fail if score < 8)
+        run: |
+          set -e
+          folders=("src" "src/features" "src/utils" "notebooks/colab" "notebooks")
+          for f in "${folders[@]}"; do
+              echo "=========================="
+              echo "Linting $f"
+              echo "=========================="
+              pylint --fail-under=8 "$f"
+          done
+
+  unit_tests:
+    name: "Run Unit Tests"
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt
+          fi
+
+      - name: Install local package
+        run: python -m pip install -e .
+
+      - name: Run Pytest with coverage
+        run: pytest --cov=src/ --cov-report xml:coverage.xml --cov-fail-under=30 .
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 7
+
+
+  sonarqube:
+    name: "SonarCloud Scan"
+    runs-on: ubuntu-latest
+    needs: unit_tests
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+
+      # 🧱 1. S'assurer que le dossier 'reports/' existe
+      - name: Ensure reports directory exists
+        run: mkdir -p reports
+
+      # 📁 2. Déplacer le coverage.xml dans le bon dossier
+      - name: Move coverage report
+        run: mv coverage.xml reports/coverage.xml
+
+      # 🧩 3. (Optionnel mais souvent nécessaire) Normaliser les chemins dans le coverage
+      # pour que SonarCloud retrouve bien les fichiers sources
+      - name: Normalize coverage paths
+        run: |
+          sed -i 's|/home/runner/work/.*/src|src|g' reports/coverage.xml
+          echo "Coverage file normalized:"
+          head -n 20 reports/coverage.xml
+
+      # 🔍 4. Vérification utile pour le debug
+      - name: Check coverage file exists
+        run: ls -lh reports/
+
+      # ☁️ 5. Lancement de l’analyse SonarCloud
+      - name: Run SonarCloud Analysis
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=Data-Team-DST_DS_COVID
+            -Dsonar.organization=data-team-dst-1
+            -Dsonar.python.coverage.reportPaths=reports/coverage.xml
+            -Dsonar.sources=src
+            -Dsonar.projectBaseDir=.
+            -Dsonar.coverage.exclusions=src/test/**,notebooks/**
+            -Dsonar.python.version=3.12
+            -Dsonar.verbose=true

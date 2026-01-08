@@ -11,14 +11,13 @@ INSTRUCTIONS:
 4. Les variables sont prêtes à l'emploi !
 
 Cette cellule est 100% autonome et fonctionne partout :
-✅ Google Colab (clone + installe automatiquement)
-✅ WSL / Linux Local
-✅ Tout environnement Jupyter
+✅ Google Colab (clone repo + mount Drive automatiquement)
+✅ Jupyter Local (notebook en local)
 
 APRÈS EXÉCUTION, VOUS POUVEZ UTILISER:
-- config: Objet de configuration (config.batch_size, config.data_dir, etc.)
-- ENV: Environnement détecté ('colab', 'wsl', 'local')
-- Tous les imports des transformers
+- project_root, data_dir, categories: Chemins et configuration
+- ENV: Environnement détecté ('colab' ou 'local')
+- Tous les transformateurs importés et prêts à l'emploi
 
 """
 
@@ -37,13 +36,12 @@ from pathlib import Path
 # =============================================================================
 
 def detect_environment():
-    """Détecte l'environnement (colab, wsl, local)"""
+    """Détecte l'environnement : colab ou local"""
     try:
         import google.colab
         return "colab"
     except ImportError:
-        is_wsl = os.path.exists('/proc/version') and 'microsoft' in open('/proc/version').read().lower()
-        return "wsl" if is_wsl else "local"
+        return "local"
 
 ENV = detect_environment()
 print(f"🌍 Environnement: {ENV.upper()}")
@@ -57,51 +55,47 @@ if ENV == "colab":
     print("\n🚀 Bootstrap Colab...")
     
     os.chdir('/content')
-    if not os.path.exists('/content/Data_Pipeline'):
+    if not os.path.exists('/content/DS_COVID_ORGA'):
         print("📥 Clonage du repository...")
-        subprocess.run(['git', 'clone', 'https://github.com/L-Poca/Data_Pipeline.git'], check=True)
+        subprocess.run(['git', 'clone', 'https://github.com/Data-Team-DST/DS_COVID.git', 'DS_COVID_ORGA'], check=True)
     
-    os.chdir('/content/Data_Pipeline')
+    os.chdir('/content/DS_COVID_ORGA')
     
-    # Checkout de la branche rafael_cleaning
+    # Checkout de la branche rafael2
     result = subprocess.run(
-        ['git', 'checkout', '-b', 'rafael_cleaning', 'origin/rafael_cleaning'],
+        ['git', 'checkout', '-b', 'rafael2', 'origin/rafael2'],
         capture_output=True,
         text=True
     )
     if result.returncode != 0:
         # Si la branche locale existe déjà, juste switcher
-        subprocess.run(['git', 'checkout', 'rafael_cleaning'], capture_output=True)
+        subprocess.run(['git', 'checkout', 'rafael2'], capture_output=True)
     
-    # ✅ setup.py détecte automatiquement Colab et n'installe AUCUNE dépendance
-    # Les packages natifs Colab sont utilisés (NumPy 2.0.2, TensorFlow 2.19.0, etc.)
-    print("✅ Utilisation des packages Colab natifs:")
-    print("   • NumPy 2.0.2")
-    print("   • TensorFlow 2.19.0")
-    print("   • SciPy 1.16.3")
-    print("   • scikit-learn 1.6.1")
+    # ✅ Colab a déjà tous les packages nécessaires
+    print("✅ Utilisation des packages Colab natifs")
     
-    # Installation du package en mode éditable (sans dépendances - détection Colab dans setup.py)
-    print("📦 Installation du package...")
-    result = subprocess.run(['pip', 'install', '-e', '.', '--quiet'], capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f"⚠️ Erreur installation: {result.stderr}")
-    else:
-        print("✅ Package installé")
-    
-    print("💾 Montage Google Drive...")
+    # Montage Google Drive pour le dataset
+    print("\n💾 Montage Google Drive...")
     from google.colab import drive
-    drive.mount('/content/drive')
+    drive.mount('/content/drive', force_remount=False)
     
-    # Extraction dataset
-    for archive in ['/content/drive/MyDrive/DS_COVID/archive_covid.zip']:
-        if os.path.exists(archive):
-            print("📦 Extraction dataset...")
-            os.makedirs('./data/raw/', exist_ok=True)
-            subprocess.run(['unzip', '-o', '-q', archive, '-d', './data/raw/COVID-19_Radiography_Dataset/'])
-            break
+    # Vérifier le dataset sur Drive
+    drive_dataset = Path('/content/drive/MyDrive/DS_COVID/archive_covid.zip')
+    local_dataset = Path('./data/raw/COVID-19_Radiography_Dataset/COVID-19_Radiography_Dataset')
     
-    print("✅ Bootstrap terminé")
+    if local_dataset.exists():
+        print("✅ Dataset déjà extrait localement")
+    elif drive_dataset.exists():
+        print("📦 Extraction dataset depuis Drive...")
+        os.makedirs('./data/raw/COVID-19_Radiography_Dataset/', exist_ok=True)
+        subprocess.run(['unzip', '-o', '-q', str(drive_dataset), '-d', './data/raw/COVID-19_Radiography_Dataset/'], check=True)
+        print("✅ Dataset extrait")
+    else:
+        print(f"⚠️ Dataset non trouvé sur Drive: {drive_dataset}")
+        print("   💡 Téléchargez depuis Kaggle et uploadez sur Drive")
+        print("   https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database")
+    
+    print("\n✅ Bootstrap Colab terminé")
 
 
 # =============================================================================
@@ -110,28 +104,26 @@ if ENV == "colab":
 
 # Déterminer project_root selon l'environnement
 if ENV == "colab":
-    project_root = Path('/content/Data_Pipeline')
-elif ENV == "wsl":
-    project_root = Path('/home/cepa/DST/projet_DS/Data_Pipeline/Data_Pipeline')
+    project_root = Path('/content/DS_COVID_ORGA')
 else:  # local
-    # Depuis un notebook dans src/notebooks/
-    project_root = Path.cwd().parent.parent
+    # Depuis un notebook dans notebooks/ ou à la racine
+    project_root = Path.cwd().parent if Path.cwd().name == 'notebooks' else Path.cwd()
 
-# Ajouter src/ au sys.path pour les imports
-# src_path = str(project_root / 'src')
-# if src_path not in sys.path:
-#     sys.path.insert(0, src_path)
-#     print(f"✅ Chemin src/ ajouté: {src_path}")
+# Ajouter au sys.path pour les imports
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+    print(f"✅ Chemin projet ajouté: {project_root}")
 
-# Charger la configuration depuis JSON
-from src.utils.config import build_config
+# Configuration manuelle (pas de fichier config.py dans ce projet)
+DATA_DIR = project_root / 'data' / 'raw' / 'COVID-19_Radiography_Dataset' / 'COVID-19_Radiography_Dataset'
+CATEGORIES = ['COVID', 'Lung_Opacity', 'Normal', 'Viral Pneumonia']
+IMG_SIZE = (299, 299) if ENV == "colab" else (128, 128)  # Plus grand en colab
+BATCH_SIZE = 128 if ENV == "colab" else 32  # Plus grand batch en colab
+EPOCHS = 50 if ENV == "colab" else 10  # Moins d'époques en local pour tests rapides
+MAX_SAMPLES_PER_CLASS = None if ENV == "colab" else 100 # Pour tests rapides, None pour tout utiliser
 
-config = build_config(project_root, ENV)
-
-# Exports pour compatibilité avec anciens notebooks
-data_dir = config.data_dir
-categories = config.classes
-img_size = config.img_size
+print(f"📂 Dataset configuré: {DATA_DIR}")
+print(f"🏷️ Classes: {', '.join(CATEGORIES)}")
 
 
 # =============================================================================
@@ -139,19 +131,23 @@ img_size = config.img_size
 # =============================================================================
 
 try:
-    from src.features.Pipelines.Transformateurs.image_loaders import ImageLoader
-    from src.features.Pipelines.Transformateurs.image_preprocessing import (
-        ImageResizer, ImageNormalizer, ImageFlattener
+    from src.features.Pipelines.transformateurs.image_loaders import ImageLoader
+    from src.features.Pipelines.transformateurs.image_preprocessing import (
+        ImageResizer, ImageNormalizer, ImageFlattener, ImageMasker, ImageBinarizer
     )
-    from src.features.Pipelines.Transformateurs.image_augmentation import (
+    from src.features.Pipelines.transformateurs.image_augmentation import (
         ImageAugmenter, ImageRandomCropper
     )
-    from src.features.Pipelines.Transformateurs.image_features import (
+    from src.features.Pipelines.transformateurs.image_features import (
         ImageHistogram, ImagePCA, ImageStandardScaler
     )
-    print("✅ Transformers importés")
+    from src.features.Pipelines.transformateurs.utilities import (
+        VisualizeTransformer, SaveTransformer
+    )
+    print("✅ Tous les transformateurs importés")
 except ImportError as e:
-    print(f"⚠️ Erreur import transformers: {e}")
+    print(f"⚠️ Erreur import transformateurs: {e}")
+    print(f"   Vérifiez que le projet est bien dans: {project_root}")
 
 
 # =============================================================================
@@ -165,6 +161,22 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow import keras
+import pandas as pd
+from collections import Counter
+from tqdm import tqdm
+import warnings
+warnings.filterwarnings('ignore')
+
+# Imports ML pour les métriques et modèles
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    accuracy_score, balanced_accuracy_score, f1_score,
+    classification_report, confusion_matrix, precision_score, recall_score
+)
+
+# Configuration supplémentaire pour les plots
+plt.style.use('seaborn-v0_8-darkgrid')
+sns.set_palette("husl")
 
 # =============================================================================
 # CONFIGURATION MATPLOTLIB
@@ -178,26 +190,30 @@ sns.set_style('whitegrid')
 # =============================================================================
 
 print("\n" + "=" * 70)
-print("✅ CONFIGURATION PRÊTE - Data Pipeline")
+print("✅ CONFIGURATION PRÊTE - DS_COVID Project")
 print("=" * 70)
 print(f"📂 Projet: {project_root}")
-print(f"📊 Dataset: {data_dir}")
-print(f"🏷️ Classes: {', '.join(categories)}")
-print(f"🎛️ Images: {img_size}")
-print(f"🔧 Batch: {config.batch_size} | Époques: {config.epochs}")
-print(f"📐 Dataset accessible: {'✅' if data_dir.exists() else '❌'}")
-if not data_dir.exists():
-    print(f"   ⚠️ Créez le dossier ou placez les données dans: {data_dir}")
+print(f"📊 Dataset: {DATA_DIR}")
+print(f"🏷️ Classes: {', '.join(CATEGORIES)}")
+print(f"🎛️ Images: {IMG_SIZE}")
+print(f"🔧 Batch: {BATCH_SIZE} | Époques: {EPOCHS}")
+print(f"📐 Dataset accessible: {'✅' if DATA_DIR.exists() else '❌'}")
+if not DATA_DIR.exists():
+    print(f"   ⚠️ Le dataset doit être placé dans: {DATA_DIR}")
+    if ENV == "colab":
+        print(f"   💡 Uploadez archive_covid.zip sur Google Drive ou téléchargez directement")
 print("=" * 70)
 print("\n💡 Variables disponibles:")
-print("   • config: Configuration complète (Config object)")
 print("   • project_root: Racine du projet (Path)")
 print("   • data_dir: Dossier des données (Path)")
 print("   • categories: Liste des 4 classes")
 print("   • img_size: Taille des images (tuple)")
+print("   • batch_size, epochs: Hyperparamètres")
 print("   • ENV: Environnement actuel")
-print("\n🎯 Transformers disponibles:")
-print("   • ImageLoader, ImageResizer, ImageNormalizer, ImageFlattener")
-print("   • ImageAugmenter, ImageRandomCropper")
-print("   • ImageHistogram, ImagePCA, ImageStandardScaler")
+print("\n🎯 Transformateurs disponibles:")
+print("   • Loaders: ImageLoader")
+print("   • Preprocessing: ImageResizer, ImageNormalizer, ImageFlattener, ImageMasker, ImageBinarizer")
+print("   • Augmentation: ImageAugmenter, ImageRandomCropper")
+print("   • Features: ImageHistogram, ImagePCA, ImageStandardScaler")
+print("   • Utilities: VisualizeTransformer, SaveTransformer")
 print("=" * 70)

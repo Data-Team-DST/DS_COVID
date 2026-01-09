@@ -21,116 +21,84 @@ import os
 def run():
     # Header / hero
     colored_header(
-        label="Modelling Lab — Comparison & Image Diagnostics",
-        description="Tester, comparer et visualiser les modèles sur images radiographiques. Notez les performances et interprétations.",
+        label="Modèles de Machine learning et de deep learning",
         color_name="blue-70"
     )
     st.divider()
 
-    # 1. Topic overview & context
-    st.markdown(
-        "## 1. Topic overview & context\n\n"
-        "Objectif modelling : définir KPI (ex : AUC, accuracy, F1), latence tolérée et critères d'interprétabilité pour les images radiographiques."
-    )
+    chemin_global = Path(__file__).parent.parent
+    #rajouter /page/images/ au chemin global
+    chemin_global = os.path.join(chemin_global, "page", "images/")
+
+    p12 = rf"{chemin_global}prep_ML_features.PNG"
+    image_12 = Path(p12).relative_to(Path.cwd())
+
+    p13 = rf"{chemin_global}features_PCA.PNG"
+    image_13 = Path(p13).relative_to(Path.cwd())
+
+    p14 = rf"{chemin_global}feature_histogram.PNG"
+    image_14 = Path(p14).relative_to(Path.cwd())
+
+    p15 = rf"{chemin_global}feature_combined.PNG"
+    image_15 = Path(p15).relative_to(Path.cwd())
+
+    p16 = rf"{chemin_global}result_ml.PNG"
+    image_16 = Path(p16).relative_to(Path.cwd())
+
+    st.image(str(p12), caption="ML Feature Preparation", use_column_width=False)
+    st.image(str(p13), caption="PCA Feature Visualization", use_column_width=False)
+    st.image(str(p14), caption="Feature Histogram", use_column_width=False)
+    st.image(str(p15), caption="Combined Features", use_column_width=False)
+    st.image(str(p16), caption="ML Results Overview", use_column_width=False)
+    
+
     st.divider()
 
-    # 2. Data & test images
-    st.markdown(
-        "## 2. Data & test images\n\n"
-        "Rappels jeux utilisés, stratégie train/val/test, et types d'images (formats DICOM/JPG/PNG, résolution)."
-    )
-    test_images_dir = st.text_input(
-        "Répertoire test images (local ou artifact)",
-        value="data/test_images",
-        key="models_test_dir"
-    )
-    if Path(test_images_dir).exists():
-        st.success(f"Répertoire trouvé : {test_images_dir}")
-        images = [f for f in os.listdir(test_images_dir) if f.lower().endswith((".png",".jpg",".jpeg",".dcm"))]
-        st.markdown(f"Nombre d'images détectées : {len(images)}")
-        if images:
-            st.image([os.path.join(test_images_dir, images[0])], width=250, caption="Exemple image test")
-    else:
-        st.warning("Répertoire non trouvé. Vérifiez le chemin.")
-    st.divider()
+    chemin_global=Path(__file__).parent.parent
+    st.markdown("""**Modèles de machine learning** :""")
+    st.markdown("""**Support Vector Machine (SVM)** :""")
+    chemin_absolu = rf"{chemin_global}/page/images/SVM.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Support Vector Machine (SVM)", use_column_width=True)
+    st.markdown("""**k-Nearest Neighbors (k-NN)** :""")
+    chemin_absolu = rf"{chemin_global}/page/images/KNN.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="k-Nearest Neighbors (k-NN)", use_column_width=True)
+    st.markdown("""**Random Forest** :""")
+    chemin_absolu = rf"{chemin_global}/page/images/random forest.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Random Forest", use_column_width=True)
+    st.info("""**Pour évaluer les trois modèles de machine learning, un échantillon équilibré de 200 données par classe a été utilisé.**""")
+    st.info("""**L'évaluation s'est appuyée sur la matrice de confusion, qui est un outil fondamental permettant de visualiser les performances d'un classificateur en croisant :**""")
+    st.info("""**Les prédictions du modèle (axes colonnes).**""")
+    st.info("""**Les réalités (axes lignes).**""")
+    chemin_absolu = rf"{chemin_global}/page/images/résultat_obtenu.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Matrice de confusion", use_column_width=True)
+    chemin_absolu = rf"{chemin_global}/page/images/interprétation des résultats.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Interprétation des résultats", use_column_width=True)
+    st.markdown("""**Modèle de deep learning Inception V3** :""")
+    chemin_absolu = rf"{chemin_global}/page/images/Inceptionv3.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Schéma explicatif", use_column_width=True)
+    chemin_absolu = rf"{chemin_global}/page/images/courbe de loss et d'accuracy.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Courbe de loss et d'accuracy", use_column_width=True)
+    st.info("""**Courbe de loss d’entraînement : constante et très faible → optimisation maîtrisée sur données apprises**""")
+    st.info("""**Courbe de loss de validation : fluctuations + pic important à l’époque 8 (correspond à la baisse de précision)**""")
+    st.info("""**Après le pic : courbe retrouve sa tendance initiale**""")
+    st.info("""**Explications possibles : bruit dans les données**""")
+    st.info("""**Précision d’entraînement : très élevée (0.98-1.00) tout au long → apprentissage efficace sur données d’entraînement**""")
+    st.info("""**Précision de validation : stable ∼0.90 + fluctuations légères + chute nette époque 8 → retour rapide aux valeurs élevées**""")
+    st.info("""**Différence train/validation : signe de difficulté de généralisation sur certains batchs de validation**""")
+    st.info("""**Pic de baisse : instabilité temporaire liée à la répartition des données**""")
+    chemin_absolu = rf"{chemin_global}/page/images/matrice de confusion.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Matrice de confusion", use_column_width=True)
+    st.info("""**Performance globale : modèle très performant, bonne identification des classes (COVID,pneumonie virale, normal)**""")
+    st.info("""**Efficacité prouvée : transfert d’apprentissage avec InceptionV3 excellent pour classification d’images médicales**""")
 
-    # 3. Models loaded & evaluation
-    st.markdown(
-        "## 3. Models loaded & evaluation\n\n"
-        "Charger vos modèles existants et effectuer un test rapide sur quelques images pour visualiser les prédictions."
-    )
-    # Placeholder: list des modèles
-    models_list = ["model1.pth", "model2.pth"]  # ou .h5 pour keras
-    selected_model = st.selectbox("Sélectionner le modèle à tester", models_list)
-    st.markdown(f"**Modèle sélectionné :** {selected_model}")
 
-    st.markdown("### Diagnostics & metrics placeholder")
-    st.info("Insérer ici learning curves, validation curves, ou distribution des probabilités de sortie du modèle")
-    st.text_area("Commentaires sur performances", value="", height=80, key="model_diag_notes")
-    st.divider()
-
-    # 4. Test sur images radiographiques
-    st.markdown(
-        "## 4. Test sur images radiographiques\n\n"
-        "Sélectionnez des images pour prédiction et visualisation des résultats."
-    )
-    uploaded_files = st.file_uploader(
-        "Upload images (PNG/JPG)",
-        accept_multiple_files=True,
-        type=["png","jpg"]
-    )
-    if uploaded_files:
-        for img_file in uploaded_files:
-            st.image(img_file, caption=img_file.name, width=250)
-            st.button(f"Predict {img_file.name}", key=f"predict_{img_file.name}")
-            st.text(f"Prediction placeholder : {img_file.name} -> [classe/proba]")
-    st.divider()
-
-    # 5. Preprocessing & pipeline applied to models
-    st.markdown(
-        "## 5. Preprocessing & pipeline applied to models\n\n"
-        "Indiquer les transformations appliquées avant inference (resize, normalization, augmentation)."
-    )
-    st.text_area(
-        "Pipeline applied",
-        value="- Resize 224x224\n- Normalize [0,1]\n- Convert to tensor / array",
-        height=100,
-        key="models_pipeline_notes"
-    )
-    st.divider()
-
-    # 6. Best model analysis
-    st.markdown(
-        "## 6. Best model analysis\n\n"
-        "Comparaison visuelle de feature maps, activations, ou explanations (ex: GradCAM) si applicable."
-    )
-    st.info("Placeholder pour heatmaps / attention maps sur les radiographies.")
-    st.text_area("Notes interprétation best model", value="", height=80, key="best_model_notes")
-    st.divider()
-
-    # 7. Conclusions & business relevance
-    st.markdown(
-        "## 7. Conclusions & business relevance\n\n"
-        "Résumer performance globale, choix du modèle, implications pour le workflow clinique."
-    )
-    st.text_area("Conclusions métier", value="", height=80, key="models_conclusions")
-    st.divider()
-
-    # 8. Critique & future perspectives
-    st.markdown(
-        "## 8. Critique & future perspectives\n\n"
-        "Améliorations : plus de données, fine-tuning, pipeline augmentation, tests inter-hôpitaux, CI/CD artefacts."
-    )
-    st.text_area("Backlog modeling", value="", height=80, key="models_backlog")
-    st.divider()
-
-    # 9. CI/CD pipeline overview
-    st.markdown(
-        "## 9. CI/CD pipeline overview\n\n"
-        "Automatiser tests de non-régression sur sorties images, génération de rapports et stockage modèles/artefacts."
-    )
-    st.markdown(
-        "- **Artifacts** : modèles pickled / h5 / torch, snapshots sorties images, métriques en CSV/JSON."
-    )
-
-# STATUS: page/05_modeles.py — intégrale, Streamlit Extras obligatoire, sections 1–9 avec placeholders interactifs, pipelines et checklists.
+if __name__ == "__main__":
+    run()

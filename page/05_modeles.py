@@ -57,32 +57,32 @@ def run():
     chemin_global=Path(__file__).parent.parent
     st.markdown("""**Modèles de machine learning** :""")
     st.markdown("""**Support Vector Machine (SVM)** :""")
-    chemin_absolu = rf"{chemin_global}/page/SVM.png"
+    chemin_absolu = rf"{chemin_global}/page/images/SVM.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Support Vector Machine (SVM)", use_column_width=True)
     st.markdown("""**k-Nearest Neighbors (k-NN)** :""")
-    chemin_absolu = rf"{chemin_global}/page/KNN.png"
+    chemin_absolu = rf"{chemin_global}/page/images/KNN.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="k-Nearest Neighbors (k-NN)", use_column_width=True)
     st.markdown("""**Random Forest** :""")
-    chemin_absolu = rf"{chemin_global}/page/random forest.png"
+    chemin_absolu = rf"{chemin_global}/page/images/random forest.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Random Forest", use_column_width=True)
     st.info("""**Pour évaluer les trois modèles de machine learning, un échantillon équilibré de 200 données par classe a été utilisé.**""")
     st.info("""**L'évaluation s'est appuyée sur la matrice de confusion, qui est un outil fondamental permettant de visualiser les performances d'un classificateur en croisant :**""")
     st.info("""**Les prédictions du modèle (axes colonnes).**""")
     st.info("""**Les réalités (axes lignes).**""")
-    chemin_absolu = rf"{chemin_global}/page/résultat_obtenu.png"
+    chemin_absolu = rf"{chemin_global}/page/images/résultat_obtenu.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Matrice de confusion", use_column_width=True)
-    chemin_absolu = rf"{chemin_global}/page/interprétation des résultats.png"
+    chemin_absolu = rf"{chemin_global}/page/images/interprétation des résultats.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Interprétation des résultats", use_column_width=True)
     st.markdown("""**Modèle de deep learning Inception V3** :""")
-    chemin_absolu = rf"{chemin_global}/page/Inceptionv3.png"
+    chemin_absolu = rf"{chemin_global}/page/images/Inceptionv3.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Schéma explicatif", use_column_width=True)
-    chemin_absolu = rf"{chemin_global}/page/courbe de loss et d'accuracy.png"
+    chemin_absolu = rf"{chemin_global}/page/images/courbe de loss et d'accuracy.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Courbe de loss et d'accuracy", use_column_width=True)
     st.info("""**Courbe de loss d’entraînement : constante et très faible → optimisation maîtrisée sur données apprises**""")
@@ -93,7 +93,7 @@ def run():
     st.info("""**Précision de validation : stable ∼0.90 + fluctuations légères + chute nette époque 8 → retour rapide aux valeurs élevées**""")
     st.info("""**Différence train/validation : signe de difficulté de généralisation sur certains batchs de validation**""")
     st.info("""**Pic de baisse : instabilité temporaire liée à la répartition des données**""")
-    chemin_absolu = rf"{chemin_global}/page/matrice de confusion.png"
+    chemin_absolu = rf"{chemin_global}/page/images/matrice de confusion.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Matrice de confusion", use_column_width=True)
     st.info("""**Performance globale : modèle très performant, bonne identification des classes (COVID,pneumonie virale, normal)**""")

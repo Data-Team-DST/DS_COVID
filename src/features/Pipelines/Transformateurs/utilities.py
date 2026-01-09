@@ -1,9 +1,8 @@
 """Utility transformers for visualization and saving features."""
 
 import os
-
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -19,11 +18,11 @@ class VisualizeTransformer(BaseEstimator, TransformerMixin):
 
     def fit(self, data_x, data_y=None):  # pylint: disable=unused-argument
         """Fit the transformer (no-op for visualization).
-
+        
         Args:
             data_x: Input data (unused)
             data_y: Target data (unused)
-
+            
         Returns:
             self: Returns self for method chaining
         """
@@ -31,11 +30,11 @@ class VisualizeTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, data_x, data_y=None):  # pylint: disable=unused-argument
         """Transform data by visualizing sample images.
-
+        
         Args:
             data_x: Array of images to visualize
             data_y: Target data (unused)
-
+            
         Returns:
             np.ndarray: Input data passed through unchanged
         """
@@ -43,14 +42,14 @@ class VisualizeTransformer(BaseEstimator, TransformerMixin):
             plt.figure()
             title = f"{self.prefix}_sample_{i}"
             if data_x[i].ndim == 2:
-                plt.imshow(data_x[i], cmap="gray")
+                plt.imshow(data_x[i], cmap='gray')
             else:
                 plt.imshow(data_x[i])
             plt.title(title)
-            plt.axis("off")
+            plt.axis('off')
             if self.save_dir:
                 path = os.path.join(self.save_dir, f"{self.prefix}_sample_{i}.png")
-                plt.savefig(path, bbox_inches="tight")
+                plt.savefig(path, bbox_inches='tight')
                 print(f"Image sauvegardée : {path}")
             plt.show()
             plt.close()
@@ -67,11 +66,11 @@ class SaveTransformer(BaseEstimator, TransformerMixin):
 
     def fit(self, data_x, data_y=None):  # pylint: disable=unused-argument
         """Fit the transformer (no-op for saving).
-
+        
         Args:
             data_x: Input data (unused)
             data_y: Target data (unused)
-
+            
         Returns:
             self: Returns self for method chaining
         """
@@ -79,11 +78,11 @@ class SaveTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, data_x, data_y=None):  # pylint: disable=unused-argument
         """Transform data by saving features to disk.
-
+        
         Args:
             data_x: Array of features to save
             data_y: Target data (unused)
-
+            
         Returns:
             np.ndarray: Input data passed through unchanged
         """

@@ -2,13 +2,12 @@
 
 import logging
 import random
-from typing import Optional, Tuple, Union
+from typing import List, Union, Tuple, Optional
 
-import numpy as np  # type: ignore
-from scipy import ndimage  # type: ignore
-import cv2  # type: ignore
-from sklearn.base import BaseEstimator, TransformerMixin  # type: ignore
-from tqdm import tqdm  # type: ignore
+import numpy as np
+from scipy import ndimage
+from tqdm import tqdm
+from sklearn.base import BaseEstimator, TransformerMixin
 
 # Configuration du logger
 logger = logging.getLogger(__name__)
@@ -16,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 class ImageAugmenter(BaseEstimator, TransformerMixin):
     """Apply data augmentation to images.
-
+    
     This transformer applies various augmentation techniques including flips,
     rotations, brightness/contrast adjustments, and noise addition.
-
+    
     Parameters
     ----------
     flip_horizontal : bool, default=True
@@ -40,7 +39,7 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         Random seed for reproducibility
     verbose : bool, default=True
         Whether to display progress messages
-
+        
     Attributes
     ----------
     n_images_augmented_ : int
@@ -59,7 +58,7 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         zoom_range: Optional[Tuple[float, float]] = None,
         probability: float = 0.5,
         seed: Optional[int] = None,
-        verbose: bool = True,
+        verbose: bool = True
     ):
         self.flip_horizontal = flip_horizontal
         self.flip_vertical = flip_vertical
@@ -73,30 +72,29 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
 
     def fit(self, data_x, data_y=None):
         """Fit the transformer by initializing random state.
-
+        
         Parameters
         ----------
         data_x : array-like
             Input data (unused)
         data_y : array-like, optional
             Target data (unused)
-
+            
         Returns
         -------
         self : ImageAugmenter
             Returns self for method chaining
         """
-        # Generateur de nombres aléatoires
-        self.rng_ = np.random.default_rng(self.seed)
+        self.rng_ = np.random.default_rng(self.seed) # Generateur de nombres aléatoires
         return self
 
-    # self.rng_.random()            Nombre aléatoire 0-1
-    # self.rng_.uniform(min, max)  # Nombre dans intervalle
-    # self.rng_.normal(mean, std)  # Distribution normale
-
+# self.rng_.random()           # Nombre aléatoire 0-1
+# self.rng_.uniform(min, max)  # Nombre dans intervalle
+# self.rng_.normal(mean, std)  # Distribution normale
+    
     def _apply_flip(self, img: np.ndarray) -> np.ndarray:
         """Apply random flips to image."""
-        if self.flip_horizontal and self.rng_.random() > 0.5:  # 50% chance
+        if self.flip_horizontal and self.rng_.random() > 0.5: # 50% chance
             img = np.fliplr(img)
         if self.flip_vertical and self.rng_.random() > 0.5:
             img = np.flipud(img)
@@ -106,13 +104,13 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
         """Apply random rotation to image."""
         if self.rotation_range > 0:
             angle = self.rng_.uniform(-self.rotation_range, self.rotation_range)
-            img = ndimage.rotate(img, angle, reshape=False, mode="nearest")
+            img = ndimage.rotate(img, angle, reshape=False, mode='nearest')
         return img
 
     def _apply_brightness(self, img: np.ndarray) -> np.ndarray:
         """Apply random brightness adjustment."""
         if self.brightness_range is not None:
-            factor = self.rng_.uniform(*self.brightness_range)
+            factor = self.rng_.uniform(*self.brightness_range) 
             img = np.clip(img * factor, 0, 255 if img.dtype == np.uint8 else 1.0)
         return img
 
@@ -127,77 +125,63 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
                 img = np.clip(img, 0, 1)
         return img
 
-    def _apply_zoom(self, img):
-        """
-        Applique un zoom aléatoire à une image
-        tout en conservant la taille originale.
-        """
-        h, w, c = img.shape
-
-        # Choix aléatoire du facteur de zoom
-        zoom_factor = np.random.uniform(self.zoom_range[0], self.zoom_range[1])
-
-        # Calcul de la nouvelle taille
-        new_h, new_w = int(h * zoom_factor), int(w * zoom_factor)
-
-        # Redimensionne l'image
-        img_zoomed = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
-
-        # Calcul du padding nécessaire pour revenir à la taille originale
-        pad_h = max(h - new_h, 0)
-        pad_w = max(w - new_w, 0)
-
-        # Pad (hauteur, largeur, canaux)
-        npad = (
-            (pad_h // 2, pad_h - pad_h // 2),
-            (pad_w // 2, pad_w - pad_w // 2),
-            (0, 0),
-        )  # pas de padding sur les canaux
-
-        img_padded = np.pad(
-            img_zoomed, pad_width=npad, mode="constant", constant_values=0
-        )
-
-        # Si le zoom est supérieur à 1, on crop au centre
-        if zoom_factor > 1:
-            start_h = (new_h - h) // 2
-            start_w = (new_w - w) // 2
-            img_padded = img_zoomed[start_h : start_h + h, start_w : start_w + w, :]
-
-        return img_padded
+    def _apply_zoom(self, img: np.ndarray) -> np.ndarray:
+        """Apply random zoom to image."""
+        if self.zoom_range is not None:
+            original_shape = img.shape
+            zoom_factor = self.rng_.uniform(*self.zoom_range)
+            if zoom_factor != 1.0:
+                zoomed = ndimage.zoom(img, zoom_factor, order=1)
+                
+                # Ensure output has same shape as input
+                if zoom_factor > 1.0:
+                    # Crop center to original size
+                    h_start = (zoomed.shape[0] - original_shape[0]) // 2
+                    w_start = (zoomed.shape[1] - original_shape[1]) // 2
+                    img = zoomed[h_start:h_start+original_shape[0], 
+                                w_start:w_start+original_shape[1]]
+                else:
+                    # Pad to original size
+                    pad_h = (original_shape[0] - zoomed.shape[0]) // 2
+                    pad_w = (original_shape[1] - zoomed.shape[1]) // 2
+                    img = np.pad(zoomed, 
+                                ((pad_h, original_shape[0] - zoomed.shape[0] - pad_h),
+                                 (pad_w, original_shape[1] - zoomed.shape[1] - pad_w)), 
+                                mode='edge')
+        return img
 
     def transform(self, data_x: np.ndarray, data_y=None) -> np.ndarray:
         """Transform images by applying augmentation.
-
+        
         Parameters
         ----------
         data_x : np.ndarray
             Images to augment
         data_y : array-like, optional
             Target data (unused)
-
+            
         Returns
         -------
         np.ndarray
             Augmented images with same shape as input
         """
-        if not hasattr(self, "rng_"):
+        if not hasattr(self, 'rng_'):
             self.fit(data_x)
-
+        
         if self.verbose:
             logger.info(f"Augmenting {len(data_x)} images (p={self.probability})...")
-
+        
         data_array = np.array(data_x)
         original_shape = data_array.shape
         data_aug = []
         n_augmented = 0
-
+        
         iterator = tqdm(data_array, desc="Augmentation") if self.verbose else data_array
-
+        
         for img in iterator:
             img_aug = img.copy()
             target_shape = img.shape  # Save original shape of this image
-
+            
             # Apply augmentation with given probability
             if self.rng_.random() < self.probability:
                 img_aug = self._apply_flip(img_aug)
@@ -206,41 +190,40 @@ class ImageAugmenter(BaseEstimator, TransformerMixin):
                 img_aug = self._apply_noise(img_aug)
                 img_aug = self._apply_zoom(img_aug)
                 n_augmented += 1
-
+                
                 # Ensure shape consistency after all transforms
                 if img_aug.shape != target_shape:
                     # Resize back to original shape if needed
-                    from scipy.ndimage import zoom  # type: ignore
-
+                    from scipy.ndimage import zoom
                     zoom_factors = [t / s for t, s in zip(target_shape, img_aug.shape)]
                     img_aug = zoom(img_aug, zoom_factors, order=1)
-
+            
             data_aug.append(img_aug)
-
+        
         self.n_images_augmented_ = n_augmented
-
+        
         if self.verbose:
             logger.info(
                 f"Augmentation completed: {n_augmented}/{len(data_x)} "
                 f"images augmented ({n_augmented/len(data_x)*100:.1f}%)"
             )
-
+        
         result = np.array(data_aug)
-
+        
         # Final safety check
         if result.shape != original_shape:
-            logger.warning("Shape mismatch detected. Forcing shape consistency.")
+            logger.warning(f"Shape mismatch detected. Forcing shape consistency.")
             result = result.reshape(original_shape)
-
+        
         return result
 
 
 class ImageRandomCropper(BaseEstimator, TransformerMixin):
     """Apply random cropping to images.
-
+    
     This transformer crops random regions from images, useful for data
     augmentation and creating diverse training samples.
-
+    
     Parameters
     ----------
     crop_size : tuple of int, default=(224, 224)
@@ -256,7 +239,7 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
         Random seed for reproducibility
     verbose : bool, default=True
         Whether to display progress bar
-
+        
     Attributes
     ----------
     n_images_cropped_ : int
@@ -268,11 +251,11 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
     def __init__(
         self,
         crop_size: Tuple[int, int] = (224, 224),
-        mode: str = "random",
+        mode: str = 'random',
         padding: Union[int, Tuple[int, int]] = 0,
-        pad_mode: str = "constant",
+        pad_mode: str = 'constant',
         seed: Optional[int] = None,
-        verbose: bool = True,
+        verbose: bool = True
     ):
         self.crop_size = crop_size
         self.mode = mode
@@ -283,14 +266,14 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
 
     def fit(self, data_x, data_y=None):
         """Fit the transformer by initializing random state.
-
+        
         Parameters
         ----------
         data_x : array-like
             Input data (unused)
         data_y : array-like, optional
             Target data (unused)
-
+            
         Returns
         -------
         self : ImageRandomCropper
@@ -300,10 +283,13 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
         return self
 
     def _get_crop_coordinates(
-        self, img_height: int, img_width: int, crop_index: int = 0
+        self,
+        img_height: int,
+        img_width: int,
+        crop_index: int = 0
     ) -> Tuple[int, int]:
         """Get crop coordinates based on mode.
-
+        
         Parameters
         ----------
         img_height : int
@@ -311,21 +297,20 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
         img_width : int
             Image width
         crop_index : int, default=0
-            Index for corner mode
-            (0-4: top-left, top-right, center, bottom-left, bottom-right)
-
+            Index for corner mode (0-4: top-left, top-right, center, bottom-left, bottom-right)
+            
         Returns
         -------
         tuple
             (top, left) coordinates for crop
         """
         crop_height, crop_width = self.crop_size
-
-        if self.mode == "center":
+        
+        if self.mode == 'center':
             top = (img_height - crop_height) // 2
             left = (img_width - crop_width) // 2
-
-        elif self.mode == "corners":
+        
+        elif self.mode == 'corners':
             # Five crop mode: 4 corners + center
             if crop_index == 0:  # top-left
                 top, left = 0, 0
@@ -338,93 +323,85 @@ class ImageRandomCropper(BaseEstimator, TransformerMixin):
                 top, left = img_height - crop_height, 0
             else:  # bottom-right
                 top, left = img_height - crop_height, img_width - crop_width
-
+        
         else:  # random
             top = self.rng_.randint(0, max(0, img_height - crop_height))
             left = self.rng_.randint(0, max(0, img_width - crop_width))
-
+        
         return top, left
 
     def transform(self, data_x: np.ndarray, data_y=None) -> np.ndarray:
         """Transform images by applying random cropping.
-
+        
         Parameters
         ----------
         data_x : np.ndarray
             Images to crop
         data_y : array-like, optional
             Target data (unused)
-
+            
         Returns
         -------
         np.ndarray
             Cropped images
         """
-        if not hasattr(self, "rng_"):
+        if not hasattr(self, 'rng_'):
             self.fit(data_x)
-
+        
         if self.verbose:
             logger.info(
-                f"Cropping {len(data_x)} images to {self.crop_size}"
-                f" (mode: {self.mode})..."
+                f"Cropping {len(data_x)} images to {self.crop_size} (mode: {self.mode})..."
             )
-
+        
         cropped = []
         n_cropped = 0
         crop_height, crop_width = self.crop_size
-
+        
         # Handle padding
         if isinstance(self.padding, int):
             pad_h = pad_w = self.padding
         else:
             pad_h, pad_w = self.padding
-
-        iterator = (
-            tqdm(data_x, desc=f"Cropping ({self.mode})") if self.verbose else data_x
-        )
-
+        
+        iterator = tqdm(data_x, desc=f"Cropping ({self.mode})") if self.verbose else data_x
+        
         for img in iterator:
             # Add padding if specified
             if pad_h > 0 or pad_w > 0:
                 if len(img.shape) == 2:
-                    img = np.pad(
-                        img, ((pad_h, pad_h), (pad_w, pad_w)), mode=self.pad_mode
-                    )
+                    img = np.pad(img, ((pad_h, pad_h), (pad_w, pad_w)), mode=self.pad_mode)
                 else:
-                    img = np.pad(
-                        img,
-                        ((pad_h, pad_h), (pad_w, pad_w), (0, 0)),
-                        mode=self.pad_mode,
-                    )
-
+                    img = np.pad(img, ((pad_h, pad_h), (pad_w, pad_w), (0, 0)), mode=self.pad_mode)
+            
             height, width = img.shape[:2]
-
+            
             # Skip if image is smaller than crop size
             if height < crop_height or width < crop_width:
                 logger.warning(
-                    f"Image {height}x{width} smaller than crop size"
-                    f" {self.crop_size}, skipping"
+                    f"Image {height}x{width} smaller than crop size {self.crop_size}, skipping"
                 )
                 cropped.append(img)
                 continue
-
+            
             # Get crop coordinates
             top, left = self._get_crop_coordinates(height, width)
-
+            
             # Perform crop
             if len(img.shape) == 2:
-                img_cropped = img[top : top + crop_height, left : left + crop_width]
+                img_cropped = img[top:top+crop_height, left:left+crop_width]
             else:
-                img_cropped = img[top : top + crop_height, left : left + crop_width, :]
-
+                img_cropped = img[top:top+crop_height, left:left+crop_width, :]
+            
             cropped.append(img_cropped)
             n_cropped += 1
-
+        
         self.n_images_cropped_ = n_cropped
-
+        
         if self.verbose:
-            logger.info(f"Cropping completed: {n_cropped}/{len(data_x)} images cropped")
+            logger.info(
+                f"Cropping completed: {n_cropped}/{len(data_x)} images cropped"
+            )
             if cropped:
                 logger.info(f"Output shape: {cropped[0].shape}")
-
+        
         return np.array(cropped)

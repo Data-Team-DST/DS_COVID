@@ -1,6 +1,19 @@
 """Transformateurs pour le traitement d'images médicales."""
 
 # Image loaders
+from .image_loaders import (
+    ImageLoader,
+)
+
+# Image preprocessing
+from .image_preprocessing import (
+    ImageResizer,
+    ImageNormalizer,
+    ImageMasker,
+    ImageFlattener,
+    ImageBinarizer,
+)
+
 # Image augmentation
 from .image_augmentation import (
     ImageAugmenter,
@@ -13,23 +26,11 @@ from .image_features import (
     ImagePCA,
     ImageStandardScaler,
 )
-from .image_loaders import (
-    ImageLoader,
-)
-
-# Image preprocessing
-from .image_preprocessing import (
-    ImageBinarizer,
-    ImageFlattener,
-    ImageMasker,
-    ImageNormalizer,
-    ImageResizer,
-)
 
 # Utilities
 from .utilities import (
-    SaveTransformer,
     VisualizeTransformer,
+    SaveTransformer,
 )
 
 __all__ = [

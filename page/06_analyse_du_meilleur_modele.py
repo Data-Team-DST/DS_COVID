@@ -20,119 +20,94 @@ import os
 def run():
     # Header / hero
     colored_header(
-        label="Deep Dive — Best Model Analysis",
-        description="Analyse complète du meilleur modèle : interpretabilité, erreurs, performance par sous-groupe et recommandations.",
+        label="Optimisation des modèles de machine learning et Interprétabilité du Inception V3",
         color_name="blue-70"
     )
     st.divider()
-
-    # 1. Topic overview & context
-    st.markdown(
-        "## 1. Topic overview & context\n\n"
-        "Objectif : analyser en détail le meilleur modèle sélectionné, justifier le choix et préparer un plan d'intégration en production (robustesse, interpretabilité, limites)."
-    )
+    st.markdown("""
+    **Random Forest** : modèle le plus performant → **optimisation approfondie**
+    
+    **SVM** : modèle le moins performant → **amélioration ciblée**
+    
+    **Objectif :**
+    - Renforcer l'efficacité du meilleur modèle
+    - Améliorer les performances du modèle faible  
+    - Obtenir une analyse comparative complète
+    """)
+    
     st.divider()
 
-    # 2. Data intro (hold-out & test images)
-    st.markdown(
-        "## 2. Data intro (hold-out & test images)\n\n"
-        "Dataset final utilisé pour évaluation : hold-out set / test set. Filtrage, résolutions et format des images."
-    )
-    test_images_dir = st.text_input(
-        "Répertoire images hold-out",
-        value="data/test_images",
-        key="best_test_dir"
-    )
-    if Path(test_images_dir).exists():
-        st.success(f"Répertoire trouvé : {test_images_dir}")
-        images = [f for f in os.listdir(test_images_dir) if f.lower().endswith((".png",".jpg",".jpeg",".dcm"))]
-        st.markdown(f"Nombre d'images détectées : {len(images)}")
-        if images:
-            st.image([os.path.join(test_images_dir, images[0])], width=250, caption="Exemple image hold-out")
-    else:
-        st.warning("Répertoire non trouvé. Vérifiez le chemin.")
+    st.markdown("""
+    **Principe** : Grid Search + validation croisée
+    
+    **Fonctionnement** : Grid Search teste toutes les combinaisons possibles d'hyperparamètres sur une "grille" prédéfinie.
+                        
+    
+    **Évaluation** : Validation croisée (k-fold) évalue chaque combinaison de manière robuste en divisant les données en k plis.
+    """)
     st.divider()
 
-    # 3. Model diagnostics & visualizations
-    st.markdown(
-        "## 3. Model diagnostics & visualizations\n\n"
-        "Confusion matrix, ROC/PR curves, distribution des erreurs, performance par sous-population (ex : âge, pathologie, canal)."
-    )
-    st.info("Placeholders pour figures analytiques : insérer PNG / Plotly / Matplotlib ici.")
-    st.expander("Snippet pour confusion matrix / ROC") .markdown(
-        """```python
-# Placeholder example
-# y_true, y_pred = ...
-# fig, ax = plt.subplots()
-# sns.heatmap(confusion_matrix(y_true, y_pred), annot=True, fmt='d', ax=ax)
-# st.pyplot(fig)
-```"""
-    )
-    st.divider()
+    st.markdown("### **Hyperparamètres testés**")
+    st.markdown("""
+    **SVM** : C (régularisation), max itérations
+    
+    **Random Forest** : nb arbres, profondeur max, critères division
+    """)
+    chemin_global = Path(__file__).parent.parent
+    #rajouter /page/images/ au chemin global
+    chemin_global = os.path.join(chemin_global, "page", "images/")
+    st.write(f"Chemin global du projet : {chemin_global}")
+    st.info("**Les différents hyperparamètres ont été sauvegardés dans un fichier.json**")
+    chemin_absolu = rf"{chemin_global}parametres.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Les hyperparamètres", use_column_width=False)
+    st.markdown("### **Résultats de la matrice de confusion pour les modèles SVM et Random Forest avec Grid Search**")
+    chemin_absolu_1 = rf"{chemin_global}grid_search_randomforest.png"
+    image_path_1 = Path(chemin_absolu_1).relative_to(Path.cwd())
+    st.image(str(image_path_1), caption="Matrice de confusion random forest", use_column_width=False)
+    chemin_absolu_2 = rf"{chemin_global}grid_search_svm.png"
+    image_path_2 = Path(chemin_absolu_2).relative_to(Path.cwd())
+    st.image(str(image_path_2), caption="Matrice de confusion SVM", use_column_width=False)
+    st.info("**Les hyperparamètres optimaux identifiés par Grid Search ont permis daméliorer significativement les performances de base des modèles.**")
 
-    # 4. Best model preprocessing & pipeline
-    st.markdown(
-        "## 4. Best model preprocessing & pipeline\n\n"
-        "Décrire pipeline exact appliqué pour l'inference : resizing, normalization, augmentations si applicable."
-    )
-    st.text_area(
-        "Pipeline final (module/script)",
-        value="- Resize 224x224\n- Normalize [0,1]\n- Convert to tensor / array",
-        height=100,
-        key="best_pipeline"
-    )
-    st.divider()
+    st.markdown("### **Interprétabilité**")
+    st.markdown("**LIME (Local Interpretable Model-agnostic Explanations) :**")
+    st.markdown("""
+                **Principe**: 
 
-    # 5. Error analysis & edge cases
-    st.markdown(
-        "## 5. Error analysis & edge cases\n\n"
-        "Visualiser erreurs typiques, faux positifs/négatifs, outliers, et documenter raisons potentielles."
-    )
-    st.info("Placeholders pour images d'erreurs avec annotation des prédictions vs vérité.")
-    st.text_area("Notes d'analyse erreurs", value="", height=100, key="best_error_notes")
-    st.divider()
+                1. IMAGE originale + prédiction du modèle complexe
+                
+                2. PERTURBATIONS : masque pixels → crée N versions modifiées
+                
+                3. PRÉDICTIONS : modèle complexe sur chaque version perturbée
+                
+                4. RÉGRESSION LINÉAIRE : trouve coefficients expliquant les prédictions
+                
+                5. CARTE DE CHALEUR : pixels importants = coefficients élevés (Jaune)
 
-    # 6. Interpretability (SHAP / GradCAM / Feature importance)
-    st.markdown(
-        "## 6. Interpretability (SHAP / GradCAM / Feature importance)\n\n"
-        "Afficher feature importance, heatmaps GradCAM sur radiographies, PDPs si applicables."
-    )
-    st.expander("Placeholder workflow interpretabilité").write(
-        "Générer SHAP / GradCAM, stocker images/HTML en artifacts, ajouter commentaires métier pour chaque figure."
-    )
-    st.divider()
 
-    # 7. Performance by subgroup
-    st.markdown(
-        "## 7. Performance by subgroup\n\n"
-        "Évaluer robustesse par tranche : âge, pathologie, canal, etc. Ajouter tableaux ou barplots comparatifs."
-    )
-    st.text_area("Notes performance sous-groupes", value="", height=80, key="best_subgroups")
-    st.divider()
+                **Avantages clés** : compréhensible, fiable, universel, généralisable (SP-LIME).
 
-    # 8. Conclusions & recommendations
-    st.markdown(
-        "## 8. Conclusions & recommendations\n\n"
-        "Synthèse performance, choix final, seuils décisionnels, KPIs post-déploiement, plan de monitoring."
-    )
-    st.text_area("Plan pilote & recommandations", value="", height=100, key="best_conclusions")
-    st.divider()
+                """)
+    st.info("**Notre modèle a été entraîné sur 2000 images 20 epochs de feature extraction + 30 epochs de fine-tuning (20 dernières couches dégelées)**")
+    chemin_absolu_3 = rf"{chemin_global}lime.png"
+    image_path_3 = Path(chemin_absolu_3).relative_to(Path.cwd())
+    st.image(str(image_path_3), caption="Résultats obtenus avec la méthode LIME", use_column_width=True)
+    chemin_absolu_4 = rf"{chemin_global}lime2.png"
+    image_path_4 = Path(chemin_absolu_4).relative_to(Path.cwd())
+    st.image(str(image_path_4), caption="Résultats obtenus avec la méthode LIME", use_column_width=True)
+    st.info("**Faux positifs** : risque élevé classe Normal (malades non détectés)")
+    st.info("**Faux négatifs** : risque critique COVID-19 (cas passés inaperçus)")
+    st.info("**Robustesse** : bonne Lung-Opacity, faible Normal/COVID-19")
+    st.info("**InceptionV3** : performances encourageantes, bonne localisation anomalies")
+    st.info("**Limites** : classe Normal + déséquilibre features COVID à améliorer")
 
-    # 9. Critique & future perspectives
-    st.markdown(
-        "## 9. Critique & future perspectives\n\n"
-        "Risques connus (drift, biais), limitations des images, travaux futurs (augmentation, fine-tuning, tests inter-hôpitaux)."
-    )
-    st.text_area("Backlog / améliorations", value="", height=100, key="best_backlog")
-    st.divider()
+if __name__ == "__main__":
+    run()
 
-    # 10. CI/CD & artefacts
-    st.markdown(
-        "## 10. CI/CD & artefacts\n\n"
-        "Automatisation : tests non-régression sur images, génération de rapports, stockage artefacts, seuils de gating pour production."
-    )
-    st.markdown(
-        "- **Artifacts recommandés** : modèles pickled / h5 / torch, snapshots images, métriques CSV/JSON, rapports HTML/PDF."
-    )
 
+
+
+
+   
 # STATUS: page/06_analyse_du_meilleur_modele.py — intégrale, Streamlit Extras obligatoire, sections 1–10 complètes avec placeholders interactifs, pipelines et checklists.

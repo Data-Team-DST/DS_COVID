@@ -5,6 +5,7 @@
 
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
+from pathlib import Path
 import datetime
 import html
 
@@ -33,14 +34,8 @@ def run():
     # Header (développé)
     try:
         colored_header(
-            label="Analyse de Radiographies pulmonaires — Classification COVID-19",
-            description=(
-                "Prototype d'assistance diagnostique visuelle conçu pour démontrer la faisabilité d'un outil "
-                "rapide et interprétable. Le pipeline intègre acquisition, prétraitement, modèles ML/DL et "
-                "méthodes d'interprétabilité afin de rapprocher la décision algorithmique de l'intuition clinique. "
-                "L'objectif de cette application est double : (1) présenter des résultats reproductibles et chiffrés, "
-                "et (2) offrir une démo interactive qui illustre clairement comment le modèle prend ses décisions."
-            ),
+            label="Analyse de Radiographies pulmonaires — Classification COVID-19 & Aide au diagnostic",
+            description=("Projet réalisé par Cirine B., Lena B., Steven M., Rafael C., Encadré par : Nicolas M."),
             color_name="blue-70"
         )
     except Exception:
@@ -50,41 +45,74 @@ def run():
     st.divider()
 
     # Contexte étendu avec problématique et solutions
-    left, right = st.columns([3, 1])
-    with left:
-        st.markdown("### 📊 Contexte de l'épidémie COVID-19")
-        
-        # Bilan mondial
+    st.markdown("### 📊 Contexte de l'épidémie COVID-19")
+    
+    # Bilan mondial
+    st.markdown(
+        "<div class='project-hero'>"
+        "<strong>🌍 Bilan mondial</strong><br>"
+        "• 3 ans d'épidémie mondiale<br>"
+        "• Plus de <strong>700 millions</strong> de cas confirmés<br>"
+        "• Plus de <strong>7 millions</strong> de décès<br>"
+        "• Type spécifique de pneumonie virale (<em>Viral Pneumonia</em>) causée par le virus <strong>SARS-CoV-2</strong>"
+        "</div>", 
+        unsafe_allow_html=True
+    )
+    
+    st.markdown("")
+    
+    # Problème 1 → Solution 1
+    st.markdown(
+        "<div class='project-hero'>"
+        "<strong>⚠️ Problème 1 : Limites des tests <abbr title='Reverse Transcription PCR'>RT-PCR</abbr></strong><br>"
+        "• Tests moléculaires <strong>lents</strong> (délais de traitement importants)<br>"
+        "• Sensibilité <strong>variable</strong> (~70% en conditions réelles vs 95% théoriques)<br>"
+        "• <strong>Pénuries de stocks</strong> et dépendance aux laboratoires<br>"
+        "<br>"
+        "<strong>✅ Solution 1 : Imagerie médicale complémentaire</strong><br>"
+        "Utiliser des méthodes d'imagerie telles que la <abbr title='Chest X-Ray'>CXR</abbr> (radiographie thoracique) "
+        "ou la <abbr title='Computed Tomography'>CT</abbr> (tomodensitométrie) pour un diagnostic plus rapide et accessible."
+        "</div>",
+        unsafe_allow_html=True
+    )
+    
+    st.markdown("")
+
+     # Caractéristiques radiologiques du COVID-19 avec image
+    img_col, text_col = st.columns([1, 2])
+    
+    with img_col:
+        img_path = Path(__file__).parent / "images" / "covid_cxr_1.jpg"
+        if img_path.exists():
+            st.image(
+                str(img_path),
+                caption="Figure 1 — Opacité en verre dépoli. Radiographie thoracique postéro-antérieure d'un patient atteint de pneumonie COVID-19. "
+                        "Les caractéristiques incluent une opacité en verre dépoli dans les zones moyennes et inférieures des deux poumons, "
+                        "principalement en périphérie (flèches blanches) avec préservation des marquages pulmonaires. "
+                        "Une opacité linéaire (zone blanche allongée et fine) est visible à la périphérie de la zone moyenne gauche (flèche noire).",
+            )
+        else:
+            st.info("💡 Image de démonstration non disponible. Placez 'covid_cxr_example.png' dans page/images/")
+    
+    with text_col:
         st.markdown(
             "<div class='project-hero'>"
-            "<strong>🌍 Bilan mondial</strong><br>"
-            "• 3 ans d'épidémie mondiale<br>"
-            "• Plus de <strong>700 millions</strong> de cas confirmés<br>"
-            "• Plus de <strong>7 millions</strong> de décès<br>"
-            "• Type spécifique de pneumonie virale (<em>Viral Pneumonia</em>) causée par le virus <strong>SARS-CoV-2</strong>"
-            "</div>", 
-            unsafe_allow_html=True
-        )
-        
-        st.markdown("")
-        
-        # Problème 1 → Solution 1
-        st.markdown(
-            "<div class='project-hero'>"
-            "<strong>⚠️ Problème 1 : Limites des tests <abbr title='Reverse Transcription PCR'>RT-PCR</abbr></strong><br>"
-            "• Tests moléculaires <strong>lents</strong> (délais de traitement importants)<br>"
-            "• Sensibilité <strong>variable</strong> (~70% en conditions réelles vs 95% théoriques)<br>"
-            "• <strong>Pénuries de stocks</strong> et dépendance aux laboratoires<br>"
+            "<strong>🔬 Signes radiologiques typiques du COVID-19 sur CXR</strong><br>"
+            "Sur une radiographie thoracique, une pneumonie COVID-19 présente généralement :<br>"
+            "• <strong>Zones blanches floues (opacités en verre dépoli ou linéaires)</strong> visibles des <strong>deux côtés des poumons</strong>, "
+            "souvent en <strong>périphérie</strong> (vers l'extérieur) ou à l'<strong>arrière</strong> des poumons<br>, "
+            "qui masquent les marquages pulmonaires normaux (vaisseaux sanguins, etc) <br>"
+            "• Localisation surtout dans la <strong>partie basse des poumons</strong> (lobes inférieurs)<br>"
+            "• <strong>Début de la maladie</strong> : zones floues légères et diffuses<br>"
+            "• <strong>Stade avancé</strong> : zones deviennent plus denses et blanches (consolidation = poumon rempli de liquide/cellules inflammatoires)<br>"
             "<br>"
-            "<strong>✅ Solution 1 : Imagerie médicale complémentaire</strong><br>"
-            "Utiliser des méthodes d'imagerie telles que la <abbr title='Chest X-Ray'>CXR</abbr> (radiographie thoracique) "
-            "ou la <abbr title='Computed Tomography'>CT</abbr> (tomodensitométrie) pour un diagnostic plus rapide et accessible."
+            "⚠️ <strong>Problème clé</strong> : ces signes ressemblent beaucoup à d'autres pneumonies virales, ou a des opacités causées par d'autres maladies pulmonaires, "
+            "rendant le diagnostic visuel très difficile même pour un expert."
             "</div>",
             unsafe_allow_html=True
         )
-        
+    
         st.markdown("")
-        
         # Problème 2 → Solution 2
         st.markdown(
             "<div class='project-hero'>"
@@ -104,20 +132,6 @@ def run():
             unsafe_allow_html=True
         )
 
-    with right:
-        st.markdown(
-            "<div style='text-align:center'>"
-            "<div style='font-size:18px;'>🧑‍🔬 Équipe</div>"
-            "<div class='kv'>Cirine Bouamrane<br>Lena Bacot<br>Steven Moire<br>Rafael Cepa</div>"
-            "<div style='margin-top:8px;font-size:12px;color:#98a1b3;'>Encadré par : Nicolas Mormiche</div>"
-            f"<div style='margin-top:6px;font-size:12px;color:#98a1b3;'>{datetime.date.today().strftime('%d %B %Y')}</div>"
-            "</div>", unsafe_allow_html=True
-        )
-
-    st.divider()
-
-
-    st.divider()
 
     # Paragraphe central
     st.markdown(
@@ -153,5 +167,3 @@ def run():
             "- **R** : réduit le risque de faux négatifs tout en contrôlant faux positifs.\n"
             "- **T** : preuve opérationnelle pour la démo (S13)."
         )
-
-    st.markdown("<small class='small-note'>Détails sur données et plan d'atténuation : onglet **02 - Données**.</small>", unsafe_allow_html=True)

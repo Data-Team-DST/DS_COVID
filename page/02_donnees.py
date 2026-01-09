@@ -224,38 +224,3 @@ def run():
         st.success(f"{total} images affichées.")
     st.divider()
 
-    # 5. ZIP download
-    st.markdown("## 5. Télécharger l'échantillon (ZIP)")
-    if st.button("Générer ZIP"):
-        sample_map = st.session_state.get("sample_map", {})
-        if not sample_map: st.warning("Pas d'échantillon à zipper.")
-        else:
-            zip_buf = create_zip_bytes_from_sample(sample_map)
-            st.download_button("Télécharger le ZIP", data=zip_buf.getvalue(), file_name="sample_images_masks.zip", mime="application/zip")
-    st.divider()
-
-    # 6. Résumé & prochaines actions
-    st.markdown("## 6. Résumé & prochaines actions")
-
-    def _render_card(title: str, text: str, container=st):
-        container.markdown(
-            f"<div class='card'><div class='card-title'>{html.escape(title)}</div><div class='card-body'>{text}</div></div>", 
-            unsafe_allow_html=True
-        )
-
-    _render_card(
-        "Actions à entreprendre & priorité",
-        "<ul>"
-        "<li><b>Action 1 (haute)</b> : Fournir snapshot DVC pour garantir la traçabilité des données.</li>"
-        "<li><b>Action 2 (moyenne)</b> : Documenter le dictionnaire des données pour faciliter l'accès et la reproductibilité.</li>"
-        "<li><b>Action 3 (basse)</b> : Automatiser les contrôles QA dans le pipeline CI pour sécuriser la qualité des données.</li>"
-        "</ul>",
-        st
-    )
-
-    st.markdown(
-        "<div class='small-note'><b>Status</b> : les champs ont été remplis et un échantillon est fourni pour rendre la section reproductible.</div>",
-        unsafe_allow_html=True
-    )
-    st.divider()
-

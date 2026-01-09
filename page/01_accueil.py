@@ -6,8 +6,6 @@
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
 from pathlib import Path
-import datetime
-import html
 
 st.set_page_config(page_title="Analyse de Radiographies — Accueil", layout="wide", page_icon="🧪")
 

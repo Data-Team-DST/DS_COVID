@@ -1,10 +1,9 @@
 # 02_donnees.py — version améliorée : UI harmonisée, preview + ZIP, robust
-import io, random, zipfile
+
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 import streamlit as st
 from PIL import Image
-import html
 
 # KaggleHub pour datasets publics
 try:
@@ -18,14 +17,16 @@ try:
 except Exception:
     colored_header = None
 
+
 # ---------------- CONFIG ----------------
 DATASET_SLUG = "tawsifurrahman/covid19-radiography-database"
 DATASET_DIR = Path("dataset")
 N_PER_CLASS_DEFAULT = 6
 THUMBNAIL_MAX = (512, 512)
 
-DEFAULT_CLASS_COUNTS = {"COVID-19": 3616, "Normal": 10192, "Viral Pneumonia": 1345, "Lung Opacity": 6012}
+DEFAULT_CLASS_COUNTS = {"COVID": 3616, "Normal": 10192, "Viral Pneumonia": 1345, "Lung Opacity": 6012}
 DEFAULT_TOTAL = sum(DEFAULT_CLASS_COUNTS.values())
+CLASS_NAMES = list(DEFAULT_CLASS_COUNTS.keys())
 
 # ---------------- CSS ----------------
 _CSS = """
@@ -58,10 +59,6 @@ def get_kaggle_dataset_path(dataset_slug: str) -> Optional[Path]:
     except Exception:
         return None
 
-def safe_listdir_dirs(root: Path) -> List[Path]:
-    if not root.exists():
-        return []
-    return sorted([p for p in root.iterdir() if p.is_dir()])
 
 def looks_like_images(p: Path):
     if not p.exists() or not p.is_dir():
@@ -76,50 +73,34 @@ def looks_like_images(p: Path):
                 return True
     return False
 
-def find_dataset_root(base: Path):
-    children = [p for p in base.iterdir() if p.is_dir()]
-    if children:
-        n_good = sum(1 for c in children if looks_like_images(c) or (c / "images").exists())
-        if n_good >= 2:
-            return base
-    for depth in range(1, 4):
-        for p in base.rglob("*"):
-            if not p.is_dir(): continue
-            if len(p.relative_to(base).parts) != depth: continue
-            subs = [c for c in p.iterdir() if c.is_dir()]
-            n_good = sum(1 for c in subs if looks_like_images(c) or (c / "images").exists())
-            if n_good >= 2:
-                return p
-    candidate = base / base.name
-    return candidate if candidate.exists() else base
+def find_dataset_root(base: Path) -> Path:
+    """Retourne la vraie racine du dataset COVID-19 Radiography.
+    
+    Structure Kaggle connue :
+    <kaggle_download>/COVID-19_Radiography_Dataset/
+        ├── COVID/images/
+        ├── Lung_Opacity/images/
+        ├── Normal/images/
+        └── Viral Pneumonia/images/
+    """
+    # Structure standard Kaggle (double niveau)
+    expected = base / "COVID-19_Radiography_Dataset" / "COVID-19_Radiography_Dataset"
+    if expected.exists() and (expected / "COVID").exists():
+        return expected
+    
+    # Un seul niveau (cas local ou structure différente)
+    nested = base / "COVID-19_Radiography_Dataset"
+    if nested.exists() and (nested / "COVID").exists():
+        return nested
+    
+    # Déjà au bon niveau
+    if (base / "COVID").exists() or (base / "Normal").exists():
+        return base
+    
+    # Fallback : retourner base
+    return base
 
-def build_sample_map_simple(root: Path, targets: List[str], n: int, include_masks: bool):
-    rng = random.Random(42)
-    sample_map: Dict[str, List[dict]] = {}
-    for cls in targets:
-        cls_dir = root / cls
-        images_dir = cls_dir / "images"
-        if not images_dir.exists():
-            images_dir = cls_dir
-        imgs = [p for p in sorted(images_dir.iterdir()) if p.suffix.lower() in {".png",".jpg",".jpeg",".bmp",".tif",".tiff"}]
-        chosen = rng.sample(imgs, k=min(n,len(imgs))) if imgs else []
-        entries = [{"image": str(img), "mask": str(cls_dir/"masks"/img.name) if include_masks and (cls_dir/"masks"/img.name).exists() else None} for img in chosen]
-        sample_map[cls] = entries
-    return sample_map
 
-def create_zip_bytes_from_sample(sample_map: Dict[str,List[dict]]) -> io.BytesIO:
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-        for cls_name, items in sample_map.items():
-            for entry in items:
-                imgp = Path(entry.get("image"))
-                if imgp.exists():
-                    zf.write(imgp, arcname=f"{cls_name}/images/{imgp.name}")
-                m = entry.get("mask")
-                if m and Path(m).exists():
-                    zf.write(m, arcname=f"{cls_name}/masks/{Path(m).name}")
-    zip_buffer.seek(0)
-    return zip_buffer
 
 # ---------------- UI ----------------
 def run():
@@ -128,7 +109,7 @@ def run():
     # Header narratif développé
     header_text = (
         "Le dataset COVID-19 Radiography Database rassemble plusieurs milliers d'images de radiographies thoraciques (CXR), "
-        "classées par type de pathologie : COVID-19, Normal, Viral Pneumonia et Lung Opacity. Ces images ont été collectées "
+        "classées par type de pathologie : COVID-19, Normal, Viral Pneumonia et Lung Opacity, et leurs masques de segmentation. Ces images ont été collectées "
         "à partir de sources publiques et de publications de recherche, et représentent trois pathologies pulmonaires différentes, " \
         "mais avec des caractéristiques visuelles parfois similaires, surtout sur une radiographie en noir et blanc. "
         "Ces images permettent d'illustrer les capacités d'analyse et de modélisation dans le cadre d'un POC, mais ne seraient pas " \
@@ -150,15 +131,6 @@ def run():
     else:
         st.markdown(f"### 📦 Présentation des données\n{header_text}")
     st.divider()
-
-    # 1. Rôle & périmètre
-    _render_section(
-        "1. Rôle des données & périmètre",
-        "Le dataset COVID-19 Radiography Dataset sert pour démonstration du POC et la validation de modèles ML/DL. "
-        "Il inclut des images thoraciques classées (COVID-19, Normal, Viral Pneumonia, Lung Opacity) ainsi que les masques correspondants. "
-        "Cette section permet de visualiser le volume de données et leur organisation, tout en garantissant un accès reproductible aux échantillons. "
-        "Le dataset est pré-traité pour uniformiser les formats et préparer les jeux d'entrainement/validation/test."
-    )
 
     # 2. Inventaire & volumétrie
     _render_section(
@@ -217,40 +189,5 @@ def run():
     st.session_state["detected_root"] = str(detected_root)
     st.session_state["classes"] = classes
 
-    # UI controls
-    col1, col2, col3 = st.columns([2,1,1])
-    with col1: choice = st.selectbox("Classe :", ["all"]+classes, index=0)
-    with col2: n = st.number_input("N images / classe :", 1,200,N_PER_CLASS_DEFAULT)
-    with col3: include_masks = st.checkbox("Inclure masks", value=False)
 
-    if st.button("Préparer échantillon"):
-        targets = classes if choice=="all" else [choice]
-        sample_map = build_sample_map_simple(detected_root, targets, n, include_masks)
-        st.session_state["sample_map"] = sample_map
-        st.success(f"Échantillon préparé ({len(sample_map)} classes).")
-    st.divider()
-
-    # 5. Aperçu échantillons
-    st.markdown("## 5. Aperçu échantillons")
-    sample_map = st.session_state.get("sample_map", {})
-    if not sample_map: st.info("Clique sur 'Préparer échantillon' pour voir les images.")
-    else:
-        total = 0
-        for cls_name, entries in sample_map.items():
-            st.markdown(f"### {cls_name} — {len(entries)} exemples")
-            if not entries: st.write("— aucun fichier —"); continue
-            cols = st.columns(3)
-            for idx, entry in enumerate(entries):
-                with cols[idx%3]:
-                    img_path = Path(entry["image"])
-                    if img_path.exists():
-                        im = Image.open(img_path).convert("RGB"); im.thumbnail(THUMBNAIL_MAX)
-                        st.image(im, caption=img_path.name, use_column_width=True)
-                    mask_path = entry.get("mask")
-                    if include_masks and mask_path and Path(mask_path).exists():
-                        m_im = Image.open(mask_path); m_im.thumbnail(THUMBNAIL_MAX)
-                        st.image(m_im, caption=f"mask: {Path(mask_path).name}", use_column_width=True)
-                    total += 1
-        st.success(f"{total} images affichées.")
-    st.divider()
-
+    

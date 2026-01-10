@@ -87,7 +87,7 @@ def run():
         value=(
             "- Normalisation des intensités nécessaire pour stabiliser l’apprentissage\n"
             "- Redimensionnement des images pouvant entraîner une perte de détails fins\n"
-            "- Absence de transformations lourdes non justifiées sans modèle entraîné\n"
+            "- Les transformations ont volontairement été limitées tant que les modèles n’avaient pas démontré de gain clair en performance.\n"
             "- Choix dictés par des contraintes exploratoires, non par une validation clinique"
         ),
         height=130,
@@ -95,31 +95,9 @@ def run():
     )
     st.divider()
 
-    # 5. Model perspective
+    # 5. Risks & usage boundaries
     st.markdown(
-        "## 5. Perspective modèle (positionnement volontairement prudent)\n\n"
-        "Aucun modèle final n’est présenté à ce stade, et ce choix est **délibéré**."
-    )
-    st.text_area(
-        "Positionnement modèle",
-        value=(
-            "- Modèles envisagés : CNN standards pour classification multi-classes\n"
-            "- Objectif : évaluer la séparabilité globale, pas produire un diagnostic\n"
-            "- Sensibilité attendue aux classes rares et au déséquilibre\n"
-            "- Toute performance chiffrée doit être interprétée à la lumière des biais identifiés"
-        ),
-        height=130,
-        key="conclusion_model"
-    )
-    st.warning(
-        "Dans un contexte médical, l’absence de validation externe et d’explicabilité robuste "
-        "interdit tout usage opérationnel."
-    )
-    st.divider()
-
-    # 6. Risks & usage boundaries
-    st.markdown(
-        "## 6. Risques et périmètre d’usage\n\n"
+        "## 5. Risques et périmètre d’usage\n\n"
         "Les risques suivants doivent être explicitement reconnus."
     )
     st.text_area(
@@ -135,27 +113,32 @@ def run():
     )
     st.divider()
 
-    # 7. Prioritized perspectives
+    # 6. Prioritized perspectives
     st.markdown(
-        "## 7. Perspectives et axes d’amélioration\n\n"
+        "## 6. Perspectives et axes d’amélioration\n\n"
         "Pistes d’évolution identifiées, priorisées selon effort et impact."
     )
+
     st.text_area(
         "Perspectives",
         value=(
-            "- Court terme : rééquilibrage du dataset, tests statistiques simples\n"
-            "- Moyen terme : calcul d’embeddings profonds hors-ligne, analyses de similarité robustes\n"
-            "- Long terme : validation multi-sources, intégration d’explicabilité et pipeline MLOps\n"
+            "- Court terme : rééquilibrage du dataset et mise en place de tests statistiques simples\n"
+            "- Moyen terme : calcul d’embeddings profonds hors-ligne, analyses de similarité robustes "
+            "et structuration du versionnage des données pour garantir la reproductibilité\n"
+            "- Long terme : validation multi-sources, intégration de méthodes d’explicabilité "
+            "et mise en place d’un pipeline MLOps incluant gestion des versions et automatisation\n"
             "- Enrichissement futur par métadonnées cliniques si disponibles"
         ),
-        height=150,
+        height=160,
         key="conclusion_future"
     )
+
     st.divider()
 
-    # 8. Final takeaway
+
+    # 7. Final takeaway
     st.markdown(
-        "## 8. Conclusion finale\n\n"
+        "## 7. Conclusion finale\n\n"
         "**La valeur principale de ce projet réside moins dans un modèle que dans le raisonnement appliqué aux données.**\n\n"
         "Il démontre l’importance d’une approche prudente, critique et méthodologiquement rigoureuse, "
         "en particulier dans des contextes sensibles comme l’imagerie médicale."

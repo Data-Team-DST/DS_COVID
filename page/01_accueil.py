@@ -110,20 +110,6 @@ def run():
 
         ]
         
-        # Navigation
-        col_prev, col_counter, col_next = st.columns([1, 2, 1])
-        
-        with col_prev:
-            if st.button("◀️", key="prev_img", use_container_width=True):
-                st.session_state.img_index = (st.session_state.img_index - 1) % len(images_data)
-        
-        with col_counter:
-            st.markdown(f"<div style='text-align: center; padding-top: 5px;'>{st.session_state.img_index + 1} / {len(images_data)}</div>", unsafe_allow_html=True)
-        
-        with col_next:
-            if st.button("▶️", key="next_img", use_container_width=True):
-                st.session_state.img_index = (st.session_state.img_index + 1) % len(images_data)
-        
         # Afficher l'image actuelle
         current_img, current_caption = images_data[st.session_state.img_index]
         img_path = Path(__file__).parent / "images" / "covid_cxr_symptoms" / current_img
@@ -132,6 +118,17 @@ def run():
             st.image(str(img_path), caption=current_caption)
         else:
             st.info(f"💡 Image {current_img} non disponible.")
+        
+        # Navigation sous l'image
+        col_prev, col_next = st.columns([1, 1])
+        
+        with col_prev:
+            if st.button("◀️ Précédent", key="prev_img", use_container_width=True):
+                st.session_state.img_index = (st.session_state.img_index - 1) % len(images_data)
+        
+        with col_next:
+            if st.button("Suivant ▶️", key="next_img", use_container_width=True):
+                st.session_state.img_index = (st.session_state.img_index + 1) % len(images_data)
     
     with text_col:
         st.markdown(

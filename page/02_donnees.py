@@ -127,10 +127,17 @@ def run():
     
     # Header narratif développé
     header_text = (
-        "Le dataset COVID-19 Radiography Database rassemble plusieurs milliers d'images de radiographies thoraciques, "
-        "classées par type de pathologie : COVID-19, Normal, Viral Pneumonia et Lung Opacity. "
-        "Ces images permettent d'illustrer les capacités d'analyse et de modélisation dans le cadre d'un POC. "
-        "Chaque image est potentiellement accompagnée d'un masque de segmentation, utile pour les modèles supervisés. "
+        "Le dataset COVID-19 Radiography Database rassemble plusieurs milliers d'images de radiographies thoraciques (CXR), "
+        "classées par type de pathologie : COVID-19, Normal, Viral Pneumonia et Lung Opacity. Ces images ont été collectées "
+        "à partir de sources publiques et de publications de recherche, et représentent trois pathologies pulmonaires différentes, " \
+        "mais avec des caractéristiques visuelles parfois similaires, surtout sur une radiographie en noir et blanc. "
+        "Ces images permettent d'illustrer les capacités d'analyse et de modélisation dans le cadre d'un POC, mais ne seraient pas " \
+        "vraiment utiles sans masques de segmentation. On peut imaginer, dans ce contexte, deux types de masques : des masques de lésions "
+        "appelés 'lesions masks', ils sont très difficiles à obtenir par un radiologiste, et cela prendrait autant de temps " \
+        "presque que le diagnostic lui même à partir de l'image et des masques de poumons ('lung masks'), qui sont simples à obtenir, informatiquement. "
+        "Dans notre dataset, chaque image est accompagnée d'un masque de segmentation des poumons, ce qui sera utile pour éviter l'overfitting par exemple, "
+        "et tout simplement pour être sûr que notre modèle se concentre sur la zone d'intérêt. En effet, on pourrait imaginer que certaines images contiennent des artefacts, " \
+        "des annotations textuelles, ou d'autres éléments non pertinents qui pourraient biaiser l'apprentissage.  "
         "L'ensemble offre une bonne variabilité et représente un volume suffisant pour visualiser la distribution des classes, "
         "tester le pipeline de preprocessing et générer des échantillons reproductibles. "
         "Cette section fournit un aperçu rapide des classes, de la volumétrie et des échantillons disponibles pour exploration."
@@ -148,7 +155,7 @@ def run():
     _render_section(
         "1. Rôle des données & périmètre",
         "Le dataset COVID-19 Radiography Dataset sert pour démonstration du POC et la validation de modèles ML/DL. "
-        "Il inclut des images thoraciques classées (COVID-19, Normal, Viral Pneumonia, Lung Opacity) ainsi que les masques correspondants lorsque disponibles. "
+        "Il inclut des images thoraciques classées (COVID-19, Normal, Viral Pneumonia, Lung Opacity) ainsi que les masques correspondants. "
         "Cette section permet de visualiser le volume de données et leur organisation, tout en garantissant un accès reproductible aux échantillons. "
         "Le dataset est pré-traité pour uniformiser les formats et préparer les jeux d'entrainement/validation/test."
     )
@@ -156,15 +163,38 @@ def run():
     # 2. Inventaire & volumétrie
     _render_section(
         "2. Inventaire & volumétrie",
-        f"Dataset : {DATASET_SLUG}\nTotal images référencées : {DEFAULT_TOTAL}\n"
+        f"Dataset : {DATASET_SLUG}\nTotal images/masques référencées : {DEFAULT_TOTAL}\n"
         "Les images sont réparties selon les classes suivantes, permettant une visualisation claire de la disponibilité des données par catégorie :"
     )
-    table_md = "| Classe | Images |\n|---:|---:|\n"
-    for k,v in DEFAULT_CLASS_COUNTS.items(): table_md += f"| {k} | {v} |\n"
+
+    table_md = "| Classe | Images | Masks |\n|---:|---:|---:|\n"
+    for k,v in DEFAULT_CLASS_COUNTS.items(): table_md += f"| {k} | {v} | {v} |\n"
     st.markdown(table_md)
-    
-    # 3. Import & aperçu rapide
-    st.markdown("## 3. Import & aperçu rapide (Kaggle)")
+
+    st.markdown(
+    "**Note sur le déséquilibre de classes** : La distribution montre un déséquilibre notable "
+    "(Normal : 10,192 vs Viral Pneumonia : 1,345). Pour atténuer l'impact sur l'entraînement, "
+    "plusieurs stratégies ont été envisagées : "
+    "**sous/sur-échantillonnage** (SMOTE, augmentation de données, undersampling, oversampling...), "
+    "**pondération de la loss** (pénaliser davantage les erreurs sur classes minoritaires), "
+    "**sampling stratifié** (échantillonnage équilibré lors du train/val split), et "
+    "**class weighting** (ajustement des poids dans le modèle). "
+    "Ces techniques seront comparées dans la section modélisation pour déterminer la stratégie optimale."
+)
+
+    # 3. Caractéristiques graphiques
+
+    _render_section(
+        "3. Caractéristiques graphiques des images et masques",
+        "- Format : PNG (Portable Network Graphics) \n"
+        "- Résolution : 299x299 pixels \n"
+        "- Couleurs : L (1 canal, niveaux de gris) ou fake RGB (3 canaux identiques) \n"
+        "- Masques : Binaires, alignés avec les images correspondantes \n"
+        "- Variabilité : Diversité dans les angles, contrastes et éléments présents \n"
+        "Ces caractéristiques influencent les étapes de pré-traitement et de modélisation."
+    )
+    # 4. Import & aperçu rapide
+    st.markdown("## 4. Import & aperçu rapide (Kaggle)")
     if kagglehub is None:
         st.warning("KaggleHub non disponible — téléchargement automatique impossible.")
         return
@@ -200,8 +230,8 @@ def run():
         st.success(f"Échantillon préparé ({len(sample_map)} classes).")
     st.divider()
 
-    # 4. Aperçu échantillons
-    st.markdown("## 4. Aperçu échantillons")
+    # 5. Aperçu échantillons
+    st.markdown("## 5. Aperçu échantillons")
     sample_map = st.session_state.get("sample_map", {})
     if not sample_map: st.info("Clique sur 'Préparer échantillon' pour voir les images.")
     else:

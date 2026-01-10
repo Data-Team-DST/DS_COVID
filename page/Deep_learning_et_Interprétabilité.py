@@ -36,7 +36,7 @@ def run():
 
     st.markdown("**Courbe de loss et d'accuracy**")
 
-    chemin_absolu = rf"{chemin_global}courbe de loss et d'accuracy.png"
+    chemin_absolu = rf"{chemin_global}courbe loss.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Courbe de loss et d'accuracy", width=500)
 
@@ -63,7 +63,7 @@ def run():
 
     st.markdown("**Matrice de confusion**")
 
-    chemin_absolu = rf"{chemin_global}matrice de confusion.png"
+    chemin_absolu = rf"{chemin_global}matrice confusion deep.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Matrice de confusion", width=500)
 

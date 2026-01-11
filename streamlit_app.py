@@ -13,9 +13,8 @@ _PAGE_FILENAMES = [
     "04_preprocessing.py",
     "05_modeles.py",
     "06_analyse_du_meilleur_modele.py",
-    "07_conclusion.py",
-    "08_critique.py",
     "09_cicd.py",
+    "07_conclusion_critique_perspective.py",
     "10_Selection_Pipeline.py",
 ]
 
@@ -137,10 +136,9 @@ _nav_labels = [
     "04 - Preprocessing",
     "05 - Modèles",
     "06 - Analyse meilleur modèle",
-    "07 - Conclusion",
-    "08 - Critique",
-    "09 - CI/CD",
-    "10 - Sélection Pipeline",
+    "07 - CI/CD",
+    "08 - Conclusion, critique & perspectives",
+    "09 - Sélection Pipeline",
 ]
 
 # --- Badges simples via emoji ---

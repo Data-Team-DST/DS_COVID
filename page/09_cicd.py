@@ -1,8 +1,9 @@
+# page/08_cicd_pipeline.py
 # Theming metadata:
 # - Preferred: streamlit-extras mandatory; inherits global dark theme.
 # - Palette: navy/dark background, high-contrast highlights; sans-serif font.
-# - File status: interactive CI/CD documentation —
-#   décrit pipeline réel implémenté + limites assumées + perspectives réalistes.
+# - File status: CI pipeline presentation —
+#   quality-focused, reproducible, deliberately non-industrial.
 
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
@@ -11,171 +12,122 @@ from streamlit_extras.colored_header import colored_header
 def run():
     # Header / hero
     colored_header(
-        label="CI/CD Pipeline & Code Quality",
+        label="CI/CD & qualité logicielle",
         description=(
-            "Documentation du pipeline CI/CD réellement implémenté : "
-            "qualité de code, tests automatisés, analyse statique et limites actuelles."
+            "Présentation du pipeline CI réellement implémenté : "
+            "objectifs, outils, limites assumées et positionnement pédagogique."
         ),
         color_name="blue-70"
     )
     st.divider()
 
-    # 1. Topic overview & context
+    # 1. Why CI/CD here?
     st.markdown(
-        "## 1. Topic overview & context\n\n"
-        "Bien que la mise en place d’un pipeline CI/CD complet ne soit pas explicitement requise "
-        "dans le cadre du projet, un effort particulier a été porté sur la **qualité du code**, "
-        "la **maintenabilité** et la **reproductibilité**.\n\n"
-        "Le pipeline mis en place vise donc à garantir un socle technique propre et fiable, "
-        "plutôt qu’un déploiement industriel complet."
+        "## 1. Pourquoi un pipeline CI/CD dans ce projet ?\n\n"
+        "Même en l’absence de mise en production, un effort volontaire a été réalisé "
+        "sur la **qualité du code**, la **reproductibilité** et la **maintenabilité**.\n\n"
+        "L’objectif n’est pas l’industrialisation, mais d’éviter : "
+        "code fragile, régressions silencieuses et dette technique."
     )
     st.divider()
 
-    # 2. Implemented CI pipeline (GitHub Actions)
+    # 2. Implemented CI pipeline
     st.markdown(
-        "## 2. Implemented CI pipeline (GitHub Actions)\n\n"
-        "Pipeline CI actuellement en place, exécuté automatiquement sur chaque push et pull request."
+        "## 2. Pipeline CI implémenté\n\n"
+        "Le pipeline est exécuté automatiquement via GitHub Actions à chaque push et pull request."
     )
     st.text_area(
-        "Pipeline CI implémenté",
+        "CI en place",
         value=(
-            "- Linting Python avec **pylint** (fail si score < 8)\n"
+            "- Linting Python avec **pylint** (seuil bloquant : score ≥ 8)\n"
             "- Tests unitaires avec **pytest**\n"
-            "- Mesure de couverture de code (coverage.xml)\n"
-            "- Analyse statique et qualité globale via **SonarCloud**"
-        ),
-        height=120,
-        key="cicd_existing"
-    )
-    st.divider()
-
-    # 3. Linting & code quality
-    st.markdown(
-        "## 3. Linting & code quality\n\n"
-        "Contrôle de la qualité du code afin de garantir lisibilité, cohérence et respect des bonnes pratiques."
-    )
-    st.text_area(
-        "Linting",
-        value=(
-            "- Outil : pylint\n"
-            "- Analyse par sous-dossier (src, features, utils, notebooks)\n"
-            "- Seuil bloquant : score minimal de 8/10\n"
-            "- Objectif : éviter dette technique et code fragile"
-        ),
-        height=120,
-        key="cicd_lint"
-    )
-    st.divider()
-
-    # 4. Unit tests & functional validation
-    st.markdown(
-        "## 4. Unit tests & functional validation\n\n"
-        "Validation automatique du bon fonctionnement du code."
-    )
-    st.text_area(
-        "Tests unitaires",
-        value=(
-            "- Framework : pytest\n"
-            "- Tests exécutés après succès du lint\n"
-            "- Couverture minimale requise : 30%\n"
-            "- Objectif : détecter régressions et erreurs fonctionnelles"
-        ),
-        height=120,
-        key="cicd_tests"
-    )
-    st.divider()
-
-    # 5. Static analysis & SonarCloud
-    st.markdown(
-        "## 5. Static analysis & SonarCloud\n\n"
-        "Surcouche d’analyse statique pour centraliser qualité, dette technique et couverture."
-    )
-    st.text_area(
-        "SonarCloud",
-        value=(
-            "- Analyse automatique du code Python\n"
-            "- Intégration du rapport de couverture pytest\n"
-            "- Détection de code smells, duplications et vulnérabilités\n"
-            "- Version gratuite : analyses limitées mais suffisantes pour un projet académique"
+            "- Génération de rapports de couverture\n"
+            "- Analyse statique centralisée via **SonarCloud**"
         ),
         height=130,
-        key="cicd_sonar"
+        key="cicd_core"
     )
     st.divider()
 
-    # 6. Artefacts generated
+    # 3. Code quality & testing philosophy
     st.markdown(
-        "## 6. Generated artefacts\n\n"
-        "Fichiers produits automatiquement par le pipeline CI."
+        "## 3. Philosophie qualité et tests\n\n"
+        "Les choix CI/CD reflètent une approche pragmatique et réaliste."
     )
     st.text_area(
-        "Artefacts",
+        "Approche qualité",
         value=(
-            "- coverage.xml (rapport de couverture pytest)\n"
-            "- Rapports SonarCloud\n"
-            "- Logs CI GitHub Actions\n"
-            "- Artefacts temporaires stockés pour inspection"
+            "- Priorité à la lisibilité et à la robustesse du code\n"
+            "- Tests unitaires ciblés sur les composants critiques\n"
+            "- Couverture volontairement modeste mais contrôlée\n"
+            "- Détection précoce des régressions"
         ),
-        height=110,
-        key="cicd_artefacts"
+        height=130,
+        key="cicd_quality"
     )
     st.divider()
 
-    # 7. What is intentionally missing
+    # 4. Artefacts & traçabilité
     st.markdown(
-        "## 7. What is intentionally missing\n\n"
-        "Éléments volontairement non implémentés à ce stade."
+        "## 4. Artefacts et traçabilité\n\n"
+        "Le pipeline produit des éléments exploitables pour audit et suivi."
     )
     st.text_area(
-        "Limites assumées du pipeline",
+        "Artefacts générés",
+        value=(
+            "- Rapports de couverture pytest (coverage.xml)\n"
+            "- Analyses SonarCloud\n"
+            "- Logs GitHub Actions\n"
+            "- Historique des exécutions CI"
+        ),
+        height=120,
+        key="cicd_artifacts"
+    )
+    st.divider()
+
+    # 5. What is intentionally missing
+    st.markdown(
+        "## 5. Ce qui est volontairement absent\n\n"
+        "Certains éléments classiques de CI/CD ne sont pas implémentés, par choix."
+    )
+    st.text_area(
+        "Limites assumées",
         value=(
             "- Pas de build Docker\n"
-            "- Pas de déploiement Kubernetes\n"
-            "- Pas de CD (Continuous Deployment)\n"
-            "- Pas de monitoring temps réel en production\n\n"
-            "Ces éléments ne sont ni demandés dans le cadre du projet, "
-            "ni compatibles avec les contraintes de coût, d’infrastructure "
-            "et de périmètre pédagogique."
+            "- Pas de déploiement continu (CD)\n"
+            "- Pas d’orchestration Kubernetes\n"
+            "- Pas de monitoring temps réel\n\n"
+            "Ces choix sont cohérents avec le périmètre académique, "
+            "les contraintes de ressources et les objectifs pédagogiques."
         ),
         height=160,
         key="cicd_limits"
     )
     st.divider()
 
-    # 8. Perspective & training alignment
+    # 6. Perspective & alignment
     st.markdown(
-        "## 8. Perspective & training alignment\n\n"
-        "Lien entre ce pipeline et la suite logique de la formation."
+        "## 6. Perspectives et alignement formation\n\n"
+        "Le pipeline constitue une base saine pour des évolutions futures."
     )
     st.text_area(
         "Évolutions possibles",
         value=(
             "- Introduction progressive de Docker\n"
             "- Séparation CI / CD\n"
-            "- Déploiement contrôlé (staging uniquement)\n"
-            "- Monitoring basique (logs, métriques)\n\n"
-            "Ces évolutions correspondent aux modules avancés de la formation "
-            "et nécessitent des compétences et ressources supplémentaires."
+            "- Déploiement contrôlé en environnement de test\n"
+            "- Monitoring basique des performances et dérives"
         ),
-        height=160,
+        height=140,
         key="cicd_future"
     )
     st.divider()
 
-    # 9. Summary & positioning
+    # 7. Final positioning
     st.markdown(
-        "## 9. Summary & positioning\n\n"
-        "Positionnement clair du pipeline dans le cadre du projet."
-    )
-    st.markdown(
-        "- Pipeline **CI solide et fonctionnel**, orienté qualité et fiabilité\n"
-        "- Implémenté volontairement au-delà des exigences minimales\n"
+        "## 7. Positionnement final\n\n"
+        "- Pipeline **CI réel et fonctionnel**, orienté qualité\n"
+        "- Implémenté au-delà des exigences minimales\n"
         "- Adapté à un projet académique avancé\n"
-        "- Base saine pour une industrialisation future, sans sur-promesse"
+        "- Base crédible pour une industrialisation future, sans sur-promesse"
     )
-
-
-# STATUS: page/09_cicd.py — intégrale,
-# pipeline CI réel documenté (lint, tests, couverture, SonarCloud),
-# positionnement honnête, sans déploiement fictif,
-# valorisation claire des compétences CI/CD sans bullshit.

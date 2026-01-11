@@ -1,8 +1,4 @@
 # 04_preprocessing.py
-# Theming metadata:
-# - Preferred: streamlit-extras mandatory; page inherits app-level dark theme.
-# - Palette: navy/dark background, high-contrast highlights; sans-serif font.
-# - File status: expert-grade preprocessing template focusing on "description et justification des traitements" — placeholders, checklists, pseudo-code et exigences CI.
 
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
@@ -22,11 +18,12 @@ from pathlib import Path
 def run():
     # Configuration de la page
     st.set_page_config(page_title="Preprocessing — Description & Justification", layout="wide")
-    colored_header(
-        label="Preprocessing — Description & Justification",
-        description="Documenter chaque transformation : quoi, pourquoi, comment, impact et tests associés.",
-        color_name="blue-70"
-    )
+    # colored_header(
+    #     label="Preprocessing — Description & Justification",
+    #     description="Documenter chaque transformation : quoi, pourquoi, comment, impact et tests associés.",
+    #     color_name="blue-70"
+    # )
+
     st.divider()
 
     # Obtenir le chemin global du projet
@@ -72,34 +69,39 @@ def run():
         with collab_col:
             collab_cont = st.container(border=True)
 
-        
         with windows_cont:
-            st.header("Windows",text_alignment="center")
-            # st.info("Configuration de l'environnement Windows pour le projet.")
+            st.header("Windows", text_alignment="center")
             st.success(" Environnement Simple")
             st.info(" Données stockées localement")
             st.error(" Pas de compatibilité avec GPU")
 
         with wsl_cont:
-            st.header("WSL",text_alignment="center")
-            # st.info("Configuration de l'environnement WSL pour le projet.")
+            st.header("WSL", text_alignment="center")
             st.warning(" Configuration plus complexe, Cuda à installer")
             st.info(" Données stockées localement")
             st.warning(" Compatibilité avec GPU, Carte Nvidia")
 
         with collab_cont:
-            st.header("Google Colab",text_alignment="center")
-            # st.info("Configuration de l'environnement Google Colab pour le projet.")
+            st.header("Google Colab", text_alignment="center")
             st.error(" Environnement le plus complexe")
             st.warning(" Données stockées sur le cloud (Drive)")
             st.success(" Compatibilité avec GPU/TPU")
 
         config_auto_container = st.container(border=True)
         with config_auto_container:
-            st.header("Configuration automatique")
-            st.write(" Script pour détecter et configurer automatiquement l'environnement de travail.")
-            st.image(p11, caption="Configuration Automatique")
-
+            config_col1, config_col2 = st.columns([0.5,0.5],gap="small")
+            with config_col1:
+                config_1_container = st.container(border=True)
+                with config_1_container:
+                    st.header("Configuration automatique", text_alignment="center")
+                    st.write(" Script pour détecter et configurer automatiquement l'environnement de travail.")
+                    st.image(p11, caption="Configuration Automatique")
+            with config_col2:
+                config_2_container = st.container(border=True)
+                with config_2_container:
+                    st.header("Configuration WSL", text_alignment="center")
+                    st.write(" Étapes pour configurer l'environnement WSL pour le projet.")
+                    st.image(str(p6), caption="WSL Configuration")
 
     st.divider()
 
@@ -113,31 +115,57 @@ def run():
 
     with Masking_container:
         st.title("Masking des images")
-        col_1, col_2,col_3, col_4, col_5 = st.columns([0.2,0.2,0.2,0.3,0.1],gap="small")
+        col_1, col_2 = st.columns([0.2,0.2],gap="small")
 
         with col_1:
-            st.image(str(p3), caption="Arborescence automatique")
+            sub_col_1, sub_col_2 = st.columns(2)
 
-        with col_2:
-            st.image(str(p1), caption="Before Masking")
+            with sub_col_1:
+                st.image(str(p1), caption="Before Masking")
 
-        with col_3:
-            st.image(str(p2), caption="After Masking")
+            with sub_col_2:
+                st.image(str(p2), caption="After Masking")
 
-        with col_4:
             st.info("Quoi ? Masque pour isoler la région d'intérêt")
             st.info("Pourquoi ? Réduire le bruit et améliorer la qualité des données en se concentrant sur les zones pertinentes")
             st.info("Comment ? Utilisation d'algorithmes de segmentation pour créer et appliquer le masque")
             st.info("Impact ? Amélioration potentielle des performances du modèle en réduisant les distractions")
             st.info("Tests associés ? Comparaison des performances du modèle avant et après l'application du masque")
 
+        with col_2:
+            st.image(str(p3), caption="Arborescence automatique")
 
-    
-    st.image(str(p4), caption="Class Distribution Imbalance")
-    st.image(str(p5), caption="Dataset Configuration")
-    st.image(str(p6), caption="WSL Configuration")
-    st.image(str(p7), caption="Rebalancing Strategy")
-    st.image(str(p8), caption="Stratified Split")
-    st.image(str(p9), caption="Data Augmentation Configuration")
-    st.image(str(p10), caption="Augmentation Visualization")
+        # with col_3:
+        #     st.image(str(p2), caption="After Masking")
+            
+        # with col_4:
+            
+
+    st.divider()
+
+    # Gestion du déséquilibre de classes
+
+
+    desequilibre_container = st.container(border=True)
+    with desequilibre_container:
+        st.title("Gestion du déséquilibre de classes")
+        des_col_1, des_col_2, des_col_3 = st.columns([0.3,0.3,0.4],gap="small")
+        with des_col_1:
+            st.image(p5, caption="Dataset Configuration")
+        with des_col_2:
+            st.image(p8, caption="Stratified Split")
+        with des_col_3:
+            st.image(p7, caption="Rebalancing Strategy")
+
+    st.divider()
+
+    # Data Augmentation
+    augmentation_container = st.container(border=True)
+    with augmentation_container:
+        st.title("Data Augmentation")
+        aug_col_1, aug_col_2 = st.columns([0.5,0.5],gap="small")
+        with aug_col_1:
+            st.image(str(p9), caption="Data Augmentation Configuration")
+        with aug_col_2:
+            st.image(str(p10), caption="Augmentation Visualization")
     

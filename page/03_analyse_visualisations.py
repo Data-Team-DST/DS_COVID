@@ -74,8 +74,6 @@ def sample_images_from_class(root: Path, cls: str, n: int) -> List[Path]:
     rng = random.Random()
     return rng.sample(imgs, k=n)
 
-def get_lum
-
 def compute_image_metrics(img: Image.Image) -> Dict:
     """Calcule luminosité (L), contraste (std), entropie approxi., fake-RGB."""
     arr = np.array(img.convert("RGB"), dtype=np.float32)

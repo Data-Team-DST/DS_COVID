@@ -554,33 +554,6 @@ def run():
         "Actions suggérées pour l'amélioration du dataset",
         color_name="violet-70"
     )
-    
-    st.markdown("""
-    #### 📋 Points clés :
-    
-    1. **Qualité des images**
-       - Vérifier les images avec luminosité/contraste extrêmes
-       - Identifier les artefacts visuels (texte, logos, bandes noires)
-    
-    2. **Masques de segmentation**
-       - Valider la cohérence des masques (couverture > 0%)
-       - Vérifier l'alignement image/masque
-    
-    3. **Équilibrage des classes**
-       - Surveiller le déséquilibre entre classes
-       - Envisager augmentation de données si nécessaire
-    
-    4. **Documentation**
-       - Tracer toutes les transformations appliquées
-       - Documenter les choix de preprocessing
-    """)
-    
-    st.markdown(
-        "<div class='small-note'>"
-        "💡 Conseil : Exécutez régulièrement cette analyse après modification du dataset."
-        "</div>",
-        unsafe_allow_html=True
-    )
 
 
 # ============================================================================

@@ -457,26 +457,37 @@ def run():
     if not img_paths:
         st.info("Aucune image disponible pour cette classe.")
     else:
-        cols = st.columns(min(3, len(img_paths)))
+        # Sélection de l'image à afficher
+        img_names = [p.name for p in img_paths]
+        selected_name = st.selectbox(
+            "Choisir une image :",
+            options=img_names,
+            key="selected_sample_image"
+        )
         
-        for idx, img_path in enumerate(img_paths):
-            with cols[idx % len(cols)]:
-                try:
-                    img = Image.open(img_path).convert("RGB")
-                    img.thumbnail(THUMBNAIL_MAX)
-                    
-                    st.image(img, use_column_width=True, caption=img_path.name)
-                    
-                    metrics = compute_image_metrics(img)
-                    
-                    st.markdown(
-                        f"**Luminosité** : {metrics['luminosity_mean']:.1f}  \n"
-                        f"**Contraste** : {metrics['contrast_std']:.1f}  \n"
-                        f"**Entropie** : {metrics['entropy']:.2f}"
-                    )
-                
-                except Exception as e:
-                    st.error(f"Erreur : {e}")
+        # Trouver l'image correspondante
+        selected_idx = img_names.index(selected_name)
+        img_path = img_paths[selected_idx]
+        
+        # Affichage de l'image sélectionnée
+        try:
+            img = Image.open(img_path).convert("RGB")
+            img.thumbnail(THUMBNAIL_MAX)
+            
+            st.image(img, caption=img_path.name)
+            
+            metrics = compute_image_metrics(img)
+            
+            col_a, col_b, col_c = st.columns(3)
+            with col_a:
+                st.metric("Luminosité", f"{metrics['luminosity_mean']:.1f}")
+            with col_b:
+                st.metric("Contraste", f"{metrics['contrast_std']:.1f}")
+            with col_c:
+                st.metric("Entropie", f"{metrics['entropy']:.2f}")
+        
+        except Exception as e:
+            st.error(f"Erreur : {e}")
     
     st.divider()
     

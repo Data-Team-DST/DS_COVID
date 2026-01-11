@@ -115,7 +115,7 @@ def run():
                 
                 st.success(f"✅ **{selected_pipeline}**")
                 
-                load_button = st.button("🔍 Charger et Analyser", use_container_width=True)
+                load_button = st.button("🔍 Charger et Analyser", width="stretch")
             
             with col2:
                 st.markdown("### 📄 Détails du Pipeline")
@@ -168,7 +168,7 @@ def run():
                 col_exec1, col_exec2 = st.columns([1, 3])
                 
                 with col_exec1:
-                    exec_button = st.button("▶️ Exécuter Pipeline", use_container_width=True, type="primary")
+                    exec_button = st.button("▶️ Exécuter Pipeline", width="stretch", type="primary")
                 
                 with col_exec2:
                     if exec_button:
@@ -384,7 +384,7 @@ def run():
             col_action1, col_action2 = st.columns(2)
             
             with col_action1:
-                create_button = st.button("🔧 Créer le Pipeline", use_container_width=True, type="primary")
+                create_button = st.button("🔧 Créer le Pipeline", width="stretch", type="primary")
             
             with col_action2:
                 if create_button:

@@ -49,9 +49,9 @@ def run():
     image_16 = Path(p16).relative_to(Path.cwd())
 
     st.image(str(p12), caption="ML Feature Preparation", width=500)
-    # st.image(str(p13), caption="PCA Feature Visualization", use_column_width=False)
-    # st.image(str(p14), caption="Feature Histogram", use_column_width=False)
-    # st.image(str(p15), caption="Combined Features", use_column_width=False)
+    # st.image(str(p13), caption="PCA Feature Visualization")
+    # st.image(str(p14), caption="Feature Histogram")
+    # st.image(str(p15), caption="Combined Features")
     st.image(str(p16), caption="ML Results Overview", width=500)
     
 
@@ -120,7 +120,7 @@ def run():
 
     # chemin_absolu = rf"{chemin_global}/page/images/interprétation des résultats.png"
     # image_path = Path(chemin_absolu).relative_to(Path.cwd())
-    # st.image(str(image_path), caption="Interprétation des résultats", use_column_width=True)
+    # st.image(str(image_path), caption="Interprétation des résultats")
     
     st.markdown("### **Optimisation des modèles de machine learning**")
     

@@ -260,7 +260,7 @@ def plot_luminosity_distributions(df_metrics: pd.DataFrame):
         title="Distribution de luminosité par classe",
         color="class"
     )
-    st.plotly_chart(fig_lum, use_container_width=True)
+    st.plotly_chart(fig_lum, width="stretch")
     
     st.markdown("### 📊 Distribution de Contraste par Classe")
     
@@ -271,7 +271,7 @@ def plot_luminosity_distributions(df_metrics: pd.DataFrame):
         title="Distribution du contraste par classe",
         color="class"
     )
-    st.plotly_chart(fig_std, use_container_width=True)
+    st.plotly_chart(fig_std, width="stretch")
 
 
 def plot_mask_coverage(by_class: Dict, classes: List[str]):
@@ -297,7 +297,7 @@ def plot_mask_coverage(by_class: Dict, classes: List[str]):
         title="Distribution de la couverture des masques par classe",
         color="class"
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 
 def show_mask_overlays(per_image: List[Dict], max_examples: int = 3):

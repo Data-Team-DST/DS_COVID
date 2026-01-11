@@ -166,10 +166,8 @@ def run():
     st.markdown("### **Résultats de la matrice de confusion pour les modèles SVM et Random Forest avec Grid Search**")
 
    
-    choice2 = st.selectbox("Modèle :", ["all"] + MODELS)  
+    #choice2 = st.selectbox("Modèle :", ["all"] + MODELS)  
     
-    MODELS = ["SVM", "KNN", "RF"]
-    MATRICES_FOLDER = chemin_global / Path("matrices_confusion")
 
     # UN SEUL BLOC DE CONTRÔLES (ligne ~160)
     col1, col2, col3 = st.columns([2, 1, 1])

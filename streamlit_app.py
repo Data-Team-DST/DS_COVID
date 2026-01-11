@@ -9,13 +9,12 @@ _PAGE_DIR = Path(__file__).parent / "page"
 _PAGE_FILENAMES = [
     "01_accueil.py",
     "02_donnees.py",
-    "03_analyse_visualisations.py",
-    "04_preprocessing.py",
-    "05_modeles.py",
+    "03_preprocessing.py",
+    "04_Machine_learning_et_optimisation.py",
+    "05_Deep_learning_et_Interprétabilité.py",
     "06_analyse_du_meilleur_modele.py",
-    "09_cicd.py",
     "07_conclusion_critique_perspective.py",
-    "10_Selection_Pipeline.py",
+    "08_cicd.py"
 ]
 
 # --- Import dynamique des modules ---
@@ -132,13 +131,12 @@ html, body, [class*="css"] {
 _nav_labels = [
     "01 - Accueil",
     "02 - Données",
-    "03 - Analyse & Visu",
-    "04 - Preprocessing",
-    "05 - Modèles",
+    "03 - Preprocessing",
+    "04 - Machine Learning & Optimisation",
+    "05 - Deep Learning & Interprétabilité",
     "06 - Analyse meilleur modèle",
-    "07 - CI/CD",
-    "08 - Conclusion, critique & perspectives",
-    "09 - Sélection Pipeline",
+    "07 - Conclusion & Perspectives",
+    "08 - CI/CD"
 ]
 
 # --- Badges simples via emoji ---

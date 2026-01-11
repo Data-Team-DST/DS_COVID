@@ -12,9 +12,9 @@ _PAGE_FILENAMES = [
     "03_preprocessing.py",
     "04_Machine_learning_et_optimisation.py",
     "05_Deep_learning_et_Interprétabilité.py",
-    "06_analyse_du_meilleur_modele.py",
-    "07_conclusion_critique_perspective.py",
-    "08_cicd.py"
+    "06_cicd.py",
+    "07_conclusion_critique_perspective.py"
+    
 ]
 
 # --- Import dynamique des modules ---
@@ -134,9 +134,9 @@ _nav_labels = [
     "03 - Preprocessing",
     "04 - Machine Learning & Optimisation",
     "05 - Deep Learning & Interprétabilité",
-    "06 - Analyse meilleur modèle",
+    "06 - CI/CD & Pipeline",
     "07 - Conclusion & Perspectives",
-    "08 - CI/CD"
+    
 ]
 
 # --- Badges simples via emoji ---

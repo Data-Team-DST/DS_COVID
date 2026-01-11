@@ -82,55 +82,41 @@ def run():
     MODELS = ["SVM", "KNN", "RF"]
     MATRICES_FOLDER = chemin_global / Path("matrices_confusion")
 
-    # UN SEUL BLOC DE CONTRÔLES (ligne ~160)
-    col1, col2, col3 = st.columns([2, 1, 1])
+  # UN SEUL BLOC SIMPLIFIÉ (toujours 1ère image)
+    # Contrôles simplifiés (2 colonnes)
+    col1, col2 = st.columns([3, 1])
     with col1: 
         choice1 = st.selectbox("Modèle :", ["all"] + MODELS, index=0, key="MATRICES_1")
     with col2: 
-        n_images1 = st.number_input("N images / modèle :", 1, 2, 2, key="N1")
-    with col3: 
         show_filenames1 = st.checkbox("Noms fichiers", value=True, key="NAMES1")
 
     if st.button("🔍 Matrices de confusion", key="LOAD1"): 
-        
         sample_map = {}
         for model_name in MODELS:
             model_path = MATRICES_FOLDER / model_name
             if model_path.exists():
-                img_files = list(model_path.glob("*.png")) + list(model_path.glob("*.jpg"))
-                sample_map[model_name] = [
-                    {"image": str(f)} for f in img_files[:n_images1]  
-                ]
-        st.session_state["sample_map"] = sample_map
+                img_files = sorted(model_path.glob("*.png")) + sorted(model_path.glob("*.jpg"))
+                if img_files:
+                    sample_map[model_name] = [{"image": str(img_files[0])}]
+        st.session_state["sample_map_1"] = sample_map  # Key unique
 
-    st.divider()
-
-    # Affichage
     st.markdown("## 📈 Matrices de Confusion")
-    sample_map = st.session_state.get("sample_map", {})
+    sample_map = st.session_state.get("sample_map_1", {})
     if not sample_map: 
-        st.info("👆 Cliquer sur  'Matrices de confusion'")
+        st.info("👆 Cliquez 'Matrices de confusion'")
     else:
-        total = 0
         targets = list(sample_map.keys()) if choice1 == "all" else [choice1]
-        
         for model_name, entries in sample_map.items():
-            if model_name not in targets: continue
-                
-            st.markdown(f"### {model_name} — {len(entries)} matrices")
-            cols = st.columns(2)  # 2 colonnes car 2 images max
-            
-            for idx, entry in enumerate(entries):
-                with cols[idx % 2]:  # 2 colonnes seulement
-                    img_path = Path(entry["image"])
+            if model_name in targets:
+                st.markdown(f"### {model_name}")
+                if entries:
+                    img_path = Path(entries[0]["image"])
                     if img_path.exists():
                         im = Image.open(img_path).convert("RGB")
-                        THUMBNAIL_MAX = (200, 200)
-                        im.thumbnail(THUMBNAIL_MAX)
-                        caption = img_path.name if show_filenames1 else f"Matrix {idx+1}"
-                        st.image(im, caption=caption, width="content")
-                    total += 1
-        
+                        im.thumbnail((200, 200))
+                        caption = img_path.name if show_filenames1 else "Matrix"
+                        st.image(im, caption=caption)  
+
 
     # chemin_absolu = rf"{chemin_global}/page/images/interprétation des résultats.png"
     # image_path = Path(chemin_absolu).relative_to(Path.cwd())

@@ -9,7 +9,6 @@ _PAGE_DIR = Path(__file__).parent / "page"
 _PAGE_FILENAMES = [
     "01_accueil.py",
     "02_donnees.py",
-    "03_analyse_visualisations.py",
     "04_preprocessing.py",
     "05_modeles.py",
     "06_analyse_du_meilleur_modele.py",

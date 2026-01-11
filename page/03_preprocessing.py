@@ -149,13 +149,25 @@ def run():
     desequilibre_container = st.container(border=True)
     with desequilibre_container:
         st.title("Gestion du déséquilibre de classes")
-        des_col_1, des_col_2, des_col_3 = st.columns([0.3,0.3,0.4],gap="small")
+        
+        des_col_1, des_col_2 = st.columns([0.3,0.3],gap="small")
         with des_col_1:
-            st.image(p5, caption="Dataset Configuration")
+            reeq_container = st.container(border=True,horizontal_alignment="center",height="stretch")
+            with reeq_container:
+                st.title("Stratégie de rééquilibrage",text_alignment="center")
+                st.image(p7, caption="Rebalancing Strategy")
+
         with des_col_2:
-            st.image(p8, caption="Stratified Split")
-        with des_col_3:
-            st.image(p7, caption="Rebalancing Strategy")
+            split_strat_container = st.container(border=True,horizontal_alignment="center",height="stretch")
+            with split_strat_container:
+                st.title("Stratified Split",text_alignment="center")
+                st.image(p8, caption="Stratified Split")
+
+        dataset_config_cont = st.container(border=True,horizontal_alignment="center")
+        with dataset_config_cont:
+            st.title("Configuration du Dataset",text_alignment="center")
+            st.image(p5, caption="Dataset Configuration",)
+            
 
     st.divider()
 

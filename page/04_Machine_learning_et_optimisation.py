@@ -130,7 +130,7 @@ def run():
     **SVM** : modèle le moins performant.
     
     **Objectif de notre choix :**
-    - Renforcer l'efficacité et améliorer les performancesdu de chaque modèle
+    - Renforcer l'efficacité et améliorer les performances de chaque modèle
     - Obtenir une analyse comparative complète
     """)
     

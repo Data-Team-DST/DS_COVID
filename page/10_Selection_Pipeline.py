@@ -259,156 +259,156 @@ def run():
                             with st.expander("Voir le traceback"):
                                 st.code(traceback.format_exc())
 
-    # ============================================================
-    # MODE 2: CRÉER UN NOUVEAU PIPELINE
-    # ============================================================
-    else:
-        container_create = st.container(border=True)
-        with container_create:
-            st.markdown("### 🆕 Création de Pipeline Personnalisé")
+    # # ============================================================
+    # # MODE 2: CRÉER UN NOUVEAU PIPELINE
+    # # ============================================================
+    # else:
+    #     container_create = st.container(border=True)
+    #     with container_create:
+    #         st.markdown("### 🆕 Création de Pipeline Personnalisé")
             
-            # Configuration du pipeline
-            st.markdown("#### 1️⃣ Configuration générale")
-            col_config1, col_config2 = st.columns(2)
+    #         # Configuration du pipeline
+    #         st.markdown("#### 1️⃣ Configuration générale")
+    #         col_config1, col_config2 = st.columns(2)
             
-            with col_config1:
-                pipeline_name = st.text_input(
-                    "Nom du pipeline:",
-                    value="custom_pipeline",
-                    help="Nom du fichier .pkl"
-                )
-                img_size = st.select_slider(
-                    "Taille des images:",
-                    options=[32, 64, 96, 128, 224, 256],
-                    value=128
-                )
+    #         with col_config1:
+    #             pipeline_name = st.text_input(
+    #                 "Nom du pipeline:",
+    #                 value="custom_pipeline",
+    #                 help="Nom du fichier .pkl"
+    #             )
+    #             img_size = st.select_slider(
+    #                 "Taille des images:",
+    #                 options=[32, 64, 96, 128, 224, 256],
+    #                 value=128
+    #             )
             
-            with col_config2:
-                use_masks = st.checkbox("Utiliser les masques", value=False)
-                use_augmentation = st.checkbox("Augmentation de données", value=False)
+    #         with col_config2:
+    #             use_masks = st.checkbox("Utiliser les masques", value=False)
+    #             use_augmentation = st.checkbox("Augmentation de données", value=False)
             
-            st.divider()
+    #         st.divider()
             
-            # Sélection des transformateurs
-            st.markdown("#### 2️⃣ Sélection des transformateurs")
+    #         # Sélection des transformateurs
+    #         st.markdown("#### 2️⃣ Sélection des transformateurs")
             
-            col_trans1, col_trans2, col_trans3 = st.columns(3)
+    #         col_trans1, col_trans2, col_trans3 = st.columns(3)
             
-            with col_trans1:
-                st.markdown("**Preprocessing**")
-                do_resize = st.checkbox("ImageResizer", value=True)
-                do_normalize = st.checkbox("ImageNormalizer", value=True)
-                do_grayscale = st.checkbox("RGB → Grayscale", value=True)
+    #         with col_trans1:
+    #             st.markdown("**Preprocessing**")
+    #             do_resize = st.checkbox("ImageResizer", value=True)
+    #             do_normalize = st.checkbox("ImageNormalizer", value=True)
+    #             do_grayscale = st.checkbox("RGB → Grayscale", value=True)
             
-            with col_trans2:
-                st.markdown("**Features**")
-                do_flatten = st.checkbox("ImageFlattener", value=False)
-                do_pca = st.checkbox("ImagePCA", value=False)
-                do_histogram = st.checkbox("ImageHistogram", value=False)
+    #         with col_trans2:
+    #             st.markdown("**Features**")
+    #             do_flatten = st.checkbox("ImageFlattener", value=False)
+    #             do_pca = st.checkbox("ImagePCA", value=False)
+    #             do_histogram = st.checkbox("ImageHistogram", value=False)
                 
-                if do_pca:
-                    n_components = st.slider("Composantes PCA:", 10, 100, 50)
-                if do_histogram:
-                    n_bins = st.slider("Bins histogram:", 8, 64, 32)
+    #             if do_pca:
+    #                 n_components = st.slider("Composantes PCA:", 10, 100, 50)
+    #             if do_histogram:
+    #                 n_bins = st.slider("Bins histogram:", 8, 64, 32)
             
-            with col_trans3:
-                st.markdown("**Utilities**")
-                do_split = st.checkbox("Train/Test Split", value=False)
-                do_save = st.checkbox("SaveTransformer", value=False)
+    #         with col_trans3:
+    #             st.markdown("**Utilities**")
+    #             do_split = st.checkbox("Train/Test Split", value=False)
+    #             do_save = st.checkbox("SaveTransformer", value=False)
                 
-                if do_split:
-                    test_size = st.slider("Test size:", 0.1, 0.4, 0.2, 0.05)
+    #             if do_split:
+    #                 test_size = st.slider("Test size:", 0.1, 0.4, 0.2, 0.05)
             
-            st.divider()
+    #         st.divider()
             
-            # Construction du pipeline
-            st.markdown("#### 3️⃣ Pipeline à créer")
+    #         # Construction du pipeline
+    #         st.markdown("#### 3️⃣ Pipeline à créer")
             
-            # Construire la liste des étapes
-            pipeline_steps = [
-                ('loader', ImagePathLoader(root_dir=data_dir, verbose=True, use_streamlit=True)),
-                ('tuple_to_df', TupleToDataFrame(verbose=True, use_streamlit=True)),
-                ('analyzer', ImageAnalyser(
-                    load_images=True,
-                    analyze_masks=use_masks,
-                    verbose=True,
-                    use_streamlit=True
-                )),
-            ]
+    #         # Construire la liste des étapes
+    #         pipeline_steps = [
+    #             ('loader', ImagePathLoader(root_dir=data_dir, verbose=True, use_streamlit=True)),
+    #             ('tuple_to_df', TupleToDataFrame(verbose=True, use_streamlit=True)),
+    #             ('analyzer', ImageAnalyser(
+    #                 load_images=True,
+    #                 analyze_masks=use_masks,
+    #                 verbose=True,
+    #                 use_streamlit=True
+    #             )),
+    #         ]
             
-            if do_resize:
-                pipeline_steps.append(('resizer', ImageResizer(img_size=(img_size, img_size), verbose=True, use_streamlit=True)))
+    #         if do_resize:
+    #             pipeline_steps.append(('resizer', ImageResizer(img_size=(img_size, img_size), verbose=True, use_streamlit=True)))
             
-            if do_normalize:
-                pipeline_steps.append(('normalizer', ImageNormalizer(verbose=True, use_streamlit=True)))
+    #         if do_normalize:
+    #             pipeline_steps.append(('normalizer', ImageNormalizer(verbose=True, use_streamlit=True)))
             
-            if use_augmentation:
-                pipeline_steps.append(('augmenter', ImageAugmenter(
-                    flip_horizontal=True,
-                    rotation_range=15,
-                    brightness_range=0.2,
-                    probability=0.5,
-                    verbose=True,
-                    use_streamlit=True
-                )))
+    #         if use_augmentation:
+    #             pipeline_steps.append(('augmenter', ImageAugmenter(
+    #                 flip_horizontal=True,
+    #                 rotation_range=15,
+    #                 brightness_range=0.2,
+    #                 probability=0.5,
+    #                 verbose=True,
+    #                 use_streamlit=True
+    #             )))
             
-            if use_masks:
-                pipeline_steps.append(('masker', ImageMasker(verbose=True, use_streamlit=True)))
+    #         if use_masks:
+    #             pipeline_steps.append(('masker', ImageMasker(verbose=True, use_streamlit=True)))
             
-            if do_grayscale:
-                pipeline_steps.append(('gray', RGB_to_L(verbose=True, use_streamlit=True)))
+    #         if do_grayscale:
+    #             pipeline_steps.append(('gray', RGB_to_L(verbose=True, use_streamlit=True)))
             
-            if do_flatten:
-                pipeline_steps.append(('flattener', ImageFlattener(verbose=True, use_streamlit=True)))
+    #         if do_flatten:
+    #             pipeline_steps.append(('flattener', ImageFlattener(verbose=True, use_streamlit=True)))
             
-            if do_histogram:
-                pipeline_steps.append(('histogram', ImageHistogram(bins=n_bins if do_histogram else 32, verbose=True, use_streamlit=True)))
+    #         if do_histogram:
+    #             pipeline_steps.append(('histogram', ImageHistogram(bins=n_bins if do_histogram else 32, verbose=True, use_streamlit=True)))
             
-            if do_pca and do_flatten:
-                pipeline_steps.append(('pca', ImagePCA(n_components=n_components if do_pca else 50, verbose=True, use_streamlit=True)))
+    #         if do_pca and do_flatten:
+    #             pipeline_steps.append(('pca', ImagePCA(n_components=n_components if do_pca else 50, verbose=True, use_streamlit=True)))
             
-            if do_split:
-                pipeline_steps.append(('splitter', TrainTestSplitter(
-                    test_size=test_size if do_split else 0.2,
-                    random_state=42,
-                    verbose=True,
-                    use_streamlit=True
-                )))
+    #         if do_split:
+    #             pipeline_steps.append(('splitter', TrainTestSplitter(
+    #                 test_size=test_size if do_split else 0.2,
+    #                 random_state=42,
+    #                 verbose=True,
+    #                 use_streamlit=True
+    #             )))
             
-            if do_save:
-                pipeline_steps.append(('saver', SaveTransformer(
-                    save_dir='outputs',
-                    prefix=pipeline_name,
-                    verbose=True,
-                    use_streamlit=True
-                )))
+    #         if do_save:
+    #             pipeline_steps.append(('saver', SaveTransformer(
+    #                 save_dir='outputs',
+    #                 prefix=pipeline_name,
+    #                 verbose=True,
+    #                 use_streamlit=True
+    #             )))
             
-            # Afficher l'aperçu
-            st.code("\n".join([f"{i+1}. {name}: {step.__class__.__name__}" 
-                            for i, (name, step) in enumerate(pipeline_steps)]))
+    #         # Afficher l'aperçu
+    #         st.code("\n".join([f"{i+1}. {name}: {step.__class__.__name__}" 
+    #                         for i, (name, step) in enumerate(pipeline_steps)]))
             
-            # Boutons d'action
-            col_action1, col_action2 = st.columns(2)
+    #         # Boutons d'action
+    #         col_action1, col_action2 = st.columns(2)
             
-            with col_action1:
-                create_button = st.button("🔧 Créer le Pipeline", use_container_width=True, type="primary")
+    #         with col_action1:
+    #             create_button = st.button("🔧 Créer le Pipeline", use_container_width=True, type="primary")
             
-            with col_action2:
-                if create_button:
-                    try:
-                        # Créer le pipeline
-                        new_pipeline = Pipeline(pipeline_steps)
+    #         with col_action2:
+    #             if create_button:
+    #                 try:
+    #                     # Créer le pipeline
+    #                     new_pipeline = Pipeline(pipeline_steps)
                         
-                        # Sauvegarder
-                        pipeline_path = os.path.join(save_dir_paths, f"{pipeline_name}.pkl")
-                        joblib.dump(new_pipeline, pipeline_path)
+    #                     # Sauvegarder
+    #                     pipeline_path = os.path.join(save_dir_paths, f"{pipeline_name}.pkl")
+    #                     joblib.dump(new_pipeline, pipeline_path)
                         
-                        st.success(f"✅ Pipeline créé et sauvegardé: `{pipeline_name}.pkl`")
-                        st.session_state.created_pipeline = new_pipeline
-                        st.session_state.created_pipeline_name = pipeline_name
+    #                     st.success(f"✅ Pipeline créé et sauvegardé: `{pipeline_name}.pkl`")
+    #                     st.session_state.created_pipeline = new_pipeline
+    #                     st.session_state.created_pipeline_name = pipeline_name
                         
-                    except Exception as e:
-                        st.error(f"❌ Erreur de création: {e}")
+    #                 except Exception as e:
+    #                     st.error(f"❌ Erreur de création: {e}")
 
 # Appel de la fonction principale
 if __name__ == "__main__":

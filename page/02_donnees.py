@@ -364,15 +364,16 @@ def run():
         st.markdown(f"### 📦 Présentation des données\n{header_text}")
     st.divider()
 
-    # 2. Inventaire & volumétrie
+    # Inventaire & volumétrie
     _render_section(
-        "2. Inventaire & volumétrie",
+        "Inventaire & volumétrie",
         f"Dataset : {KAGGLE_SLUG}\nTotal images/masques référencées : {DEFAULT_TOTAL}\n"
         "Les images sont réparties selon les classes suivantes, permettant une visualisation claire de la disponibilité des données par catégorie :"
     )
 
     table_md = "| Classe | Images | Masks |\n|---:|---:|---:|\n"
     for k,v in DEFAULT_CLASS_COUNTS.items(): table_md += f"| {k} | {v} | {v} |\n"
+    table_md += f"| **Total** | **{DEFAULT_TOTAL}** | **{DEFAULT_TOTAL}** |"
     st.markdown(table_md)
 
     st.markdown(
@@ -386,10 +387,10 @@ def run():
     "Ces techniques seront comparées dans la section modélisation pour déterminer la stratégie optimale."
 )
 
-    # 3. Caractéristiques graphiques
+    # Caractéristiques graphiques
 
     _render_section(
-        "3. Caractéristiques graphiques des images et masques",
+        "  Caractéristiques graphiques des images et masques",
         "- Format : PNG (Portable Network Graphics) \n"
         "- Résolution : 299x299 pixels \n"
         "- Couleurs : L (1 canal, niveaux de gris) ou fake RGB (3 canaux identiques) \n"
@@ -397,8 +398,12 @@ def run():
         "- Variabilité : Diversité dans les angles, contrastes et éléments présents \n"
         "Ces caractéristiques influencent les étapes de pré-traitement et de modélisation."
     )
-    # 4. Import & aperçu rapide
-    st.markdown("## 4. Import & aperçu rapide (Kaggle)")
+    
+    # ========================================================================
+    # 1. CHARGEMENT DU DATASET
+    # ========================================================================
+    
+    st.markdown("## Import & aperçu rapide (Kaggle)")
     if kagglehub is None:
         st.warning("KaggleHub non disponible — téléchargement automatique impossible.")
         return
@@ -436,12 +441,6 @@ def run():
         "Exploration visuelle et métriques des images radiographiques COVID-19",
         color_name="violet-70"
     )
-    st.divider()
-    
-    # ========================================================================
-    # 1. CHARGEMENT DU DATASET
-    # ========================================================================
-    
     
     # ========================================================================
     # 2. ÉCHANTILLONNAGE RAPIDE
@@ -507,18 +506,6 @@ def run():
             with col_img:
                 st.markdown("**📷 Image**")
                 st.image(img, caption=img_path.name)
-
-                # Métriques de l'image
-                st.markdown("---")
-                metrics = compute_image_metrics(img)
-                
-                col_a, col_b, col_c = st.columns(3)
-                with col_a:
-                    st.metric("Luminosité", f"{metrics['luminosity_mean']:.1f}")
-                with col_b:
-                    st.metric("Contraste", f"{metrics['contrast_std']:.1f}")
-                with col_c:
-                    st.metric("Entropie", f"{metrics['entropy']:.2f}")
             
             with col_mask:
                 st.markdown("**🎭 Masque**")
@@ -527,15 +514,30 @@ def run():
                         mask = Image.open(mask_path).convert("L")
                         mask.thumbnail(THUMBNAIL_MAX)
                         st.image(mask, caption=mask_path.name)
-                        
-                        # Calculer couverture du masque
-                        mask_cov = mask_coverage(mask_path)
-                        if mask_cov is not None:
-                            st.metric("Couverture", f"{mask_cov:.1f}%")
                     except Exception as e:
                         st.warning(f"Erreur chargement masque : {e}")
                 else:
                     st.info("Aucun masque disponible pour cette image.")
+            
+            # Métriques alignées en dessous
+            st.markdown("---")
+            st.markdown("**📊 Métriques**")
+            
+            metrics = compute_image_metrics(img)
+            mask_cov = mask_coverage(mask_path) if mask_path.exists() else None
+            
+            col_a, col_b, col_c, col_d = st.columns(4)
+            with col_a:
+                st.metric("Luminosité", f"{metrics['luminosity_mean']:.1f}")
+            with col_b:
+                st.metric("Contraste", f"{metrics['contrast_std']:.1f}")
+            with col_c:
+                st.metric("Entropie", f"{metrics['entropy']:.2f}")
+            with col_d:
+                if mask_cov is not None:
+                    st.metric("Couverture masque", f"{mask_cov:.1f}%")
+                else:
+                    st.metric("Couverture masque", "N/A")
             
 
         
@@ -597,7 +599,6 @@ def run():
     # Luminosité & Contraste
     plot_luminosity_distributions(df_metrics)
     
-    st.divider()
     
     # Masques - Exemples
     show_mask_overlays(scan_data["per_image"], max_examples=3)
@@ -608,16 +609,50 @@ def run():
     plot_mask_coverage(scan_data["by_class"], classes)
     
     st.divider()
-    
+
     # ========================================================================
-    # 5. RECOMMANDATIONS
+    # ANOMALIES CXR - Galerie d'images
     # ========================================================================
     
     colored_header(
-        "3. Recommandations",
-        "Actions suggérées pour l'amélioration du dataset",
+        "📸 Galerie d'Outliers Radiographiques",
+        "Exemples d'annotations et artefacts observés dans les radiographies thoraciques",
         color_name="violet-70"
     )
+    
+    anomalies_dir = Path(__file__).parent / "images" / "anomalies_cxr"
+    
+    if anomalies_dir.exists():
+        # Récupérer toutes les images du dossier
+        anomaly_images = sorted([
+            f for f in anomalies_dir.iterdir() 
+            if f.is_file() and f.suffix.lower() in {".png"}
+        ])
+        
+        if anomaly_images:
+            # Créer la liste des noms d'images pour le selectbox
+            anomaly_names = [img.name for img in anomaly_images]
+            
+            selected_anomaly = st.selectbox(
+                "Choisir une \"anomalie\" à visualiser :",
+                options=anomaly_names,
+                key="selected_anomaly_image"
+            )
+            
+            # Trouver l'image correspondante
+            selected_idx = anomaly_names.index(selected_anomaly)
+            selected_img_path = anomaly_images[selected_idx]
+            
+            # Afficher l'image sélectionnée
+            try:
+                anomaly_img = Image.open(selected_img_path).convert("RGB")
+                st.image(anomaly_img, caption=selected_anomaly)
+            except Exception as e:
+                st.error(f"Erreur lors du chargement de l'image : {e}")
+        else:
+            st.info("📁 Le dossier anomalies_cxr est vide. Ajoutez des images pour les visualiser ici.")
+    else:
+        st.warning("⚠️ Le dossier anomalies_cxr n'existe pas.")
 
 
 # ============================================================================

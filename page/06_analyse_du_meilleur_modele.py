@@ -20,53 +20,55 @@ import os
 def run():
     # Header / hero
     colored_header(
-        label="Optimisation des modèles de machine learning et Interprétabilité du Inception V3",
+        label="Deep learning et Interprétabilité",
         color_name="blue-70"
     )
     st.divider()
-    st.markdown("""
-    **Random Forest** : modèle le plus performant → **optimisation approfondie**
     
-    **SVM** : modèle le moins performant → **amélioration ciblée**
-    
-    **Objectif :**
-    - Renforcer l'efficacité du meilleur modèle
-    - Améliorer les performances du modèle faible  
-    - Obtenir une analyse comparative complète
-    """)
-    
-    st.divider()
+    chemin_global=Path(__file__).parent.parent
+    chemin_global = os.path.join(chemin_global, "page", "images/")
 
-    st.markdown("""
-    **Principe** : Grid Search + validation croisée
-    
-    **Fonctionnement** : Grid Search teste toutes les combinaisons possibles d'hyperparamètres sur une "grille" prédéfinie.
-                        
-    
-    **Évaluation** : Validation croisée (k-fold) évalue chaque combinaison de manière robuste en divisant les données en k plis.
-    """)
-    st.divider()
+    st.markdown("### **Modèle de deep learning Inception V3** ")
 
-    st.markdown("### **Hyperparamètres testés**")
-    st.markdown("""
-    **SVM** : C (régularisation), max itérations
-    
-    **Random Forest** : nb arbres, profondeur max
-    """)
-    chemin_global = Path(__file__).parent.parent
-    st.write(f"Chemin global du projet : {chemin_global}")
-    st.info("**Les différents hyperparamètres ont été sauvegardés dans un fichier.json**")
-    chemin_absolu = rf"{chemin_global}/page/parametres.png"
+    chemin_absolu = rf"{chemin_global}Inceptionv3.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
-    st.image(str(image_path), caption="Les hyperparamètres", use_column_width=False)
-    st.markdown("### **Résultats de la matrice de confusion pour les modèles SVM et Random Forest avec Grid Search**")
-    chemin_absolu_1 = rf"{chemin_global}/page/grid_search_randomforest.png"
-    image_path_1 = Path(chemin_absolu_1).relative_to(Path.cwd())
-    st.image(str(image_path_1), caption="Matrice de confusion random forest", use_column_width=False)
-    chemin_absolu_2 = rf"{chemin_global}/page/grid_search_svm.png"
-    image_path_2 = Path(chemin_absolu_2).relative_to(Path.cwd())
-    st.image(str(image_path_2), caption="Matrice de confusion SVM", use_column_width=False)
-    st.info("**Les hyperparamètres optimaux identifiés par Grid Search ont permis daméliorer significativement les performances de base des modèles.**")
+    st.image(str(image_path), caption="Schéma explicatif", width="content")
+
+    st.markdown("**Courbe de loss et d'accuracy**")
+
+    chemin_absolu = rf"{chemin_global}courbe de loss et d'accuracy.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Courbe de loss et d'accuracy", width=500)
+
+    st.markdown("""
+                
+    **Analyse des courbes d'entraînement :**
+
+    **Courbe de loss d'entraînement** : constante et très faible → optimisation maîtrisée sur données apprises
+
+    **Courbe de loss de validation** : fluctuations + pic important à l'époque 8 (correspond à la baisse de précision)
+
+    **Après le pic** : courbe retrouve sa tendance initiale
+
+    **Explications possibles** : bruit dans les données ou instabilité temporaire liée à la répartition des données
+
+    **Précision d'entraînement** : très élevée (0.98-1.00) tout au long → apprentissage efficace sur données d'entraînement
+
+    **Précision de validation** : stable ∼0.90 + fluctuations légères + chute nette époque 8 → retour rapide aux valeurs élevées
+
+    **Différence train/validation** : signe de difficulté de généralisation sur certains batchs de validation
+
+    """)
+
+
+    st.markdown("**Matrice de confusion**")
+
+    chemin_absolu = rf"{chemin_global}matrice de confusion.png"
+    image_path = Path(chemin_absolu).relative_to(Path.cwd())
+    st.image(str(image_path), caption="Matrice de confusion", width=500)
+
+    st.info("""**Performance globale : modèle très performant, bonne identification des classes (COVID,pneumonie virale, normal)**""")
+    st.info("""**Efficacité prouvée : transfert d’apprentissage avec InceptionV3 excellent pour classification d’images médicales**""")
 
     st.markdown("### **Interprétabilité**")
     st.markdown("**LIME (Local Interpretable Model-agnostic Explanations) :**")
@@ -87,18 +89,32 @@ def run():
                 **Avantages clés** : compréhensible, fiable, universel, généralisable (SP-LIME).
 
                 """)
+    
     st.info("**Notre modèle a été entraîné sur 2000 images 20 epochs de feature extraction + 30 epochs de fine-tuning (20 dernières couches dégelées)**")
-    chemin_absolu_3 = rf"{chemin_global}/page/lime.png"
+    
+    chemin_absolu_3 = rf"{chemin_global}lime.png"
     image_path_3 = Path(chemin_absolu_3).relative_to(Path.cwd())
-    st.image(str(image_path_3), caption="Résultats obtenus avec la méthode LIME", use_column_width=True)
-    chemin_absolu_4 = rf"{chemin_global}/page/lime2.png"
+    st.image(str(image_path_3), caption="Résultats obtenus avec la méthode LIME", width="content")
+    chemin_absolu_4 = rf"{chemin_global}lime2.png"
     image_path_4 = Path(chemin_absolu_4).relative_to(Path.cwd())
-    st.image(str(image_path_4), caption="Résultats obtenus avec la méthode LIME", use_column_width=True)
-    st.info("**Faux positifs** : risque élevé classe Normal (malades non détectés)")
-    st.info("**Faux négatifs** : risque critique COVID-19 (cas passés inaperçus)")
-    st.info("**Robustesse** : bonne Lung-Opacity, faible Normal/COVID-19")
-    st.info("**InceptionV3** : performances encourageantes, bonne localisation anomalies")
-    st.info("**Limites** : classe Normal + déséquilibre features COVID à améliorer")
+    st.image(str(image_path_4), caption="Résultats obtenus avec la méthode LIME", width="content")
+
+    st.markdown("""
+                
+    **Analyse LIME - Points clés :**
+
+    **Faux positifs** : risque élevé classe Normal (malades non détectés)
+
+    **Faux négatifs** : risque critique COVID-19 (cas passés inaperçus)
+
+    **Robustesse** : bonne Lung-Opacity, faible Normal/COVID-19
+
+    **InceptionV3** : performances encourageantes, bonne localisation anomalies
+
+    **Limites** : classe Normal + déséquilibre features COVID à améliorer
+                
+    """)
+
 
 if __name__ == "__main__":
     run()

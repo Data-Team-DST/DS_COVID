@@ -26,7 +26,7 @@ from keras.applications.resnet50 import preprocess_input as resnet_preprocess
 from keras.applications.vgg16 import preprocess_input as vgg16_preprocess
 
 # Import from interpretability module
-from interpretability.gradcam import GradCAM, visualize_gradcam
+from src.interpretability.gradcam import GradCAM, visualize_gradcam
 
 # Configure logger
 logger = logging.getLogger(__name__)

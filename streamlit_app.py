@@ -16,6 +16,7 @@ _PAGE_FILENAMES = [
     "07_conclusion.py",
     "08_critique.py",
     "09_cicd.py",
+    "10_Selection_Pipeline.py",
 ]
 
 # --- Import dynamique des modules ---
@@ -139,10 +140,11 @@ _nav_labels = [
     "07 - Conclusion",
     "08 - Critique",
     "09 - CI/CD",
+    "10 - Sélection Pipeline",
 ]
 
 # --- Badges simples via emoji ---
-_badges_emojis = ["🔹", "🟢", "🔴", "🟡", "🟣", "🟠", "🔵", "⚡", "⭐"]
+_badges_emojis = ["🔹", "🟢", "🔴", "🟡", "🟣", "🟠", "🔵", "⚡", "⭐", "🔬"]
 
 # Onglets avec badges emoji
 _nav_labels_with_badges = [f"{label} {_badges_emojis[i]}" for i, label in enumerate(_nav_labels)]
@@ -163,7 +165,8 @@ for idx, tab in enumerate(tabs):
             "linear-gradient(90deg, #071022, #1a296b)",
             "linear-gradient(90deg, #0a1a30, #071022)",
             "linear-gradient(90deg, #142850, #0f204f)",
-            "linear-gradient(90deg, #0f204f, #071022)"
+            "linear-gradient(90deg, #0f204f, #071022)",
+            "linear-gradient(90deg, #1a3050, #0f1a35)"
         ]
         st.markdown(
             f"<div class='hero-header' style='background:{gradients[idx]}'>{_nav_labels[idx]}</div>",

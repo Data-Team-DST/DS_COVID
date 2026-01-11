@@ -97,9 +97,27 @@ jobs:
         with:
           name: coverage-report
 
-      - name: Move coverage report
-        run: mkdir -p reports && mv coverage.xml reports/coverage.xml
+      # 🧱 1. S'assurer que le dossier 'reports/' existe
+      - name: Ensure reports directory exists
+        run: mkdir -p reports
 
+      # 📁 2. Déplacer le coverage.xml dans le bon dossier
+      - name: Move coverage report
+        run: mv coverage.xml reports/coverage.xml
+
+      # 🧩 3. (Optionnel mais souvent nécessaire) Normaliser les chemins dans le coverage
+      # pour que SonarCloud retrouve bien les fichiers sources
+      - name: Normalize coverage paths
+        run: |
+          sed -i 's|/home/runner/work/.*/src|src|g' reports/coverage.xml
+          echo "Coverage file normalized:"
+          head -n 20 reports/coverage.xml
+
+      # 🔍 4. Vérification utile pour le debug
+      - name: Check coverage file exists
+        run: ls -lh reports/
+
+      # ☁️ 5. Lancement de l’analyse SonarCloud
       - name: Run SonarCloud Analysis
         uses: SonarSource/sonarcloud-github-action@v2
         with:
@@ -112,4 +130,3 @@ jobs:
             -Dsonar.coverage.exclusions=src/test/**,notebooks/**
             -Dsonar.python.version=3.12
             -Dsonar.verbose=true
-

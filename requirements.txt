@@ -6,6 +6,14 @@ pandas>=2.2.0,<3.0.0
 # Machine Learning
 scikit-learn>=1.5.0,<2.0.0
 
+# Machine Learning libraries
+xgboost>=2.0.0
+lightgbm>=4.0.0
+shap
+lime
+optuna
+imbalanced-learn
+
 # Deep Learning (optional - install only where compatible)
 # tensorflow is heavy; keep comment if you don't need it on Streamlit cloud
 tensorflow>=2.18.0,<3.0.0
@@ -15,6 +23,10 @@ matplotlib>=3.9.0,<4.0.0
 seaborn>=0.13.2,<1.0.0
 pillow>=11.0.0,<13.0.0
 plotly>=5.20.0,<6.0.0
+
+# Computer Vision
+opencv-python>=4.9.0,<5.0.0
+opencv-contrib-python>=4.9.0,<5.0.0
 
 # Utils
 tqdm>=4.67.0,<5.0.0

@@ -132,14 +132,13 @@ html, body, [class*="css"] {
 _nav_labels = [
     "01 - Accueil",
     "02 - Données",
-    "03 - Analyse & Visu",
-    "04 - Preprocessing",
-    "05 - Modèles",
-    "06 - Analyse meilleur modèle",
-    "07 - Conclusion",
-    "08 - Critique",
-    "09 - CI/CD",
-    "10 - Sélection Pipeline",
+    "03 - Preprocessing",
+    "04 - Modèles",
+    "05 - Analyse meilleur modèle",
+    "06 - Conclusion",
+    "07 - Critique",
+    "08 - CI/CD",
+    "09 - Sélection Pipeline",
 ]
 
 # --- Badges simples via emoji ---

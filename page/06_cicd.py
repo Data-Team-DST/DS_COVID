@@ -158,7 +158,6 @@ def run():
                 st.info(f"📊 Labels: {', '.join(labels)}")
             else:
                 st.error("❌ Répertoire de données introuvable")
-                st.stop()
 
             # --- Mode de sélection ---
             mode = st.radio(
@@ -175,7 +174,6 @@ def run():
                 if not pkl_files:
                     st.warning(f"⚠️ Aucun pipeline trouvé dans {save_dir_paths}")
                     st.info("💡 Créez un nouveau pipeline ou utilisez le notebook pour en générer.")
-                    st.stop()
 
                 # --- Container sélection ---
                 container_selection = st.container()

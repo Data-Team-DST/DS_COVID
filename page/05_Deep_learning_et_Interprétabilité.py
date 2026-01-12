@@ -51,19 +51,6 @@ def run():
 
     st.markdown("### **Interprétabilité**")
     st.markdown("**LIME (Local Interpretable Model-Agnostic Explanations)**")
-    st.markdown("""
-    **Principe :**
-
-    1. Image originale et prédiction du modèle complexe.
-
-    2. Perturbations : masquage de pixels afin de créer N versions modifiées.
-
-    3. Prédictions : application du modèle complexe sur chaque version perturbée.
-
-    4. Régression linéaire : estimation des coefficients expliquant les prédictions.
-
-    5. Carte de chaleur : pixels importants associés à des coefficients élevés.
-    """)
 
     st.markdown(
         "**Avantages clés** : méthode compréhensible, fiable, universelle et généralisable "
@@ -90,20 +77,6 @@ def run():
         caption="Résultats obtenus avec la méthode LIME",
         width="content"
     )
-
-    st.markdown("""
-    **Analyse LIME – points clés :**
-
-    **Faux positifs** : risque élevé pour la classe Normal (patients malades non détectés).
-
-    **Faux négatifs** : risque critique pour le COVID-19 (cas non identifiés).
-
-    **Robustesse** : bonne pour Lung Opacity, plus faible pour Normal et COVID-19.
-
-    **InceptionV3** : performances encourageantes avec une bonne localisation des anomalies.
-
-    **Limites** : amélioration nécessaire pour la classe Normal et le déséquilibre des features COVID.
-    """)
 
 
 if __name__ == "__main__":

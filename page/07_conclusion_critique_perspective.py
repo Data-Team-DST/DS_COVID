@@ -71,9 +71,9 @@ def run():
         "| Surinterprétation | Approche prudente et critique |\n"
         "| Généralisation abusive | Rester dans le périmètre du jeu de données |\n"
         "| Sensibilité acquisition | Tests robustes, contrôle des préprocesseurs |\n"
-        "| Usage clinique | Ne pas utiliser comme outil de diagnostic |"
+        "| Usage clinique | Ne pas utiliser comme outil de diagnostic définitif|"
     )
-    st.warning("→ Ce projet n’est **pas destiné à un usage clinique** (disclaimer éthique).")
+    st.warning("→ Ce projet n’est **pas destiné à un usage clinique** en l'état (disclaimer éthique).")
     st.divider()
 
     # 6. Perspectives et axes d’amélioration
@@ -82,17 +82,12 @@ def run():
         "- Court terme : rééquilibrage des classes, tests statistiques simples\n"
         "- Moyen terme : embeddings profonds hors ligne, analyses de similarité, versionnage des données\n"
         "- Long terme : validation multi-sources, explicabilité, pipeline MLOps\n"
-        "- Futur : intégration de métadonnées cliniques si disponibles"
+        "- Futur : intégration de métadonnées cliniques et explorations autres modèles"
+        
     )
     st.divider()
 
-    # 7. Conclusion finale
-    st.markdown("## 7. Conclusion finale")
-    st.markdown(
-        "**Valeur principale : raisonnement appliqué aux données, pas le modèle.**\n\n"
-        "→ Importance d’une approche critique et méthodologiquement rigoureuse.\n"
-        "→ Référence implicite aux standards de validation clinique montre maturité critique."
-    )
+
 
 if __name__ == "__main__":
     run()

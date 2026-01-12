@@ -99,25 +99,25 @@ def run():
 
     # Objectifs SMART
     st.markdown("## Objectifs SMART")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Objectif 1 — Performance")
-        st.markdown(
+    # col1, col2 = st.columns(2)
+    # with col1:
+    st.subheader("Objectif 1 — Performance")
+    st.markdown(
             "- **S** : classification COVID vs non-COVID\n"
-            "- **M** : AUC ≥ 0,88 sur validation indépendante\n"
-            "- **A** : fine-tuning InceptionV3 avec repondération\n"
-            "- **R** : amélioration du triage\n"
-            "- **T** : validé expérimentalement"
-        )
-    with col2:
-        st.subheader("Objectif 2 — Sensibilité / Spécificité")
-        st.markdown(
-            "- **S** : maximiser détection positives\n"
-            "- **M** : sensibilité ≥0,85 / spécificité ≥0,90\n"
-            "- **A** : ajustement seuils et calibration\n"
+            "- **M** : F1 ≥ 0,80 sur validation indépendante\n"
+            "- **A** : fine-tuning InceptionV3\n"
             "- **R** : réduire faux négatifs\n"
-            "- **T** : démontré sur validation"
+            "- **T** : 12/01/2024 démonstration"
         )
+    # with col2:
+    #     st.subheader("Objectif 2 — Sensibilité / Spécificité ")
+    #     st.markdown(
+    #         "- **S** : maximiser détection positives\n"
+    #         "- **M** : matrice de confusion pour comparaison\n"
+    #         "- **A** : ajustement seuils et calibration\n"
+    #         "- **R** : réduire faux négatifs\n"
+    #         "- **T** : démontré sur validation"
+    #     )
 
 if __name__ == "__main__":
     run()

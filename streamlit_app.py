@@ -160,16 +160,12 @@ _gradients = [
 for idx, tab in enumerate(tabs):
     fname, mod = _loaded_pages[idx]
     with tab:
-        st.write(f"DEBUG: début exécution {fname}")
         # Hero header dynamique
         gradient = _gradients[idx % len(_gradients)]  # sécurité si mismatch
         st.markdown(
             f"<div class='hero-header' style='background:{gradient}'>{_nav_labels[idx]}</div>",
             unsafe_allow_html=True
         )
-
-        # DEBUG info
-        st.markdown(f"<div style='font-size:9px;color:#666;'>DEBUG: Onglet {idx} -> {fname}</div>", unsafe_allow_html=True)
 
         # Exécution du module
         try:

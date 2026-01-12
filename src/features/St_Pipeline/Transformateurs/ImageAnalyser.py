@@ -304,7 +304,7 @@ class ImageAnalyser(BaseTransform):
                 'std_intensity': ['mean', 'std']
             }).round(2)
             st.write("**Statistiques d'Intensité**")
-            st.dataframe(intensity_stats, use_container_width=True)
+            st.dataframe(intensity_stats, width="stretch")
         
         with col2:
             # Box plot des intensités
@@ -313,4 +313,4 @@ class ImageAnalyser(BaseTransform):
                 title="Distribution de l'Intensité par Label",
                 color='label'
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")

@@ -169,7 +169,7 @@ class DatasetStatistics(BaseTransform):
                 )
                 fig.update_traces(texttemplate='%{text}', textposition='outside')
                 fig.update_layout(showlegend=False, height=400)
-                st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, width="stretch")
             
             with col2:
                 # Pie chart
@@ -180,7 +180,7 @@ class DatasetStatistics(BaseTransform):
                     hole=0.3
                 )
                 fig_pie.update_traces(textposition='inside', textinfo='percent+label')
-                st.plotly_chart(fig_pie, use_container_width=True)
+                st.plotly_chart(fig_pie, width="stretch")
             
             # Tableau des stats
             st.markdown("**📋 Détails par Classe**")
@@ -189,7 +189,7 @@ class DatasetStatistics(BaseTransform):
                 'Nombre': counts,
                 'Pourcentage': [f"{p:.2f}%" for p in percentages]
             })
-            st.dataframe(df_stats, use_container_width=True)
+            st.dataframe(df_stats, width="stretch")
             
             # Métriques clés
             col1, col2, col3 = st.columns(3)
@@ -270,7 +270,7 @@ class DatasetStatistics(BaseTransform):
             df = pd.DataFrame(data_list)
             
             # Tableau stats
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df,width="stretch")
             
             # Box plot interactif
             fig = go.Figure()
@@ -294,7 +294,7 @@ class DatasetStatistics(BaseTransform):
                 showlegend=True,
                 height=400
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         
         else:
             # Matplotlib

@@ -135,8 +135,7 @@ _nav_labels = [
     "04 - Machine Learning & Optimisation",
     "05 - Deep Learning & Interprétabilité",
     "06 - CI/CD & Pipeline",
-    "07 - Conclusion & Perspectives",
-    
+    "07 - Conclusion & Perspectives"
 ]
 
 # --- Badges simples via emoji ---

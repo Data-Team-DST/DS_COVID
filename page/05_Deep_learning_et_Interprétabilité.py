@@ -17,102 +17,117 @@ import os
 # import seaborn as sns
 # from sklearn.metrics import confusion_matrix, roc_curve, auc
 
+
 def run():
     # Header / hero
     colored_header(
-        label="Deep learning et Interprétabilité",
+        label="Deep learning et interprétabilité",
         color_name="blue-70"
     )
     st.divider()
-    
-    chemin_global=Path(__file__).parent.parent
-    chemin_global = os.path.join(chemin_global, "page", "images/")
 
-    st.markdown("### **Modèle de deep learning Inception V3** ")
+    chemin_global = Path(__file__).parent.parent
+    chemin_global = os.path.join(chemin_global, "page", "images")
 
-    chemin_absolu = rf"{chemin_global}Inceptionv3.png"
+    st.markdown("### **Modèle de deep learning Inception V3**")
+
+    chemin_absolu = rf"{chemin_global}/Inceptionv3.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Schéma explicatif", width="content")
 
-    st.markdown("**Courbe de loss et d'accuracy**")
+    st.markdown("**Courbes de loss et d’accuracy**")
 
-    chemin_absolu = rf"{chemin_global}courbe loss.png"
+    chemin_absolu = rf"{chemin_global}/courbe loss.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
-    st.image(str(image_path), caption="Courbe de loss et d'accuracy", width=500)
+    st.image(str(image_path), caption="Courbes de loss et d’accuracy", width=500)
 
     st.markdown("""
-                
-    **Analyse des courbes d'entraînement :**
+    **Analyse des courbes d’entraînement :**
 
-    **Courbe de loss d'entraînement** : constante et très faible → optimisation maîtrisée sur données apprises
+    **Courbe de loss d’entraînement** : constante et très faible, indiquant une optimisation maîtrisée sur les données apprises.
 
-    **Courbe de loss de validation** : fluctuations + pic important à l'époque 8 (correspond à la baisse de précision)
+    **Courbe de loss de validation** : fluctuations avec un pic important à l’époque 8, correspondant à la baisse de précision.
 
-    **Après le pic** : courbe retrouve sa tendance initiale
+    **Après le pic** : la courbe retrouve sa tendance initiale.
 
-    **Explications possibles** : bruit dans les données ou instabilité temporaire liée à la répartition des données
+    **Explications possibles** : bruit dans les données ou instabilité temporaire liée à la répartition des données.
 
-    **Précision d'entraînement** : très élevée (0.98-1.00) tout au long → apprentissage efficace sur données d'entraînement
+    **Précision d’entraînement** : très élevée (0.98–1.00) sur l’ensemble des époques, indiquant un apprentissage efficace.
 
-    **Précision de validation** : stable ∼0.90 + fluctuations légères + chute nette époque 8 → retour rapide aux valeurs élevées
+    **Précision de validation** : stable autour de 0.90, avec de légères fluctuations et une chute nette à l’époque 8, suivie d’un retour rapide aux valeurs élevées.
 
-    **Différence train/validation** : signe de difficulté de généralisation sur certains batchs de validation
-
+    **Différence entraînement / validation** : signe d’une difficulté de généralisation sur certains batchs de validation.
     """)
-
 
     st.markdown("**Matrice de confusion**")
 
-    chemin_absolu = rf"{chemin_global}matrice confusion deep.png"
+    chemin_absolu = rf"{chemin_global}/matrice confusion deep.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Matrice de confusion", width=500)
 
-    st.info("""**Performance globale : modèle très performant, bonne identification des classes (COVID,pneumonie virale, normal)**""")
-    st.info("""**Efficacité prouvée : transfert d’apprentissage avec InceptionV3 excellent pour classification d’images médicales**""")
+    st.info(
+        "**Performance globale** : modèle très performant, bonne identification des classes "
+        "(COVID, pneumonie virale, normal)."
+    )
+    st.info(
+        "**Efficacité prouvée** : le transfert d’apprentissage avec InceptionV3 est excellent "
+        "pour la classification d’images médicales."
+    )
 
     st.markdown("### **Interprétabilité**")
-    st.markdown("**LIME (Local Interpretable Model-agnostic Explanations) :**")
+    st.markdown("**LIME (Local Interpretable Model-Agnostic Explanations)**")
     st.markdown("""
-                **Principe**: 
+    **Principe :**
 
-                1. IMAGE originale + prédiction du modèle complexe
-                
-                2. PERTURBATIONS : masque pixels → crée N versions modifiées
-                
-                3. PRÉDICTIONS : modèle complexe sur chaque version perturbée
-                
-                4. RÉGRESSION LINÉAIRE : trouve coefficients expliquant les prédictions
-                
-                5. CARTE DE CHALEUR : pixels importants = coefficients élevés (Jaune)
+    1. Image originale et prédiction du modèle complexe.
 
+    2. Perturbations : masquage de pixels afin de créer N versions modifiées.
 
-                **Avantages clés** : compréhensible, fiable, universel, généralisable (SP-LIME).
+    3. Prédictions : application du modèle complexe sur chaque version perturbée.
 
-                """)
-    
-    st.info("**Notre modèle a été entraîné sur 2000 images 20 epochs de feature extraction + 30 epochs de fine-tuning (20 dernières couches dégelées)**")
-    
-    chemin_absolu_3 = rf"{chemin_global}lime.png"
+    4. Régression linéaire : estimation des coefficients expliquant les prédictions.
+
+    5. Carte de chaleur : pixels importants associés à des coefficients élevés.
+    """)
+
+    st.markdown(
+        "**Avantages clés** : méthode compréhensible, fiable, universelle et généralisable "
+        "(SP-LIME)."
+    )
+
+    st.info(
+        "**Entraînement du modèle** : 2 000 images, 20 epochs de feature extraction, suivies "
+        "de 30 epochs de fine-tuning (20 dernières couches dégelées)."
+    )
+
+    chemin_absolu_3 = rf"{chemin_global}/lime.png"
     image_path_3 = Path(chemin_absolu_3).relative_to(Path.cwd())
-    st.image(str(image_path_3), caption="Résultats obtenus avec la méthode LIME", width="content")
-    chemin_absolu_4 = rf"{chemin_global}lime2.png"
+    st.image(
+        str(image_path_3),
+        caption="Résultats obtenus avec la méthode LIME",
+        width="content"
+    )
+
+    chemin_absolu_4 = rf"{chemin_global}/lime2.png"
     image_path_4 = Path(chemin_absolu_4).relative_to(Path.cwd())
-    st.image(str(image_path_4), caption="Résultats obtenus avec la méthode LIME", width="content")
+    st.image(
+        str(image_path_4),
+        caption="Résultats obtenus avec la méthode LIME",
+        width="content"
+    )
 
     st.markdown("""
-                
-    **Analyse LIME - Points clés :**
+    **Analyse LIME – points clés :**
 
-    **Faux positifs** : risque élevé classe Normal (malades non détectés)
+    **Faux positifs** : risque élevé pour la classe Normal (patients malades non détectés).
 
-    **Faux négatifs** : risque critique COVID-19 (cas passés inaperçus)
+    **Faux négatifs** : risque critique pour le COVID-19 (cas non identifiés).
 
-    **Robustesse** : bonne Lung-Opacity, faible Normal/COVID-19
+    **Robustesse** : bonne pour Lung Opacity, plus faible pour Normal et COVID-19.
 
-    **InceptionV3** : performances encourageantes, bonne localisation anomalies
+    **InceptionV3** : performances encourageantes avec une bonne localisation des anomalies.
 
-    **Limites** : classe Normal + déséquilibre features COVID à améliorer
-                
+    **Limites** : amélioration nécessaire pour la classe Normal et le déséquilibre des features COVID.
     """)
 
 
@@ -120,8 +135,6 @@ if __name__ == "__main__":
     run()
 
 
-
-
-
-   
-# STATUS: page/06_analyse_du_meilleur_modele.py — intégrale, Streamlit Extras obligatoire, sections 1–10 complètes avec placeholders interactifs, pipelines et checklists.
+# STATUS: page/06_analyse_du_meilleur_modele.py — version intégrale,
+# Streamlit Extras obligatoire, sections 1 à 10 complètes avec placeholders interactifs,
+# pipelines et checklists.

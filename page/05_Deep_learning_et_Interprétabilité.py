@@ -8,20 +8,13 @@ from streamlit_extras.colored_header import colored_header
 from pathlib import Path
 import os
 
-# Optional imports placeholders
-# import torch
-# from tensorflow import keras
-# from PIL import Image
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# from sklearn.metrics import confusion_matrix, roc_curve, auc
 
 
 def run():
     # Header / hero
     colored_header(
         label="Deep learning et interprétabilité",
+        description="",
         color_name="blue-70"
     )
     st.divider()
@@ -40,24 +33,6 @@ def run():
     chemin_absolu = rf"{chemin_global}/courbe loss.png"
     image_path = Path(chemin_absolu).relative_to(Path.cwd())
     st.image(str(image_path), caption="Courbes de loss et d’accuracy", width=500)
-
-    st.markdown("""
-    **Analyse des courbes d’entraînement :**
-
-    **Courbe de loss d’entraînement** : constante et très faible, indiquant une optimisation maîtrisée sur les données apprises.
-
-    **Courbe de loss de validation** : fluctuations avec un pic important à l’époque 8, correspondant à la baisse de précision.
-
-    **Après le pic** : la courbe retrouve sa tendance initiale.
-
-    **Explications possibles** : bruit dans les données ou instabilité temporaire liée à la répartition des données.
-
-    **Précision d’entraînement** : très élevée (0.98–1.00) sur l’ensemble des époques, indiquant un apprentissage efficace.
-
-    **Précision de validation** : stable autour de 0.90, avec de légères fluctuations et une chute nette à l’époque 8, suivie d’un retour rapide aux valeurs élevées.
-
-    **Différence entraînement / validation** : signe d’une difficulté de généralisation sur certains batchs de validation.
-    """)
 
     st.markdown("**Matrice de confusion**")
 

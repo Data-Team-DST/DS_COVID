@@ -84,7 +84,7 @@ def plot_multiple_explanations(
     for i, (method_name, explanation) in enumerate(methods, 1):
         if method_name == "Grad-CAM":
             # Superposer Grad-CAM
-            from .gradcam import overlay_heatmap
+            from .Experimental.gradcam import overlay_heatmap
 
             superimposed = overlay_heatmap(
                 image, explanation, alpha=0.4, colormap="jet"
@@ -341,7 +341,7 @@ def batch_explain(
     explanations = []
 
     if method == "gradcam":
-        from .gradcam import GradCAM
+        from .Experimental.gradcam import GradCAM
 
         gradcam = GradCAM(model, layer_name=layer_name)
 
@@ -360,7 +360,7 @@ def batch_explain(
         explanations = explainer.explain_batch(images)
 
     elif method == "shap":
-        from .shap_explainer import SHAPExplainer
+        from .Experimental.shap_explainer import SHAPExplainer
 
         if background_data is None:
             raise ValueError("background_data requis pour SHAP")
@@ -415,7 +415,7 @@ def create_interpretation_report(
     Returns:
         Dictionnaire contenant toutes les explications et métriques
     """
-    from .gradcam import GradCAM
+    from .Experimental.gradcam import GradCAM
 
     save_dir = Path(save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
@@ -452,7 +452,7 @@ def create_interpretation_report(
             print("⚠️ SHAP ignoré: background_data non fourni")
         else:
             print("Génération SHAP...")
-            from .shap_explainer import SHAPExplainer
+            from .Experimental.shap_explainer import SHAPExplainer
 
             shap_explainer = SHAPExplainer(model, background_data)
             shap_values = shap_explainer.explain(image[np.newaxis, ...])[0]

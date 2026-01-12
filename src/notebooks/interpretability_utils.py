@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import keras
 
 # Import from interpretability module
-from src.interpretability.gradcam import GradCAM, visualize_gradcam
+from DS_COVID.src.interpretability.Experimental.gradcam import GradCAM, visualize_gradcam
 
 # Import preprocessing functions
 from keras.applications.inception_v3 import preprocess_input as inception_preprocess

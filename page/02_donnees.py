@@ -357,7 +357,7 @@ def run():
         "Caractéristiques graphiques des images et des masques",
         "<ul>"
         "<li>Format : PNG</li>"
-        "<li>Résolution : 299 × 299 pixels</li>"
+        "<li>Résolution : 299 × 299 pixels (images) et 256 × 256 pixels (masques)</li>"
         "<li>Couleurs : niveaux de gris ou pseudo-RGB</li>"
         "<li>Masques : binaires, alignés avec les images</li>"
         "<li>Variabilité : anatomie, angles, contrastes et artefacts</li>"

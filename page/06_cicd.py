@@ -17,25 +17,6 @@ def run():
     )
     st.divider()
 
-    # --- Container principal pour présentation pipeline ---
-    show_pipe_cont = st.container(border=True)
-    with show_pipe_cont:
-        st.subheader("Organisation du code et amélioration")
-        st.info(
-            "Pour résoudre les problématiques d’organisation, un système de pipelines "
-            "Sklearn / Streamlit a été développé."
-        )
-
-        # --- Checkbox pour activer la section pipeline ---
-        USE_PIPELINE_PAGE = st.checkbox(
-            "Afficher la section Pipeline Sklearn",
-            value=False
-        )
-
-        # --- Container dédié au pipeline ---
-        if USE_PIPELINE_PAGE:
-            pipeline_container = st.container(border=True)
-
 
     # --- Section 1 : Pourquoi CI/CD ---
     st.markdown("## 1. Pourquoi un pipeline CI/CD ?")
@@ -110,6 +91,25 @@ def run():
     st.divider()
 
     # --- Section 8 : Pipeline Sklearn ---
+
+    # --- Container principal pour présentation pipeline ---
+    show_pipe_cont = st.container(border=True)
+    with show_pipe_cont:
+        st.subheader("Organisation du code et amélioration")
+        st.info(
+            "Pour résoudre les problématiques d’organisation, un système de pipelines "
+            "Sklearn / Streamlit a été développé."
+        )
+
+        # --- Checkbox pour activer la section pipeline ---
+        USE_PIPELINE_PAGE = st.checkbox(
+            "Afficher la section Pipeline Sklearn",
+            value=False
+        )
+
+        # --- Container dédié au pipeline ---
+        if USE_PIPELINE_PAGE:
+            pipeline_container = st.container(border=True)
     if USE_PIPELINE_PAGE:
         st.divider()
         with pipeline_container:

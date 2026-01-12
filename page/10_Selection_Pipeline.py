@@ -67,20 +67,20 @@ def run():
     # ============================================================
     # SIDEBAR - CONFIGURATION
     # ============================================================
-    with st.sidebar:
-        st.header("⚙️ Configuration")
+    # with st.sidebar:
+    #     st.header("⚙️ Configuration")
         
-        # Vérification du répertoire de données
-        if os.path.exists(data_dir):
-            st.success(f"✅ Données trouvées")
-            labels = [d for d in os.listdir(data_dir) 
-                    if os.path.isdir(os.path.join(data_dir, d, 'images'))]
-            st.info(f"📊 Labels: {', '.join(labels)}")
-        else:
-            st.error("❌ Répertoire de données introuvable")
-            st.stop()
+    #     # Vérification du répertoire de données
+    #     if os.path.exists(data_dir):
+    #         st.success(f"✅ Données trouvées")
+    #         labels = [d for d in os.listdir(data_dir) 
+    #                 if os.path.isdir(os.path.join(data_dir, d, 'images'))]
+    #         st.info(f"📊 Labels: {', '.join(labels)}")
+    #     else:
+    #         st.error("❌ Répertoire de données introuvable")
+    #         st.stop()
         
-        st.divider()
+    #     st.divider()
         
         # Mode de sélection
         mode = st.radio(

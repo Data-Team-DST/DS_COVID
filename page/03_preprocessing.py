@@ -87,17 +87,17 @@ def run():
             st.warning(" Données stockées sur le cloud (Drive)")
             st.success(" Compatibilité avec GPU/TPU")
 
-        config_auto_container = st.container(border=True)
+        config_auto_container = st.container(border=True,height="stretch")
         with config_auto_container:
             config_col1, config_col2 = st.columns([0.5,0.5],gap="small")
             with config_col1:
-                config_1_container = st.container(border=True)
+                config_1_container = st.container(border=True,height="stretch")
                 with config_1_container:
                     st.header("Configuration automatique", text_alignment="center")
                     st.write(" Script pour détecter et configurer automatiquement l'environnement de travail.")
                     st.image(p11, caption="Configuration Automatique")
             with config_col2:
-                config_2_container = st.container(border=True)
+                config_2_container = st.container(border=True,height="stretch")
                 with config_2_container:
                     st.header("Configuration WSL", text_alignment="center")
                     st.write(" Étapes pour configurer l'environnement WSL pour le projet.")
@@ -149,7 +149,7 @@ def run():
     desequilibre_container = st.container(border=True)
     with desequilibre_container:
         st.title("Gestion du déséquilibre de classes")
-        
+
         des_col_1, des_col_2 = st.columns([0.3,0.3],gap="small")
         with des_col_1:
             reeq_container = st.container(border=True,horizontal_alignment="center",height="stretch")

@@ -26,7 +26,7 @@ def run():
     st.markdown(
         "Objectif : évaluer la **faisabilité exploratoire** d’une classification automatique "
         "de radiographies thoraciques.\n"
-        "→ **POC analytique**, pas un outil médical ni un système de diagnostic."
+        "→ **POC analytique**, système d'aide au diagnostic."
     )
     st.divider()
 

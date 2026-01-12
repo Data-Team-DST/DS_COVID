@@ -243,7 +243,6 @@ def run_full_dataset_scan(
 
 def plot_luminosity_distributions(df_metrics: pd.DataFrame):
     """Affiche les distributions de luminosité et de contraste par classe."""
-    st.markdown("### Distribution de la luminosité par classe")
 
     fig_lum = px.violin(
         df_metrics,
@@ -257,7 +256,6 @@ def plot_luminosity_distributions(df_metrics: pd.DataFrame):
     )
     st.plotly_chart(fig_lum, width="stretch")
 
-    st.markdown("### Distribution du contraste par classe")
 
     fig_std = px.violin(
         df_metrics,
@@ -274,7 +272,6 @@ def plot_luminosity_distributions(df_metrics: pd.DataFrame):
 
 def plot_mask_coverage(by_class: Dict, classes: List[str]):
     """Affiche la distribution de la couverture des masques."""
-    st.markdown("### Distribution de la couverture des masques")
 
     long_data = []
     for cls in classes:
@@ -333,28 +330,17 @@ def show_mask_overlays(per_image: List[Dict], max_examples: int = 3):
 def run():
     st.markdown(_CSS, unsafe_allow_html=True)
 
-    header_text = (
-        "Le dataset COVID-19 Radiography Database rassemble plusieurs milliers d’images de radiographies thoraciques (CXR), "
-        "classées par type de pathologie : COVID-19, Normal, Viral Pneumonia et Lung Opacity, ainsi que leurs masques de segmentation. "
-        "Ces images proviennent de sources publiques et de publications scientifiques. "
-        "Bien que visuellement proches, elles présentent des caractéristiques exploitables pour la modélisation. "
-        "Chaque image est accompagnée d’un masque de segmentation pulmonaire, utile pour contraindre l’attention du modèle "
-        "sur la zone d’intérêt et limiter les biais liés aux artefacts ou annotations. "
-        "Le dataset offre une variabilité suffisante pour analyser les distributions de classes, "
-        "tester le pipeline de prétraitement et générer des échantillons reproductibles."
-    )
 
     try:
-        colored_header("Présentation des données", header_text, color_name="blue-70")
+        colored_header(label="Présentation des données", description= "",color_name="blue-70")
     except Exception:
-        st.markdown(f"### Présentation des données\n{header_text}")
+        st.markdown(f"### Présentation des données")
 
     st.divider()
 
     _render_section(
         "Inventaire et volumétrie",
-        f"Dataset : {KAGGLE_SLUG}\nTotal images et masques référencés : {DEFAULT_TOTAL}\n"
-        "Les images sont réparties par classe, ce qui permet une visualisation claire de la disponibilité des données."
+        f"Dataset : {KAGGLE_SLUG}"
     )
 
     table_md = "| Classe | Images | Masques |\n|---:|---:|---:|\n"
@@ -364,19 +350,19 @@ def run():
     st.markdown(table_md)
 
     st.markdown(
-        "**Note sur le déséquilibre des classes** : la distribution présente un déséquilibre notable. "
-        "Plusieurs stratégies sont envisagées pour l’entraînement : sous- et sur-échantillonnage, "
-        "pondération de la fonction de perte, échantillonnage stratifié et ajustement des poids de classe."
+        "**Remarque cruciale** : la distribution présente un déséquilibre notable. "
     )
 
     _render_section(
         "Caractéristiques graphiques des images et des masques",
-        "- Format : PNG\n"
-        "- Résolution : 299 × 299 pixels\n"
-        "- Couleurs : niveaux de gris ou pseudo-RGB\n"
-        "- Masques : binaires, alignés avec les images\n"
-        "- Variabilité : angles, contrastes et artefacts\n"
-        "Ces caractéristiques influencent les étapes de prétraitement et de modélisation."
+        "<ul>"
+        "<li>Format : PNG</li>"
+        "<li>Résolution : 299 × 299 pixels</li>"
+        "<li>Couleurs : niveaux de gris ou pseudo-RGB</li>"
+        "<li>Masques : binaires, alignés avec les images</li>"
+        "<li>Variabilité : anatomie, angles, contrastes et artefacts</li>"
+        "</ul>"
+        "<p>Ces caractéristiques influencent les étapes de prétraitement et de modélisation.</p>"
     )
 
     st.markdown("## Import et aperçu rapide (Kaggle)")

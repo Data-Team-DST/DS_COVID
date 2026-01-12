@@ -84,9 +84,9 @@ def run():
             "<div class='project-hero'>"
             "<strong>Difficulté du diagnostic visuel</strong><br>"
             "Les patterns radiologiques du COVID-19 sont proches d’autres pneumonies virales, complexe même pour des radiologues expérimentés.<br><br>"
-            "<strong>Problème 2.1 : surcharge des radiologues</strong><br>"
+            "<strong>Problème 2 : surcharge des radiologues</strong><br>"
             "Volume d’examens élevé → temps réduit par examen.<br><br>"
-            "<strong>Solution 2 : intelligence artificielle</strong><br>"
+            "<strong>Solution : intelligence artificielle</strong><br>"
             "Machine learning et deep learning accélèrent la détection, tout en proposant une solution interprétable et reproductible."
             "</div>",
             unsafe_allow_html=True
@@ -118,3 +118,6 @@ def run():
             "- **R** : réduire faux négatifs\n"
             "- **T** : démontré sur validation"
         )
+
+if __name__ == "__main__":
+    run()

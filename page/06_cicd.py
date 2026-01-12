@@ -106,7 +106,6 @@ def run():
     # Vérification des données
     if not os.path.exists(data_dir):
         st.error("Répertoire de données introuvable")
-        st.stop()
     else:
         labels = [d for d in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, d, "images"))]
         st.info(f"Labels disponibles : {', '.join(labels)}")
@@ -118,7 +117,6 @@ def run():
         pkl_files = [f for f in os.listdir(save_dir_paths) if f.endswith(".pkl")]
         if not pkl_files:
             st.warning("Aucun pipeline trouvé.")
-            st.stop()
         selected_pipeline = st.selectbox("Pipeline enregistré :", pkl_files, index=(pkl_files.index("Pipeline_ML_PCA_Complete.pkl") if "Pipeline_ML_PCA_Complete.pkl" in pkl_files else 0))
         if st.button("Charger et analyser"):
             pipeline_path = os.path.join(save_dir_paths, selected_pipeline)
@@ -134,3 +132,6 @@ def run():
                 st.error(f"Erreur de chargement : {e}")
     else:
         st.info("Création d’un pipeline personnalisé disponible dans la suite du module.")
+
+if __name__ == "__main__":
+    run()

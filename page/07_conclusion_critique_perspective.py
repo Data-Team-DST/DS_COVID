@@ -3,7 +3,7 @@
 # - Preferred: streamlit-extras mandatory; inherits global dark theme.
 # - Palette: navy/dark background, high-contrast highlights; sans-serif font.
 # - File status: unified conclusion —
-#   synthèse décisionnelle + critique honnête + perspectives réalistes.
+#   synthèse décisionnelle, critique honnête et perspectives réalistes.
 
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
@@ -12,7 +12,7 @@ from streamlit_extras.colored_header import colored_header
 def run():
     # Header / hero
     colored_header(
-        label="Conclusion critique & perspectives",
+        label="Conclusion critique et perspectives",
         description=(
             "Synthèse finale du projet : ce que les données permettent de conclure, "
             "leurs limites structurelles et les perspectives réalistes d’évolution."
@@ -25,7 +25,7 @@ def run():
     st.markdown(
         "## 1. Positionnement du projet\n\n"
         "Ce projet avait pour objectif principal d’évaluer la **faisabilité exploratoire** "
-        "d’une classification automatique de radiographies thoraciques à partir d’un dataset public "
+        "d’une classification automatique de radiographies thoraciques à partir d’un jeu de données public "
         "(COVID-19 Radiography Database).\n\n"
         "Il ne s’agit **ni d’un outil médical**, ni d’un système de diagnostic, mais d’un **POC analytique** "
         "visant à identifier des signaux visuels exploitables et à comprendre, dès les premières étapes, "
@@ -42,9 +42,9 @@ def run():
     st.text_area(
         "Constats clés",
         value=(
-            "- Volume de données conséquent (>21 000 images), suffisant pour une analyse exploratoire robuste\n"
+            "- Volume de données conséquent (> 21 000 images), suffisant pour une analyse exploratoire robuste\n"
             "- Déséquilibre structurel marqué entre les classes (classe *Normal* majoritaire)\n"
-            "- Images majoritairement en faux-RGB (grayscale dupliqué sur 3 canaux)\n"
+            "- Images majoritairement en faux RGB (grayscale dupliqué sur trois canaux)\n"
             "- Qualité visuelle globalement homogène (luminosité, contraste, entropie)\n"
             "- Absence de signaux triviaux exploitables directement pour une classification naïve"
         ),
@@ -60,7 +60,7 @@ def run():
     # 3. Data & methodological limitations
     st.markdown(
         "## 3. Limites des données et biais méthodologiques\n\n"
-        "Une lecture critique du dataset et des analyses est indispensable pour éviter toute sur-interprétation."
+        "Une lecture critique du jeu de données et des analyses est indispensable pour éviter toute surinterprétation."
     )
     st.text_area(
         "Limites identifiées",
@@ -69,7 +69,7 @@ def run():
             "- Faible volumétrie pour certaines classes rares\n"
             "- Absence de métadonnées cliniques (âge, sexe, contexte d’acquisition)\n"
             "- Agrégation de sources hétérogènes pouvant induire des biais d’acquisition\n"
-            "- Généralisation très limitée hors du périmètre du dataset étudié"
+            "- Généralisation très limitée hors du périmètre du jeu de données étudié"
         ),
         height=150,
         key="conclusion_limits"
@@ -78,7 +78,7 @@ def run():
 
     # 4. Preprocessing & analytical choices
     st.markdown(
-        "## 4. Choix analytiques & preprocessing\n\n"
+        "## 4. Choix analytiques et preprocessing\n\n"
         "Les décisions de preprocessing ont été guidées par un compromis entre "
         "rigueur méthodologique, contraintes de calcul et interprétabilité."
     )
@@ -87,8 +87,9 @@ def run():
         value=(
             "- Normalisation des intensités nécessaire pour stabiliser l’apprentissage\n"
             "- Redimensionnement des images pouvant entraîner une perte de détails fins\n"
-            "- Les transformations ont volontairement été limitées tant que les modèles n’avaient pas démontré de gain clair en performance.\n"
-            "- Choix dictés par des contraintes exploratoires, non par une validation clinique"
+            "- Transformations volontairement limitées tant que les modèles n’avaient pas démontré "
+            "de gain clair en performance\n"
+            "- Choix dictés par des contraintes exploratoires, et non par une validation clinique"
         ),
         height=130,
         key="conclusion_preproc"
@@ -103,7 +104,7 @@ def run():
     st.text_area(
         "Risques majeurs",
         value=(
-            "- Sur-interprétation de résultats exploratoires\n"
+            "- Surinterprétation de résultats exploratoires\n"
             "- Généralisation abusive à d’autres contextes cliniques\n"
             "- Sensibilité élevée aux variations d’acquisition\n"
             "- Absence de cadre réglementaire et clinique"
@@ -116,25 +117,24 @@ def run():
     # 6. Prioritized perspectives
     st.markdown(
         "## 6. Perspectives et axes d’amélioration\n\n"
-        "Pistes d’évolution identifiées, priorisées selon effort et impact."
+        "Pistes d’évolution identifiées, priorisées selon l’effort et l’impact."
     )
 
     st.text_area(
         "Perspectives",
         value=(
-            "- Court terme : rééquilibrage du dataset et mise en place de tests statistiques simples\n"
-            "- Moyen terme : calcul d’embeddings profonds hors-ligne, analyses de similarité robustes "
-            "et structuration du versionnage des données pour garantir la reproductibilité\n"
+            "- Court terme : rééquilibrage du jeu de données et mise en place de tests statistiques simples\n"
+            "- Moyen terme : calcul d’embeddings profonds hors ligne, analyses de similarité robustes "
+            "et structuration du versionnage des données afin de garantir la reproductibilité\n"
             "- Long terme : validation multi-sources, intégration de méthodes d’explicabilité "
             "et mise en place d’un pipeline MLOps incluant gestion des versions et automatisation\n"
-            "- Enrichissement futur par métadonnées cliniques si disponibles"
+            "- Enrichissement futur par des métadonnées cliniques, si disponibles"
         ),
         height=160,
         key="conclusion_future"
     )
 
     st.divider()
-
 
     # 7. Final takeaway
     st.markdown(
@@ -143,3 +143,7 @@ def run():
         "Il démontre l’importance d’une approche prudente, critique et méthodologiquement rigoureuse, "
         "en particulier dans des contextes sensibles comme l’imagerie médicale."
     )
+
+
+if __name__ == "__main__":
+    run()

@@ -187,7 +187,7 @@ class ImageNormalizer(BaseTransform):
             fig.update_yaxes(showticklabels=False, row=2)
             fig.update_layout(height=700, title_text="Normalisation [0, 1]", barmode='overlay')
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
     
     def visualize(self, X_before: Any, X_after: Any, n_samples: int = 3) -> None:
         """Visualise la normalisation (fallback matplotlib)."""

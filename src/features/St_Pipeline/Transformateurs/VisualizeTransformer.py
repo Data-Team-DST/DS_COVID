@@ -101,7 +101,7 @@ class VisualizeTransformer(BaseTransform):
             fig.update_xaxes(showticklabels=False)
             fig.update_yaxes(showticklabels=False)
             fig.update_layout(height=300*rows, showlegend=False)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         
         else:
             # Mode Matplotlib : affichage classique

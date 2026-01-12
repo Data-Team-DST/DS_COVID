@@ -164,7 +164,7 @@ class ImageComparisonVisualizer(BaseTransform):
             title_text="Avant (haut) vs Après (bas)"
         )
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     
     def _plot_difference_streamlit(self, imgs_before, imgs_after, n):
         """Plotly: 3 lignes (avant, après, diff)."""
@@ -202,7 +202,7 @@ class ImageComparisonVisualizer(BaseTransform):
         fig.update_yaxes(showticklabels=False)
         fig.update_layout(height=600, showlegend=False, title_text="Comparaison avec Différence")
         
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     
     def _plot_overlay_streamlit(self, imgs_before, imgs_after, n):
         """Affiche superposition avec slider (simplifié)."""

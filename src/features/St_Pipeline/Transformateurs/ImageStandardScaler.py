@@ -203,7 +203,7 @@ class ImageStandardScaler(BaseTransform):
             )
             
             fig.update_layout(height=400, showlegend=False)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         
         else:
             # Matplotlib

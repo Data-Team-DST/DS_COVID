@@ -80,17 +80,39 @@ def run():
     img_col, text_col = st.columns([1, 2])
     
     with img_col:
-        img_path = Path(__file__).parent / "images" / "covid_cxr_1.jpg"
-        if img_path.exists():
-            st.image(
-                str(img_path),
-                caption="Figure 1 — Opacité en verre dépoli. Radiographie thoracique postéro-antérieure d'un patient atteint de pneumonie COVID-19. "
+        # Liste des images et leurs légendes
+        images_data = {
+            "Fig1": ("Fig1.jpg", "Figure 1 — Opacité en verre dépoli. Radiographie thoracique postéro-antérieure d'un patient atteint de pneumonie COVID-19. "
                         "Les caractéristiques incluent une opacité en verre dépoli dans les zones moyennes et inférieures des deux poumons, "
                         "principalement en périphérie (flèches blanches) avec préservation des marquages pulmonaires. "
-                        "Une opacité linéaire (zone blanche allongée et fine) est visible à la périphérie de la zone moyenne gauche (flèche noire).",
-            )
+                        "Une opacité linéaire (zone blanche allongée et fine) est visible à la périphérie de la zone moyenne gauche (flèche noire)."),
+            "Fig2": ("Fig2.jpg", "Figure 2 — Consolidation. Radiographie thoracique antéro-postérieure (AP) d'un patient atteint de pneumonie COVID-19 sévère, "
+                        "montrant une consolidation périphérique dense bilatérale et une perte des marquages pulmonaires dans les zones moyennes et inférieures (flèches délimitées)."),
+            "Fig3": ("Fig3.jpg", "Figure 3 — Progression radiologique des symptômes de la pneumonie covid-19 chez un même patient C. (a) Radiographie thoracique postéro-antérieure normale du patient C, "
+                        "(prise 12 mois avant son admission à l'hôpital). (b) Radiographie thoracique AP du patient C lorsqu'il " 
+                        "a développé une pneumonie covid-19 (jour 0 de l'admission), montrant des opacités en verre dépoli en périphérie " 
+                        "(tiers externe du poumon) des deux poumons dans les zones moyennes et inférieures (flèches blanches), préservation des marquages pulmonaires, et opacité linéaire dans " 
+                        "la périphérie de la zone moyenne gauche (flèche noire). (c) Radiographie thoracique AP du patient C au jour 10 de l'admission, montrant une progression vers une pneumonie" 
+                        "covid-19 sévère : patient intubé avec tube endotrachéal, lignes centrales et sonde nasogastrique en place. Une consolidation dense avec perte des marquages pulmonaires est" 
+                        "maintenant visible derrière le cœur dans la zone inférieure gauche (flèche délimitée). Une extension des modifications en verre dépoli périphériques vues en (b) " 
+                        "peut être observée dans la périphérie des zones moyennes et inférieures droites et de la zone moyenne gauche (flèches blanches)."),
+            "Fig4": ("Fig4.jpg", "Figure 4 - Progression radiologique des symptômes de la pneumonie covid-19 chez un même patient D. (a) Radiographie thoracique antéro-postérieure normale du patient D, infecté par le COVID-19 (jour de l'admission). " 
+                        ". (b) Radiographie thoracique antéro-postérieure du patient D au jour 8, montrant une opacification en verre dépoli maintenant présente aux deux bases pulmonaires (flèches blanches). " 
+                        "Une consolidation est également visible dans la périphérie des zones supérieures et moyennes gauches (flèches délimitées). Une densité accrue (blancheur) est également présente dans la périphérie de la zone supérieure droite ; " 
+                        "ceci n'est pas aussi dense ou blanc que ce qui est observé dans le poumon gauche, montrant la progression des modifications pulmonaires de l'opacification en verre dépoli à la consolidation (flèches délimitées).")
+        }
+        
+        # Menu déroulant pour sélectionner l'image
+        selected_fig = st.selectbox("Sélectionner une image :", list(images_data.keys()), index=0)
+        
+        # Afficher l'image sélectionnée
+        current_img, current_caption = images_data[selected_fig]
+        img_path = Path(__file__).parent / "images" / "covid_cxr_symptoms" / current_img
+        
+        if img_path.exists():
+            st.image(str(img_path), caption=current_caption)
         else:
-            st.info("💡 Image de démonstration non disponible. Placez 'covid_cxr_example.png' dans page/images/")
+            st.info(f"💡 Image {current_img} non disponible.")
     
     with text_col:
         st.markdown(

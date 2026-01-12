@@ -7,9 +7,9 @@ Ce module fournit des outils pour comprendre les décisions des modèles CNN:
 - SHAP: Valeurs de Shapley pour deep learning
 """
 
-from .gradcam import GradCAM, visualize_gradcam
+from .Experimental.gradcam import GradCAM, visualize_gradcam
 from .lime_explainer import LIMEImageExplainer
-from .shap_explainer import SHAPExplainer
+from .Experimental.shap_explainer import SHAPExplainer
 from .utils import (
     create_interpretation_report,
     plot_multiple_explanations,

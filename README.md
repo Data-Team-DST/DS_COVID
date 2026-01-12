@@ -5,23 +5,23 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.18+-orange.svg)](https://tensorflow.org)
 
-## 📋 Description
+## Description
 
 Application de **détection COVID-19 à partir d'images radiographiques** utilisant des techniques de Deep Learning et Machine Learning. Ce projet propose une solution complète pour la classification d'images pulmonaires en 4 catégories :
 
-- 🦠 **COVID** - Cas positifs de COVID-19
-- ✅ **Normal** - Radiographies pulmonaires saines
-- 💨 **Lung_Opacity** - Opacités pulmonaires
-- 🔬 **Viral Pneumonia** - Pneumonie virale
+-  **COVID** - Cas positifs de COVID-19
+-  **Normal** - Radiographies pulmonaires saines
+-  **Lung_Opacity** - Opacités pulmonaires
+-  **Viral Pneumonia** - Pneumonie virale
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
-### 🧠 Modèles de Deep Learning
+### Modèles de Deep Learning
 - **Custom CNN** : Architecture CNN personnalisée optimisée pour l'imagerie médicale (5 blocs convolutionnels)
 - **Transfer Learning** : Support des modèles pré-entraînés (VGG16, ResNet50, EfficientNetB0, InceptionV3)
 - **Fine-tuning** : Possibilité de débloquer les couches supérieures pour un apprentissage plus fin
 
-### 🔄 Pipeline de Traitement d'Images
+### Pipeline de Traitement d'Images
 - **ImageLoader** : Chargement d'images avec validation des chemins
 - **ImageResizer** : Redimensionnement avec préservation optionnelle du ratio d'aspect
 - **ImageNormalizer** : Normalisation (min-max, standard, custom)
@@ -29,17 +29,17 @@ Application de **détection COVID-19 à partir d'images radiographiques** utilis
 - **ImageMasker** : Application de masques binaires pour segmentation
 - **ImageFlattener** : Aplatissement pour modèles ML classiques
 
-### 🔍 Interprétabilité des Modèles
+### Interprétabilité des Modèles
 - **Grad-CAM** : Visualisation des zones d'attention du modèle
 - **LIME** : Explications par segmentation d'image (super-pixels)
 - **SHAP** : Valeurs de Shapley pour explications au niveau pixel
 
-### 📊 Visualisation & Évaluation
+### Visualisation & Évaluation
 - Courbes d'entraînement (loss, accuracy, precision, recall)
 - Matrice de confusion
 - Rapports de classification détaillés
 
-## 🚀 Installation
+## Installation
 
 ### Prérequis
 - Python 3.8 ou supérieur
@@ -74,7 +74,7 @@ Le projet supporte nativement Google Colab. Utilisez simplement la cellule de co
 # La configuration est automatiquement détectée et adaptée pour Colab
 ```
 
-## 📁 Structure du Projet
+## Structure du Projet
 
 ```
 DS_COVID/
@@ -125,7 +125,7 @@ DS_COVID/
 └── README.md
 ```
 
-## 💻 Utilisation
+## Utilisation
 
 ### Configuration
 
@@ -213,7 +213,7 @@ heatmap = gradcam.compute_heatmap(image, class_idx=0)
 visualize_gradcam(image, heatmap, class_name='COVID', confidence=0.95)
 ```
 
-## 📊 Dataset
+## Dataset
 
 Ce projet utilise le **COVID-19 Radiography Database** disponible sur Kaggle :
 
@@ -230,7 +230,7 @@ kaggle datasets download -d tawsifurrahman/covid19-radiography-database
 unzip covid19-radiography-database.zip -d data/raw/COVID-19_Radiography_Dataset/
 ```
 
-## 🧪 Tests
+##  Tests
 
 ```bash
 # Exécuter tous les tests
@@ -243,7 +243,7 @@ pytest --cov=src/ --cov-report=html
 pytest src/test/test_pipelines_imports.py
 ```
 
-## 🔧 CI/CD
+##  CI/CD
 
 Le projet utilise GitHub Actions pour l'intégration continue :
 
@@ -251,17 +251,18 @@ Le projet utilise GitHub Actions pour l'intégration continue :
 2. **Unit Tests** : Exécution des tests pytest avec couverture
 3. **SonarCloud** : Analyse de qualité du code
 
-## 👥 Auteurs
+##  Auteurs
 
-- **Rafael Cepa** - *Développeur principal*
-- **Cirine** - *Contributrice*
-- **Steven Moire** - *Contributeur*
+- **Léna Bacot** 
+- **Rafael Cepa** 
+- **Cirine Bouamrane** 
+- **Steven Moire** 
 
-## 📄 Licence
+##  Licence
 
 Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-## 🙏 Remerciements
+## Remerciements
 
 - **DataScientest** pour l'encadrement du projet
 - L'équipe du **COVID-19 Radiography Database** pour le dataset
@@ -269,7 +270,7 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 
 ---
 
-## 📚 Références
+## Références
 
 - Selvaraju et al. "Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization" (2017)
 - Ribeiro et al. "Why Should I Trust You?: Explaining the Predictions of Any Classifier" (2016)
@@ -277,7 +278,7 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 
 ---
 
-## 📖 Documentation Complémentaire
+## Documentation Complémentaire
 
 Pour plus de détails sur les modules d'interprétabilité, consultez :
 - [src/interpretability/README.md](src/interpretability/README.md)

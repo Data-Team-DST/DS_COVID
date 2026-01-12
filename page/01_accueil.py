@@ -1,5 +1,5 @@
-# 01_accueil.py — 
-# - Header developpé (4-8 lignes)
+# 01_accueil.py —
+# - Header développé (4–8 lignes)
 # - Objectifs SMART (S M A R T)
 # - Pas de notes orateur / risques
 
@@ -7,7 +7,11 @@ import streamlit as st
 from streamlit_extras.colored_header import colored_header
 from pathlib import Path
 
-st.set_page_config(page_title="Analyse de Radiographies — Accueil", layout="wide", page_icon="🧪")
+st.set_page_config(
+    page_title="Analyse de radiographies — Accueil",
+    layout="wide",
+    page_icon="analyse"
+)
 
 _CSS = """
 <style>
@@ -32,136 +36,137 @@ def run():
     # Header (développé)
     try:
         colored_header(
-            label="Analyse de Radiographies pulmonaires — Classification COVID-19 & Aide au diagnostic",
-            description=("Projet réalisé par Cirine B., Lena B., Steven M., Rafael C., Encadré par : Nicolas M."),
+            label="Analyse de radiographies pulmonaires — Classification COVID-19 et aide au diagnostic",
+            description="Projet réalisé par Cirine B., Lena B., Steven M., Rafael C., encadré par Nicolas M.",
             color_name="blue-70"
         )
     except Exception:
-        st.markdown("<h2>Analyse de Radiographies pulmonaires — Classification COVID-19</h2>", unsafe_allow_html=True)
-        st.markdown("<div class='small-note'>Prototype d'assistance diagnostique visuelle — rapide, interprétable et prêt pour la démo.</div>", unsafe_allow_html=True)
+        st.markdown(
+            "<h2>Analyse de radiographies pulmonaires — Classification COVID-19</h2>",
+            unsafe_allow_html=True
+        )
+        st.markdown(
+            "<div class='small-note'>Prototype d'assistance diagnostique visuelle — rapide, interprétable et prêt pour la démonstration.</div>",
+            unsafe_allow_html=True
+        )
 
     st.divider()
 
     # Contexte étendu avec problématique et solutions
-    st.markdown("### 📊 Contexte de l'épidémie COVID-19")
-    
+    st.markdown("### Contexte de l’épidémie de COVID-19")
+
     # Bilan mondial
     st.markdown(
         "<div class='project-hero'>"
-        "<strong>🌍 Bilan mondial</strong><br>"
-        "• 3 ans d'épidémie mondiale<br>"
+        "<strong>Bilan mondial</strong><br>"
+        "• Trois ans d’épidémie mondiale<br>"
         "• Plus de <strong>700 millions</strong> de cas confirmés<br>"
         "• Plus de <strong>7 millions</strong> de décès<br>"
-        "• Type spécifique de pneumonie virale (<em>Viral Pneumonia</em>) causée par le virus <strong>SARS-CoV-2</strong>"
-        "</div>", 
-        unsafe_allow_html=True
-    )
-    
-    st.markdown("")
-    
-    # Problème 1 → Solution 1
-    st.markdown(
-        "<div class='project-hero'>"
-        "<strong>⚠️ Problème 1 : Limites des tests <abbr title='Reverse Transcription PCR'>RT-PCR</abbr></strong><br>"
-        "• Tests moléculaires <strong>lents</strong> (délais de traitement importants)<br>"
-        "• Sensibilité <strong>variable</strong> (~70% en conditions réelles vs 95% théoriques)<br>"
-        "• <strong>Pénuries de stocks</strong> et dépendance aux laboratoires<br>"
-        "<br>"
-        "<strong>✅ Solution 1 : Imagerie médicale complémentaire</strong><br>"
-        "Utiliser des méthodes d'imagerie telles que la <abbr title='Chest X-Ray'>CXR</abbr> (radiographie thoracique) "
-        "ou la <abbr title='Computed Tomography'>CT</abbr> (tomodensitométrie) pour un diagnostic plus rapide et accessible."
+        "• Type spécifique de pneumonie virale (<em>viral pneumonia</em>) causée par le virus <strong>SARS-CoV-2</strong>"
         "</div>",
         unsafe_allow_html=True
     )
-    
+
     st.markdown("")
 
-     # Caractéristiques radiologiques du COVID-19 avec image
+    # Problème 1 → Solution 1
+    st.markdown(
+        "<div class='project-hero'>"
+        "<strong>Problème 1 : limites des tests <abbr title='Reverse Transcription PCR'>RT-PCR</abbr></strong><br>"
+        "• Tests moléculaires <strong>lents</strong> (délais de traitement importants)<br>"
+        "• Sensibilité <strong>variable</strong> (environ 70 % en conditions réelles contre 95 % théoriques)<br>"
+        "• <strong>Pénuries de stocks</strong> et dépendance aux laboratoires<br>"
+        "<br>"
+        "<strong>Solution 1 : imagerie médicale complémentaire</strong><br>"
+        "Utiliser des méthodes d’imagerie telles que la <abbr title='Chest X-Ray'>CXR</abbr> (radiographie thoracique) "
+        "ou la <abbr title='Computed Tomography'>CT</abbr> (tomodensitométrie) pour un diagnostic plus rapide et plus accessible."
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown("")
+
+    # Caractéristiques radiologiques du COVID-19 avec image
     img_col, text_col = st.columns([1, 2])
-    
+
     with img_col:
-        # Liste des images et leurs légendes
         images_data = {
-            "Fig1": ("Fig1.jpg", "Figure 1 — Opacité en verre dépoli. Radiographie thoracique postéro-antérieure d'un patient atteint de pneumonie COVID-19. "
-                        "Les caractéristiques incluent une opacité en verre dépoli dans les zones moyennes et inférieures des deux poumons, "
-                        "principalement en périphérie (flèches blanches) avec préservation des marquages pulmonaires. "
-                        "Une opacité linéaire (zone blanche allongée et fine) est visible à la périphérie de la zone moyenne gauche (flèche noire)."),
-            "Fig2": ("Fig2.jpg", "Figure 2 — Consolidation. Radiographie thoracique antéro-postérieure (AP) d'un patient atteint de pneumonie COVID-19 sévère, "
-                        "montrant une consolidation périphérique dense bilatérale et une perte des marquages pulmonaires dans les zones moyennes et inférieures (flèches délimitées)."),
-            "Fig3": ("Fig3.jpg", "Figure 3 — Progression radiologique des symptômes de la pneumonie covid-19 chez un même patient C. (a) Radiographie thoracique postéro-antérieure normale du patient C, "
-                        "(prise 12 mois avant son admission à l'hôpital). (b) Radiographie thoracique AP du patient C lorsqu'il " 
-                        "a développé une pneumonie covid-19 (jour 0 de l'admission), montrant des opacités en verre dépoli en périphérie " 
-                        "(tiers externe du poumon) des deux poumons dans les zones moyennes et inférieures (flèches blanches), préservation des marquages pulmonaires, et opacité linéaire dans " 
-                        "la périphérie de la zone moyenne gauche (flèche noire). (c) Radiographie thoracique AP du patient C au jour 10 de l'admission, montrant une progression vers une pneumonie" 
-                        "covid-19 sévère : patient intubé avec tube endotrachéal, lignes centrales et sonde nasogastrique en place. Une consolidation dense avec perte des marquages pulmonaires est" 
-                        "maintenant visible derrière le cœur dans la zone inférieure gauche (flèche délimitée). Une extension des modifications en verre dépoli périphériques vues en (b) " 
-                        "peut être observée dans la périphérie des zones moyennes et inférieures droites et de la zone moyenne gauche (flèches blanches)."),
-            "Fig4": ("Fig4.jpg", "Figure 4 - Progression radiologique des symptômes de la pneumonie covid-19 chez un même patient D. (a) Radiographie thoracique antéro-postérieure normale du patient D, infecté par le COVID-19 (jour de l'admission). " 
-                        ". (b) Radiographie thoracique antéro-postérieure du patient D au jour 8, montrant une opacification en verre dépoli maintenant présente aux deux bases pulmonaires (flèches blanches). " 
-                        "Une consolidation est également visible dans la périphérie des zones supérieures et moyennes gauches (flèches délimitées). Une densité accrue (blancheur) est également présente dans la périphérie de la zone supérieure droite ; " 
-                        "ceci n'est pas aussi dense ou blanc que ce qui est observé dans le poumon gauche, montrant la progression des modifications pulmonaires de l'opacification en verre dépoli à la consolidation (flèches délimitées).")
+            "Fig1": (
+                "Fig1.jpg",
+                "Figure 1 — Opacité en verre dépoli. Radiographie thoracique postéro-antérieure d’un patient atteint de pneumonie COVID-19. "
+                "Présence d’opacités en verre dépoli dans les zones moyennes et inférieures des deux poumons, principalement en périphérie "
+                "(flèches blanches), avec préservation des marquages pulmonaires. Une opacité linéaire est visible à la périphérie de la zone moyenne gauche (flèche noire)."
+            ),
+            "Fig2": (
+                "Fig2.jpg",
+                "Figure 2 — Consolidation. Radiographie thoracique antéro-postérieure d’un patient atteint de pneumonie COVID-19 sévère, "
+                "montrant une consolidation périphérique dense bilatérale et une perte des marquages pulmonaires dans les zones moyennes et inférieures."
+            ),
+            "Fig3": (
+                "Fig3.jpg",
+                "Figure 3 — Progression radiologique de la pneumonie COVID-19 chez un même patient. "
+                "(a) Radiographie thoracique postéro-antérieure normale prise 12 mois avant l’admission. "
+                "(b) Radiographie thoracique antéro-postérieure au jour 0 montrant des opacités en verre dépoli périphériques bilatérales. "
+                "(c) Radiographie thoracique antéro-postérieure au jour 10 montrant une progression vers une pneumonie sévère avec consolidation dense."
+            ),
+            "Fig4": (
+                "Fig4.jpg",
+                "Figure 4 — Progression radiologique chez un patient atteint de COVID-19. "
+                "(a) Radiographie thoracique antéro-postérieure normale au jour de l’admission. "
+                "(b) Radiographie thoracique antéro-postérieure au jour 8 montrant une opacification en verre dépoli aux bases pulmonaires et une consolidation périphérique."
+            ),
         }
-        
-        # Menu déroulant pour sélectionner l'image
+
         selected_fig = st.selectbox("Sélectionner une image :", list(images_data.keys()), index=0)
-        
-        # Afficher l'image sélectionnée
+
         current_img, current_caption = images_data[selected_fig]
         img_path = Path(__file__).parent / "images" / "covid_cxr_symptoms" / current_img
-        
+
         if img_path.exists():
             st.image(str(img_path), caption=current_caption)
         else:
-            st.info(f"💡 Image {current_img} non disponible.")
-    
+            st.info(f"Image {current_img} non disponible.")
+
     with text_col:
         st.markdown(
             "<div class='project-hero'>"
-            "<strong>🔬 Signes radiologiques typiques du COVID-19 sur CXR</strong><br>"
-            "Sur une radiographie thoracique, une pneumonie COVID-19 présente généralement :<br>"
-            "• <strong>Zones blanches floues (opacités en verre dépoli ou linéaires)</strong> visibles des <strong>deux côtés des poumons</strong>, "
-            "souvent en <strong>périphérie</strong> (vers l'extérieur) ou à l'<strong>arrière</strong> des poumons<br>, "
-            "qui masquent les marquages pulmonaires normaux (vaisseaux sanguins, etc) <br>"
-            "• Localisation surtout dans la <strong>partie basse des poumons</strong> (lobes inférieurs)<br>"
-            "• <strong>Début de la maladie</strong> : zones floues légères et diffuses<br>"
-            "• <strong>Stade avancé</strong> : zones deviennent plus denses et blanches (consolidation = poumon rempli de liquide/cellules inflammatoires)<br>"
+            "<strong>Signes radiologiques typiques du COVID-19 sur CXR</strong><br>"
+            "Une pneumonie COVID-19 se caractérise généralement par :<br>"
+            "• Des <strong>opacités bilatérales floues</strong>, souvent en <strong>périphérie</strong> ou dans les régions postérieures des poumons<br>"
+            "• Une atteinte prédominante des <strong>lobes inférieurs</strong><br>"
+            "• Un <strong>stade précoce</strong> marqué par des opacités diffuses légères<br>"
+            "• Un <strong>stade avancé</strong> avec consolidation dense liée à un remplissage alvéolaire<br>"
             "<br>"
-            "⚠️ <strong>Problème clé</strong> : ces signes ressemblent beaucoup à d'autres pneumonies virales, ou a des opacités causées par d'autres maladies pulmonaires, "
-            "rendant le diagnostic visuel très difficile même pour un expert."
+            "<strong>Problème clé :</strong> ces signes sont très proches de ceux observés dans d’autres pneumonies virales, "
+            "rendant le diagnostic visuel complexe, même pour un radiologue expérimenté."
             "</div>",
             unsafe_allow_html=True
         )
-    
+
         st.markdown("")
-        # Problème 2 → Solution 2
+
         st.markdown(
             "<div class='project-hero'>"
-            "<strong>⚠️ Problème 2 : Difficulté du diagnostic visuel</strong><br>"
-            "Même un radiologue expérimenté a du mal à <strong>distinguer</strong> un cas de COVID-19 "
-            "d'un autre type de pneumonie sur une image radiographique, en raison de la similarité des patterns visuels.<br>"
+            "<strong>Problème 2 : difficulté du diagnostic visuel</strong><br>"
+            "La similarité des patterns radiologiques complique la distinction entre COVID-19 et autres pneumonies.<br>"
             "<br>"
-            "<strong>⚠️ Problème 2.1 : Surcharge des radiologues</strong><br>"
-            "Pendant l'épidémie, les radiologues sont <strong>surchargés</strong> et n'ont pas le temps "
-            "de lire toutes les radiographies avec l'attention nécessaire, créant un goulot d'étranglement diagnostique.<br>"
+            "<strong>Problème 2.1 : surcharge des radiologues</strong><br>"
+            "Le volume d’examens durant l’épidémie a généré une surcharge importante, réduisant le temps disponible par examen.<br>"
             "<br>"
-            "<strong>✅ Solution 2 : Intelligence artificielle</strong><br>"
-            "Utiliser <strong>ML/DL</strong> pour accélérer la détection des cas positifs depuis les images "
-            "et fournir une solution <strong>interprétable</strong> et <strong>reproductible</strong> "
-            "pour la démonstration et le POC (Proof of Concept)."
+            "<strong>Solution 2 : intelligence artificielle</strong><br>"
+            "L’utilisation de modèles de machine learning et de deep learning permet d’accélérer la détection des cas positifs, "
+            "tout en proposant une solution interprétable et reproductible pour un POC et une démonstration."
             "</div>",
             unsafe_allow_html=True
         )
 
-
-    # Paragraphe central
     st.markdown(
-        "La radiographie thoracique reste un examen rapide, simple d'accès et couramment utilisé dans le triage initial des pathologies pulmonaires. "
-        "Notre pipeline combine des modèles classiques de machine learning et un réseau convolutionnel deep-learning (InceptionV3 fine-tuned) "
-        "pour extraire des signaux diagnostiques robustes à partir des images. "
-        "Nous ajoutons des méthodes d'interprétabilité visuelle (Grad-CAM) et feature-based (SHAP) afin de rendre la décision du modèle plus transparente "
-        "pour le clinicien et de faciliter la validation visuelle des prédictions. "
-        "L'approche vise une solution équilibrée entre performance, explicabilité et faisabilité opérationnelle, adaptée pour une démonstration en soutenance.",
-        unsafe_allow_html=True
+        "La radiographie thoracique reste un examen rapide et largement accessible pour le triage initial des pathologies pulmonaires. "
+        "Notre pipeline combine des modèles classiques de machine learning et un réseau convolutionnel deep learning "
+        "(InceptionV3 affiné par fine-tuning) afin d’extraire des signaux diagnostiques robustes. "
+        "Des méthodes d’interprétabilité visuelle (Grad-CAM) et basées sur les caractéristiques (SHAP) sont intégrées "
+        "pour rendre les décisions du modèle plus transparentes et faciliter leur validation clinique. "
+        "L’objectif est de proposer une solution équilibrée entre performance, explicabilité et faisabilité opérationnelle."
     )
 
     st.divider()
@@ -169,21 +174,23 @@ def run():
     # Objectifs SMART
     st.markdown("## Objectifs SMART (propositions retenues)")
     col1, col2 = st.columns(2)
+
     with col1:
         st.subheader("Objectif 1 — Performance diagnostique")
         st.markdown(
-            "- **S** : AUC ≥ **0.88** sur classification COVID vs non-COVID (patient-level hold-out).\n"
-            "- **M** : ROC AUC + IC 95% via bootstrap; rapport automatisé.\n"
-            "- **A** : fine-tuning InceptionV3 + augmentation et reweighting.\n"
-            "- **R** : priorite clinique — permet un triage plus rapide et fiable.\n"
-            "- **T** : démontré en Phase Validation (S11)."
+            "- **S** : AUC ≥ **0,88** pour la classification COVID vs non-COVID (patient-level hold-out).\n"
+            "- **M** : ROC AUC avec intervalle de confiance à 95 % par bootstrap.\n"
+            "- **A** : fine-tuning d’InceptionV3 avec augmentation et repondération des classes.\n"
+            "- **R** : priorité clinique permettant un triage plus rapide et fiable.\n"
+            "- **T** : démontré en phase de validation."
         )
+
     with col2:
-        st.subheader("Objectif 2 — Sensibilité & Spécificité")
+        st.subheader("Objectif 2 — Sensibilité et spécificité")
         st.markdown(
-            "- **S** : Sensibilité ≥ **0.85** & Spécificité ≥ **0.90** (seuil choisi via ROC).\n"
-            "- **M** : confusion matrix, ROC/PR, rapports par fold.\n"
-            "- **A** : calibration du modèle et ajustement de seuils.\n"
-            "- **R** : réduit le risque de faux négatifs tout en contrôlant faux positifs.\n"
-            "- **T** : preuve opérationnelle pour la démo (S13)."
+            "- **S** : Sensibilité ≥ **0,85** et spécificité ≥ **0,90**.\n"
+            "- **M** : matrices de confusion, courbes ROC et PR.\n"
+            "- **A** : calibration du modèle et ajustement du seuil.\n"
+            "- **R** : réduction du risque de faux négatifs tout en contrôlant les faux positifs.\n"
+            "- **T** : preuve opérationnelle pour la démonstration."
         )

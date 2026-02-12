@@ -4,6 +4,9 @@ import importlib.util
 from pathlib import Path
 from typing import List
 
+# Ceci est un commentaire
+
+
 # --- Liste des pages ---
 _PAGE_DIR = Path(__file__).parent / "page"
 _PAGE_FILENAMES = [

@@ -2,7 +2,7 @@ from pathlib import Path
 from PIL import Image
 from tqdm import tqdm
 
-# Configuration
+# Configuration .
 PROJECT_ROOT = Path(__file__).parent.parent
 SOURCE_PATH = PROJECT_ROOT / "data" / "processed" / "raw_dataset_without_masks"
 OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "unmasked_full_dataset_256_256_L"

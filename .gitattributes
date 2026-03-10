@@ -1,0 +1,1 @@
+data/*.dvc filter=dvc diff=dvc merge=dvc -text

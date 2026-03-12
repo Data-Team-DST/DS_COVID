@@ -22,7 +22,7 @@ from .data_utils import (
     create_data_generators,
     create_preprocessing_pipeline,
     create_transfer_learning_generators,
-    load_dataset_paths_and_labels,
+    load_dataset,
     prepare_train_val_test_split,
 )
 
@@ -55,9 +55,12 @@ from .visualization_utils import (
     plot_training_curves,
 )
 
+# Pipeline execution (Streamlit)
+from .pipeline_executor import StreamlitPipelineExecutor
+
 __all__ = [
     # Data
-    "load_dataset_paths_and_labels",
+    "load_dataset",
     "create_preprocessing_pipeline",
     "prepare_train_val_test_split",
     "compute_class_weights",
@@ -80,4 +83,6 @@ __all__ = [
     "run_gradcam_analysis",
     "select_sample_images",
     "get_preprocessing_function",
+    # Pipeline execution
+    "StreamlitPipelineExecutor",
 ]

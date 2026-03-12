@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ds_covid_backend"
+version = "0.1.0"
+description = "COVID-19 ML Backend with FastAPI"
+requires-python = ">=3.11"
+
+[tool.setuptools]
+packages = ["ds_covid_backend"]
+package-dir = {"" = "src"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=src/ds_covid_backend --cov-report=term-missing"

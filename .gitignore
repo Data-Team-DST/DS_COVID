@@ -148,6 +148,13 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# Project-specific (non-code archives)
+docs_guides/
+migration_backup/
+*.venv/
+ml-backend/venv/
+
+
 # Pyre type checker
 .pyre/
 

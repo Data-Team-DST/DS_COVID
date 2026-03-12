@@ -1,361 +1,152 @@
-# Script: Create ML-Backend Structure with src/ (Windows PowerShell)
-# Usage: powershell -ExecutionPolicy Bypass -File create_structure.ps1
+# Create ml-backend structure with DDD architecture
+Write-Host "Creating ml-backend structure..." -ForegroundColor Green
 
-Write-Host "🚀 Creating DS_COVID ML Backend Structure..." -ForegroundColor Green
-Write-Host "==================================================" -ForegroundColor Green
-Write-Host ""
-
-# Navigate to ml-backend
-if (-not (Test-Path "ml-backend")) {
-    New-Item -ItemType Directory -Path "ml-backend" | Out-Null
-}
-Set-Location "ml-backend"
-
-# 1. Create src/ structure
-Write-Host "📦 Creating src/ directory..." -ForegroundColor Cyan
-
+# Create main directories
 $dirs = @(
-    "src/ds_covid_backend",
-    "src/ds_covid_backend/api/routes",
-    "src/ds_covid_backend/api/schemas",
-    "src/ds_covid_backend/api/errors",
-    "src/ds_covid_backend/api/middlewares",
-    "src/ds_covid_backend/domain/models",
-    "src/ds_covid_backend/domain/repositories",
-    "src/ds_covid_backend/application/predict_service",
-    "src/ds_covid_backend/application/data_processor",
-    "src/ds_covid_backend/application/training_service",
-    "src/ds_covid_backend/infrastructure/ml_models",
-    "src/ds_covid_backend/infrastructure/storage",
-    "src/ds_covid_backend/infrastructure/logging",
-    "src/ds_covid_backend/config",
-    "tests/unit",
-    "tests/integration",
-    "tests/fixtures",
-    "notebooks",
-    "migration_backup",
-    "logs",
-    "data/raw",
-    "data/processed",
-    "models/trained",
-    "models/checkpoints"
+    "ml-backend/src/ds_covid_backend/api",
+    "ml-backend/src/ds_covid_backend/domain",
+    "ml-backend/src/ds_covid_backend/application",
+    "ml-backend/src/ds_covid_backend/infrastructure",
+    "ml-backend/src/ds_covid_backend/config",
+    "ml-backend/tests/unit",
+    "ml-backend/tests/integration",
+    "ml-backend/tests/fixtures"
 )
 
 foreach ($dir in $dirs) {
-    if (-not (Test-Path $dir)) {
-        New-Item -ItemType Directory -Path $dir | Out-Null
-        Write-Host "  ✓ Created $dir" -ForegroundColor Green
+    if (!(Test-Path $dir)) {
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+        Write-Host "Created: $dir" -ForegroundColor Cyan
     }
 }
 
-# 2. Create __init__.py files in src/
-Write-Host ""
-Write-Host "✨ Creating __init__.py files..." -ForegroundColor Cyan
+# Create __init__.py files
+$initFiles = @(
+    "ml-backend/src/ds_covid_backend/__init__.py",
+    "ml-backend/src/ds_covid_backend/api/__init__.py",
+    "ml-backend/src/ds_covid_backend/domain/__init__.py",
+    "ml-backend/src/ds_covid_backend/application/__init__.py",
+    "ml-backend/src/ds_covid_backend/infrastructure/__init__.py",
+    "ml-backend/src/ds_covid_backend/config/__init__.py",
+    "ml-backend/tests/__init__.py",
+    "ml-backend/tests/unit/__init__.py",
+    "ml-backend/tests/integration/__init__.py",
+    "ml-backend/tests/fixtures/__init__.py"
+)
 
-$pythonDirs = Get-ChildItem -Path "src" -Directory -Recurse
-foreach ($dir in $pythonDirs) {
-    $initFile = Join-Path $dir.FullName "__init__.py"
-    if (-not (Test-Path $initFile)) {
-        New-Item -ItemType File -Path $initFile | Out-Null
+foreach ($file in $initFiles) {
+    if (!(Test-Path $file)) {
+        New-Item -ItemType File -Path $file -Force | Out-Null
+        Write-Host "Created: $file" -ForegroundColor Yellow
     }
 }
 
-$testDirs = Get-ChildItem -Path "tests" -Directory -Recurse
-foreach ($dir in $testDirs) {
-    $initFile = Join-Path $dir.FullName "__init__.py"
-    if (-not (Test-Path $initFile)) {
-        New-Item -ItemType File -Path $initFile | Out-Null
-    }
-}
+# Create requirements.txt
+$requirements = "# Core Framework
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.0
+python-dotenv==1.0.0
 
-Write-Host "  ✓ Created __init__.py files" -ForegroundColor Green
-
-# 3. Create .gitkeep files
-Write-Host ""
-Write-Host "📌 Creating .gitkeep files..." -ForegroundColor Cyan
-
-Create-Item -ItemType File -Path "data/.gitkeep" -Force | Out-Null
-Create-Item -ItemType File -Path "models/.gitkeep" -Force | Out-Null
-Create-Item -ItemType File -Path "logs/.gitkeep" -Force | Out-Null
-
-Write-Host "  ✓ Created .gitkeep files" -ForegroundColor Green
-
-# 4. Create .gitignore
-Write-Host ""
-Write-Host "🔧 Creating .gitignore..." -ForegroundColor Cyan
-
-$gitignore = @"
-# Migration backup (temporaire)
-migration_backup/
-_old/
-*_backup/
-
-# Python
-__pycache__/
-*.py[cod]
-*`$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Data & Models (gros fichiers)
-data/raw/
-data/processed/
-models/trained/
-models/checkpoints/
-*.h5
-*.pkl
-*.joblib
-*.onnx
-
-# Jupyter
-notebooks/.ipynb_checkpoints/
-.ipynb_checkpoints/
-
-# Logs
-logs/
-*.log
-
-# Environment
-.env
-.env.local
-.env.*.local
-venv/
-env/
-ENV/
-.venv
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
+# ML & Data Processing
+tensorflow==2.15.0
+scikit-learn==1.3.2
+numpy==1.24.3
+pandas==2.0.3
+opencv-python==4.8.0.76
+Pillow==10.0.0
 
 # Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-
-# Docker
-.dockerignore
-
-# OS
-Thumbs.db
-.DS_Store
-"@
-
-Set-Content -Path ".gitignore" -Value $gitignore
-Write-Host "  ✓ Created .gitignore" -ForegroundColor Green
-
-# 5. Create .env.example
-Write-Host "📝 Creating .env.example..." -ForegroundColor Cyan
-
-$envExample = @"
-# Application
-PROJECT_NAME=DS_COVID_Backend
-DEBUG=false
-LOG_LEVEL=INFO
-
-# Server
-HOST=0.0.0.0
-PORT=8000
-
-# Model
-MODEL_NAME=covid_detector
-MODEL_PATH=models/trained/cnn_covid.h5
-MODEL_TYPE=cnn
-
-# Data
-DATA_PATH=data/processed
-IMG_SIZE=224
-BATCH_SIZE=32
-
-# Logging
-LOG_LEVEL=INFO
-LOG_FILE=logs/app.log
-
-# Monitoring
-TRACK_PREDICTIONS=true
-METRICS_FILE=metrics/predictions.json
-"@
-
-Set-Content -Path ".env.example" -Value $envExample
-Write-Host "  ✓ Created .env.example" -ForegroundColor Green
-
-# 6. Create pyproject.toml
-Write-Host "📄 Creating pyproject.toml..." -ForegroundColor Cyan
-
-$pyproject = @"
-[project]
-name = "ds-covid-backend"
-version = "0.1.0"
-description = "ML Backend for COVID-19 Detection"
-requires-python = ">=3.11"
-dependencies = [
-    "fastapi==0.104.1",
-    "uvicorn[standard]==0.24.0",
-    "pydantic==2.5.0",
-    "pydantic-settings==2.1.0",
-    "tensorflow==2.15.0",
-    "numpy==1.24.3",
-    "pandas==2.1.3",
-    "scikit-learn==1.3.2",
-    "Pillow==10.1.0",
-    "python-multipart==0.0.6",
-    "opencv-python==4.8.1.78",
-    "joblib==1.3.2",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest==7.4.3",
-    "pytest-cov==4.1.0",
-    "black==23.12.0",
-    "ruff==0.1.8",
-    "mypy==1.7.1",
-]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-v --tb=short --cov=src"
-
-[tool.black]
-line-length = 100
-target-version = ["py311"]
-
-[tool.ruff]
-select = ["E", "F", "W", "I"]
-line-length = 100
-"@
-
-Set-Content -Path "pyproject.toml" -Value $pyproject
-Write-Host "  ✓ Created pyproject.toml" -ForegroundColor Green
-
-# 7. Create requirements.txt
-Write-Host "📋 Creating requirements.txt..." -ForegroundColor Cyan
-
-$requirements = @"
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
-tensorflow==2.15.0
-numpy==1.24.3
-pandas==2.1.3
-scikit-learn==1.3.2
-Pillow==10.1.0
-python-multipart==0.0.6
-opencv-python==4.8.1.78
-joblib==1.3.2
 pytest==7.4.3
 pytest-cov==4.1.0
-"@
+pytest-asyncio==0.21.1
+httpx==0.25.0
 
-Set-Content -Path "requirements.txt" -Value $requirements
-Write-Host "  ✓ Created requirements.txt" -ForegroundColor Green
+# Development
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+pre-commit==3.5.0
 
-# 8. Create README.md
-Write-Host "📚 Creating README.md..." -ForegroundColor Cyan
+# Documentation
+python-multipart==0.0.6"
 
-$readme = @"
-# DS_COVID ML Backend
+Set-Content -Path "ml-backend/requirements.txt" -Value $requirements
+Write-Host "Created: ml-backend/requirements.txt" -ForegroundColor Yellow
 
-FastAPI service for COVID-19 detection from radiological images.
+# Create pyproject.toml
+$pyproject = "[build-system]
+requires = [\"setuptools>=65.0\", \"wheel\"]
+build-backend = \"setuptools.build_meta\"
 
-## Structure
+[project]
+name = \"ds_covid_backend\"
+version = \"0.1.0\"
+description = \"COVID-19 ML Backend API with FastAPI and TensorFlow\"
+requires-python = \">=3.11\"
 
-\`\`\`
-src/ds_covid_backend/
-├── api/          # HTTP endpoints
-├── domain/       # Business entities
-├── application/  # Use cases & services
-├── infrastructure/  # Implementations (TensorFlow, BD, etc)
-└── config/       # Configuration
-\`\`\`
+[tool.setuptools]
+packages = [\"ds_covid_backend\"]
+package-dir = {\"\" = \"src\"}
 
-## Quick Start
+[tool.pytest.ini_options]
+testpaths = [\"tests\"]
+addopts = \"--cov=src/ds_covid_backend --cov-report=term-missing -v\""
 
-\`\`\`bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-# or
-source venv/bin/activate  # Linux/Mac
+Set-Content -Path "ml-backend/pyproject.toml" -Value $pyproject
+Write-Host "Created: ml-backend/pyproject.toml" -ForegroundColor Yellow
 
-pip install -r requirements.txt
+# Create setup.py
+$setup = "from setuptools import setup, find_packages
 
-# Run tests
-pytest tests/ -v --cov=src
+setup(
+    name=\"ds_covid_backend\",
+    version=\"0.1.0\",
+    package_dir={\"\":\"src\"},
+    packages=find_packages(where=\"src\"),
+    python_requires=\">=3.11\",
+)"
 
-# Run API
-uvicorn src.ds_covid_backend.main:app --reload --port 8000
-\`\`\`
+Set-Content -Path "ml-backend/setup.py" -Value $setup
+Write-Host "Created: ml-backend/setup.py" -ForegroundColor Yellow
 
-## API Docs
+# Create .env.example
+$env = "# API Configuration
+API_HOST=0.0.0.0
+API_PORT=8000
+DEBUG=false"
 
-Once running: http://localhost:8000/docs
-"@
+Set-Content -Path "ml-backend/.env.example" -Value $env
+Write-Host "Created: ml-backend/.env.example" -ForegroundColor Yellow
 
-Set-Content -Path "README.md" -Value $readme
-Write-Host "  ✓ Created README.md" -ForegroundColor Green
+# Create sample API main.py
+$apiMain = "# API Routes
+from fastapi import APIRouter
 
-# Summary
-Write-Host ""
-Write-Host "==================================================" -ForegroundColor Green
-Write-Host "✅ Structure Created Successfully!" -ForegroundColor Green
-Write-Host "==================================================" -ForegroundColor Green
-Write-Host ""
-Write-Host "📊 What was created:" -ForegroundColor Yellow
-Write-Host ""
-Write-Host "  ✓ src/ds_covid_backend/  (Package principal)" -ForegroundColor Green
-Write-Host "    ├─ api/               (Routes HTTP)" -ForegroundColor Gray
-Write-Host "    ├─ domain/            (Entités métier)" -ForegroundColor Gray
-Write-Host "    ├─ application/       (Use cases)" -ForegroundColor Gray
-Write-Host "    ├─ infrastructure/    (Implémentations)" -ForegroundColor Gray
-Write-Host "    └─ config/            (Configuration)" -ForegroundColor Gray
-Write-Host ""
-Write-Host "  ✓ tests/                (Tests)" -ForegroundColor Green
-Write-Host "    ├─ unit/              (Unit tests)" -ForegroundColor Gray
-Write-Host "    ├─ integration/       (Integration tests)" -ForegroundColor Gray
-Write-Host "    └─ fixtures/          (Test data)" -ForegroundColor Gray
-Write-Host ""
-Write-Host "  ✓ notebooks/            (Jupyter notebooks)" -ForegroundColor Green
-Write-Host "  ✓ migration_backup/     (Anciens fichiers → à supprimer)" -ForegroundColor Yellow
-Write-Host "  ✓ logs/, data/, models/ (Runtime directories)" -ForegroundColor Green
-Write-Host ""
-Write-Host "📄 Configuration files:" -ForegroundColor Yellow
-Write-Host "  ✓ .gitignore      (Ignored files)" -ForegroundColor Green
-Write-Host "  ✓ .env.example    (Environment variables template)" -ForegroundColor Green
-Write-Host "  ✓ pyproject.toml  (Python project config)" -ForegroundColor Green
-Write-Host "  ✓ requirements.txt (Dependencies)" -ForegroundColor Green
-Write-Host "  ✓ README.md       (Project documentation)" -ForegroundColor Green
-Write-Host ""
-Write-Host "🚀 Next steps:" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "  1. cd ml-backend" -ForegroundColor White
-Write-Host "  2. python -m venv venv" -ForegroundColor White
-Write-Host "  3. venv\Scripts\activate           (Windows)" -ForegroundColor White
-Write-Host "     source venv/bin/activate        (Linux/Mac)" -ForegroundColor White
-Write-Host "  4. pip install -r requirements.txt" -ForegroundColor White
-Write-Host "  5. Move existing code to migration_backup/" -ForegroundColor White
-Write-Host "  6. Follow ARCHITECTURE_FINAL.md to structure your code" -ForegroundColor White
-Write-Host ""
-Write-Host "View structure:" -ForegroundColor Cyan
-Write-Host "  tree /F src\  # (install 'tree' with: choco install tree)" -ForegroundColor Gray
-Write-Host ""
+router = APIRouter()
+
+@router.get(\"/health\")
+async def health_check():
+    return {\"status\": \"ok\"}"
+
+Set-Content -Path "ml-backend/src/ds_covid_backend/api/main.py" -Value $apiMain
+Write-Host "Created: ml-backend/src/ds_covid_backend/api/main.py" -ForegroundColor Yellow
+
+# Create sample app.py
+$appFile = "from fastapi import FastAPI
+from src.ds_covid_backend.api.main import router
+
+app = FastAPI(title=\"COVID-19 ML API\", version=\"0.1.0\")
+app.include_router(router)"
+
+Set-Content -Path "ml-backend/app.py" -Value $appFile
+Write-Host "Created: ml-backend/app.py" -ForegroundColor Yellow
+
+# Create sample test
+$testFile = "def test_sample():
+    assert 1 + 1 == 2"
+
+Set-Content -Path "ml-backend/tests/unit/test_sample.py" -Value $testFile
+Write-Host "Created: ml-backend/tests/unit/test_sample.py" -ForegroundColor Yellow
+
+Write-Host "`nStructure created successfully!" -ForegroundColor Green

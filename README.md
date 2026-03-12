@@ -1,283 +1,139 @@
-# 🦠 DS_COVID - Détection COVID-19
+# 🦠 DS_COVID - ML Microservice Refactoring
 
-[![CI/CD](https://github.com/Data-Team-DST/DS_COVID/actions/workflows/pipelinecici.yml/badge.svg)](https://github.com/Data-Team-DST/DS_COVID/actions/workflows/pipelinecici.yml)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.18+-orange.svg)](https://tensorflow.org)
+Production-ready microservice architecture for COVID-19 ML prediction model.
 
-## 📋 Description
-
-Application de **détection COVID-19 à partir d'images radiographiques** utilisant des techniques de Deep Learning et Machine Learning. Ce projet propose une solution complète pour la classification d'images pulmonaires en 4 catégories :
-
-- 🦠 **COVID** - Cas positifs de COVID-19
-- ✅ **Normal** - Radiographies pulmonaires saines
-- 💨 **Lung_Opacity** - Opacités pulmonaires
-- 🔬 **Viral Pneumonia** - Pneumonie virale
-
-## ✨ Fonctionnalités
-
-### 🧠 Modèles de Deep Learning
-- **Custom CNN** : Architecture CNN personnalisée optimisée pour l'imagerie médicale (5 blocs convolutionnels)
-- **Transfer Learning** : Support des modèles pré-entraînés (VGG16, ResNet50, EfficientNetB0, InceptionV3)
-- **Fine-tuning** : Possibilité de débloquer les couches supérieures pour un apprentissage plus fin
-
-### 🔄 Pipeline de Traitement d'Images
-- **ImageLoader** : Chargement d'images avec validation des chemins
-- **ImageResizer** : Redimensionnement avec préservation optionnelle du ratio d'aspect
-- **ImageNormalizer** : Normalisation (min-max, standard, custom)
-- **ImageAugmenter** : Augmentation de données (rotation, flip, zoom, bruit, luminosité)
-- **ImageMasker** : Application de masques binaires pour segmentation
-- **ImageFlattener** : Aplatissement pour modèles ML classiques
-
-### 🔍 Interprétabilité des Modèles
-- **Grad-CAM** : Visualisation des zones d'attention du modèle
-- **LIME** : Explications par segmentation d'image (super-pixels)
-- **SHAP** : Valeurs de Shapley pour explications au niveau pixel
-
-### 📊 Visualisation & Évaluation
-- Courbes d'entraînement (loss, accuracy, precision, recall)
-- Matrice de confusion
-- Rapports de classification détaillés
-
-## 🚀 Installation
-
-### Prérequis
-- Python 3.8 ou supérieur
-- pip ou conda
-
-### Installation Standard
+## 🚀 Quick Start
 
 ```bash
-# Cloner le repository
-git clone https://github.com/Data-Team-DST/DS_COVID.git
-cd DS_COVID
+# Activate environment
+cd ml-backend
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
 
-# Installer les dépendances
+# Install dependencies
 pip install -r requirements.txt
 
-# Installer le package en mode développement
-pip install -e .
+# Run API
+python app.py
+
+# Run tests
+pytest
 ```
 
-### Installation avec dépendances de développement
-
-```bash
-pip install -e ".[dev]"
-```
-
-### Installation sur Google Colab
-
-Le projet supporte nativement Google Colab. Utilisez simplement la cellule de configuration standalone :
-
-```python
-# Copiez le contenu de CELL_CONFIG_STANDALONE.py comme première cellule
-# La configuration est automatiquement détectée et adaptée pour Colab
-```
-
-## 📁 Structure du Projet
+## 📁 Project Structure
 
 ```
 DS_COVID/
-├── config/                          # Fichiers de configuration JSON
-│   ├── default_config.json          # Configuration par défaut
-│   └── colab_config.json            # Configuration spécifique Colab
+├── ml-backend/                    ← Production-ready backend
+│   ├── src/ds_covid_backend/      ← DDD Architecture
+│   │   ├── api/                   (FastAPI routes)
+│   │   ├── domain/                (Business logic)
+│   │   ├── application/           (Use cases)
+│   │   ├── infrastructure/        (Data access)
+│   │   └── config/                (Configuration)
+│   ├── tests/                     (Unit & integration tests)
+│   ├── venv/                      (Virtual environment)
+│   └── app.py                     (FastAPI app)
 │
-├── data/                            # Données (non incluses dans Git)
-│   ├── raw/                         # Dataset original
-│   │   └── COVID-19_Radiography_Dataset/
-│   └── processed/                   # Données transformées
+├── _REFACTORING_MICROSERVICE_/    ← Methodology & guides
+│   ├── 00_COMMENCER_ICI/          (Quick start)
+│   ├── 01_ARCHITECTURE/           (Technical design)
+│   ├── 02_PLANNING/               (Timeline & roadmap)
+│   ├── 03_SCRIPTS/                (Automation tools)
+│   ├── 04_GUIDES_JOUR_PAR_JOUR/   (Day-by-day instructions)
+│   └── 05_REFERENCE/              (Quick lookup)
 │
-├── models/                          # Modèles entraînés (.keras, .h5)
+├── migration_backup/              ← Local backup (not committed)
+├── docs_guides/                   ← Documentation index
+├── _OLD_ROOT_FILES/               ← Archived old files
 │
-├── notebooks/                       # Notebooks Jupyter
-│   ├── Main_Revamp.ipynb            # Notebook principal
-│   ├── Main_Revamp_colab.ipynb      # Version Colab
-│   └── test_*.ipynb                 # Notebooks de test
-│
-├── src/                             # Code source
-│   ├── features/                    # Extraction de features
-│   │   └── Pipelines/               # Pipelines sklearn
-│   │       └── transformateurs/     # Transformateurs personnalisés
-│   │           ├── image_augmentation.py
-│   │           ├── image_features.py
-│   │           ├── image_loaders.py
-│   │           ├── image_preprocessing.py
-│   │           └── utilities.py
-│   │
-│   ├── interpretability/            # Modules d'interprétabilité
-│   │   ├── gradcam.py               # Grad-CAM
-│   │   ├── lime_explainer.py        # LIME
-│   │   ├── shap_explainer.py        # SHAP
-│   │   └── utils.py                 # Utilitaires communs
-│   │
-│   ├── utils/                       # Utilitaires généraux
-│   │   ├── config.py                # Gestion de configuration
-│   │   ├── data_utils.py            # Chargement de données
-│   │   ├── model_builders.py        # Construction de modèles
-│   │   ├── training_utils.py        # Entraînement
-│   │   └── visualization_utils.py   # Visualisation
-│   │
-│   └── test/                        # Tests unitaires
-│
-├── .streamlit/                      # Configuration Streamlit
-├── pyproject.toml                   # Configuration du projet (PEP 517)
-├── requirements.txt                 # Dépendances Python
-└── README.md
+└── src/, notebooks/, page/        ← Original code (to migrate)
 ```
 
-## 💻 Utilisation
+## 🎯 Architecture: Domain-Driven Design (DDD)
 
-### Configuration
-
-La configuration est centralisée dans des fichiers JSON (`config/default_config.json`). Les principaux paramètres :
-
-```json
-{
-  "images": { "width": 256, "height": 256, "channels": 1 },
-  "training": { "batch_size": 32, "epochs": 50, "learning_rate": 0.001 },
-  "dataset": { "classes": ["COVID", "Normal", "Lung_Opacity", "Viral Pneumonia"] }
-}
+```
+API Layer (FastAPI)
+    ↓
+Application Layer (Use Cases)
+    ↓
+Domain Layer (Business Logic)
+    ↓
+Infrastructure Layer (TensorFlow, Storage)
 ```
 
-### Exemple d'utilisation basique
+## 📚 Documentation
 
-```python
-from src.utils.config import build_config
-from src.utils.data_utils import load_dataset, create_preprocessing_pipeline
-from src.utils.model_builders import build_custom_cnn, compile_model
+**Begin here:** [`_REFACTORING_MICROSERVICE_/README.md`](_REFACTORING_MICROSERVICE_/README.md)
 
-# Charger la configuration
-config = build_config(project_root, environment="local")
+Quick guides:
+- **Immediate action:** `_REFACTORING_MICROSERVICE_/00_COMMENCER_ICI/IMMEDIATE_ACTION.md`
+- **Architecture:** `_REFACTORING_MICROSERVICE_/01_ARCHITECTURE/`
+- **Day-by-day guide:** `_REFACTORING_MICROSERVICE_/04_GUIDES_JOUR_PAR_JOUR/JOUR_1_STRUCTURE_CREATION.md`
+- **Timeline:** `_REFACTORING_MICROSERVICE_/02_PLANNING/`
 
-# Charger les données
-image_paths, _, labels, labels_int = load_dataset(
-    data_dir=config.data_dir,
-    categories=config.classes,
-    n_images_per_class=500
-)
+## 🔄 Refactoring Phases
 
-# Créer le pipeline de prétraitement
-pipeline = create_preprocessing_pipeline(
-    img_size=(128, 128),
-    color_mode="RGB"
-)
+| Phase | Duration | Deliverable |
+|-------|----------|-------------|
+| **Phase 1** | Days 1-5 | ml-backend structure + environment |
+| **Phase 2** | Days 6-12 | ML pipeline + unit tests (40%) |
+| **Phase 3** | Days 13-18 | FastAPI endpoints + inference API |
+| **Phase 4** | Days 19-26 | CI/CD + Docker + Deployment |
 
-# Transformer les images
-images = pipeline.fit_transform(image_paths)
+**Current Status:** ✅ Phase 1 Complete (Jour 1)
 
-# Construire et compiler le modèle
-model = build_custom_cnn(
-    input_shape=(128, 128, 3),
-    num_classes=4
-)
-model = compile_model(model, learning_rate=0.001)
-```
+## 🛠️ Tech Stack
 
-### Transfer Learning avec Fine-tuning
+- **Framework:** FastAPI 0.104.1
+- **ML:** TensorFlow 2.x (TBD)
+- **Testing:** pytest 9.0.2
+- **Data:** pandas, numpy, scikit-learn
+- **Deployment:** Docker, GitHub Actions
 
-```python
-from src.utils.model_builders import (
-    build_transfer_learning_model,
-    unfreeze_top_layers
-)
+## 📖 For Different Roles
 
-# Phase 1 : Feature Extraction
-model, base_model = build_transfer_learning_model(
-    base_model_name="InceptionV3",
-    input_shape=(224, 224, 3),
-    num_classes=4,
-    freeze_base=True
-)
+- **👨‍💼 Product Manager** → Read `_REFACTORING_MICROSERVICE_/02_PLANNING/RESUME_EXECUTIF.md`
+- **👨‍💻 Developer** → Go to `ml-backend/` + `_REFACTORING_MICROSERVICE_/01_ARCHITECTURE/`
+- **🧪 QA/Tester** → Check `_REFACTORING_MICROSERVICE_/02_PLANNING/CHECKLIST_PROGRESSION.md`
+- **🚀 DevOps** → See `ml-backend/.gitignore` + Docker guides (coming soon)
 
-# Phase 2 : Fine-tuning
-model = unfreeze_top_layers(
-    base_model=base_model,
-    model=model,
-    n_layers=10,
-    learning_rate=5e-5
-)
-```
+## 🎓 Learning Path
 
-### Interprétabilité avec Grad-CAM
+1. Read: `_REFACTORING_MICROSERVICE_/00_COMMENCER_ICI/README.md`
+2. Understand: `_REFACTORING_MICROSERVICE_/01_ARCHITECTURE/ARCHITECTURE_FINAL.md`
+3. Plan: `_REFACTORING_MICROSERVICE_/02_PLANNING/`
+4. Execute: `_REFACTORING_MICROSERVICE_/04_GUIDES_JOUR_PAR_JOUR/`
 
-```python
-from src.interpretability import GradCAM, visualize_gradcam
+## 📦 Dependencies
 
-# Créer l'explainer
-gradcam = GradCAM(model)
+See `ml-backend/requirements.txt` for Python packages.
 
-# Calculer la heatmap pour une image
-heatmap = gradcam.compute_heatmap(image, class_idx=0)
+For old project context, see `_OLD_ROOT_FILES/` for archived documentation.
 
-# Visualiser
-visualize_gradcam(image, heatmap, class_name='COVID', confidence=0.95)
-```
+## ✅ Checklist
 
-## 📊 Dataset
+Progress tracking: `_REFACTORING_MICROSERVICE_/02_PLANNING/CHECKLIST_PROGRESSION.md`
 
-Ce projet utilise le **COVID-19 Radiography Database** disponible sur Kaggle :
+**Current:** 
+- ✅ Phase 1: Structure created
+- ⏳ Phase 2: Starting code migration
+- ⏳ Phase 3: API endpoints
+- ⏳ Phase 4: Production deployment
 
-- **Source** : [COVID-19 Radiography Database](https://www.kaggle.com/tawsifurrahman/covid19-radiography-database)
-- **Classes** : COVID (3,616), Normal (10,192), Lung Opacity (6,012), Viral Pneumonia (1,345)
-- **Format** : Images PNG en niveaux de gris
-- **Résolution** : 299x299 pixels
+## 🤝 Contributing
 
-### Téléchargement
+1. Activate venv: `cd ml-backend && source venv/bin/activate`
+2. Code follows DDD pattern (see architecture guide)
+3. All code requires tests (pytest)
+4. Push to branch matching phase
 
-```bash
-# Via Kaggle CLI
-kaggle datasets download -d tawsifurrahman/covid19-radiography-database
-unzip covid19-radiography-database.zip -d data/raw/COVID-19_Radiography_Dataset/
-```
+## 📞 Support
 
-## 🧪 Tests
-
-```bash
-# Exécuter tous les tests
-pytest
-
-# Tests avec couverture
-pytest --cov=src/ --cov-report=html
-
-# Tests spécifiques
-pytest src/test/test_pipelines_imports.py
-```
-
-## 🔧 CI/CD
-
-Le projet utilise GitHub Actions pour l'intégration continue :
-
-1. **Lint** : Vérification du code avec pylint (score minimum: 8/10)
-2. **Unit Tests** : Exécution des tests pytest avec couverture
-3. **SonarCloud** : Analyse de qualité du code
-
-## 👥 Auteurs
-
-- **Rafael Cepa** - *Développeur principal*
-- **Cirine** - *Contributrice*
-- **Steven Moire** - *Contributeur*
-
-## 📄 Licence
-
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-## 🙏 Remerciements
-
-- **DataScientest** pour l'encadrement du projet
-- L'équipe du **COVID-19 Radiography Database** pour le dataset
-- Les auteurs des méthodes d'interprétabilité (Grad-CAM, LIME, SHAP)
+Check documentation first: `_REFACTORING_MICROSERVICE_/05_REFERENCE/INDEX_DOCS.md`
 
 ---
 
-## 📚 Références
-
-- Selvaraju et al. "Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization" (2017)
-- Ribeiro et al. "Why Should I Trust You?: Explaining the Predictions of Any Classifier" (2016)
-- Lundberg & Lee "A Unified Approach to Interpreting Model Predictions" (2017)
-
----
-
-## 📖 Documentation Complémentaire
-
-Pour plus de détails sur les modules d'interprétabilité, consultez :
-- [src/interpretability/README.md](src/interpretability/README.md)
+**Last Updated:** Phase 1 Complete  
+**Status:** 🟢 Ready for Phase 2  
+**Next:** Code Migration (Jour 2)

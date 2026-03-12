@@ -101,7 +101,11 @@ class ImagePCA(BaseTransform):
                     yaxis_title="Variance Expliquée",
                     height=300
                 )
+<<<<<<< HEAD
+                st.plotly_chart(fig1, use_container_width=True)
+=======
                 st.plotly_chart(fig1, width="stretch")
+>>>>>>> origin/Dev
             
             with col2:
                 # Variance par composante (top 20)
@@ -118,7 +122,11 @@ class ImagePCA(BaseTransform):
                     yaxis_title="Variance",
                     height=300
                 )
+<<<<<<< HEAD
+                st.plotly_chart(fig2, use_container_width=True)
+=======
                 st.plotly_chart(fig2, width="stretch")
+>>>>>>> origin/Dev
             
             st.info(f"📊 Total variance expliquée: **{cumsum[-1]:.2%}** avec {self.n_components} composantes")
     
@@ -204,7 +212,11 @@ class ImagePCA(BaseTransform):
                     yaxis_title="Variance Expliquée",
                     height=300
                 )
+<<<<<<< HEAD
+                st.plotly_chart(fig1, use_container_width=True)
+=======
                 st.plotly_chart(fig1, width="stretch")
+>>>>>>> origin/Dev
             
             with col2:
                 # Variance par composante (top 20)
@@ -221,7 +233,11 @@ class ImagePCA(BaseTransform):
                     yaxis_title="Variance",
                     height=300
                 )
+<<<<<<< HEAD
+                st.plotly_chart(fig2, use_container_width=True)
+=======
                 st.plotly_chart(fig2, width="stretch")
+>>>>>>> origin/Dev
             
             st.info(f"📊 Total variance expliquée: **{cumsum[-1]:.2%}** avec {self.n_components} composantes")
     

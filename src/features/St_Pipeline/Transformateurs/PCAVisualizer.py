@@ -159,7 +159,11 @@ class PCAVisualizer(BaseTransform):
             fig.update_yaxes(title_text="Variance Cumulée", row=1, col=2)
             
             fig.update_layout(height=400, showlegend=False)
+<<<<<<< HEAD
+            st.plotly_chart(fig, use_container_width=True)
+=======
             st.plotly_chart(fig, width="stretch")
+>>>>>>> origin/Dev
         
         else:
             # Matplotlib
@@ -214,7 +218,11 @@ class PCAVisualizer(BaseTransform):
             fig.update_traces(marker=dict(size=8, opacity=0.7))
             fig.update_layout(height=500)
             
+<<<<<<< HEAD
+            st.plotly_chart(fig, use_container_width=True)
+=======
             st.plotly_chart(fig, width="stretch")
+>>>>>>> origin/Dev
         
         else:
             # Matplotlib
@@ -267,7 +275,11 @@ class PCAVisualizer(BaseTransform):
             fig.update_traces(marker=dict(size=5, opacity=0.7))
             fig.update_layout(height=600)
             
+<<<<<<< HEAD
+            st.plotly_chart(fig, use_container_width=True)
+=======
             st.plotly_chart(fig, width="stretch")
+>>>>>>> origin/Dev
         
         else:
             # Matplotlib 3D

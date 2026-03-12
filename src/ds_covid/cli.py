@@ -7,6 +7,17 @@ import sys
 from pathlib import Path
 from typing import Optional
 import os
+import subprocess
+from .models import build_baseline_cnn,MaskApplicator
+from .features import load_images_flat, DEFAULT_CLASS_PATHS, DEFAULT_CLASS_LABELS
+from sklearn.model_selection import train_test_split
+import numpy as np
+import tensorflow as tf
+from PIL import Image
+import numpy as np
+from .features import DEFAULT_CLASS_LABELS,get_image_mask_pairs
+import cv2
+from tqdm import tqdm
 
 
 def train_model():
@@ -60,12 +71,6 @@ def train_model():
     )
     
     args = parser.parse_args()
-    
-    # Import here to avoid loading heavy dependencies if not needed
-    from .models import build_baseline_cnn
-    from .features import load_images_flat, DEFAULT_CLASS_PATHS, DEFAULT_CLASS_LABELS
-    from sklearn.model_selection import train_test_split
-    import numpy as np
     
     print("🚀 Starting COVID-19 model training...")
     print(f"📁 Dataset: {args.dataset_path}")
@@ -172,12 +177,6 @@ def predict():
     
     args = parser.parse_args()
     
-    # Import dependencies
-    import tensorflow as tf
-    from PIL import Image
-    import numpy as np
-    from .features import DEFAULT_CLASS_LABELS
-    
     print(f"🔮 Making prediction...")
     print(f"🧠 Model: {args.model_path}")
     print(f"🖼️  Image: {args.image_path}")
@@ -274,11 +273,6 @@ def apply_masks():
     
     args = parser.parse_args()
     
-    from .models import MaskApplicator
-    from .features import get_image_mask_pairs
-    import cv2
-    from tqdm import tqdm
-    
     print(f"🎭 Applying masks...")
     print(f"📁 Dataset: {args.dataset_path}")
     print(f"📂 Category: {args.category}")
@@ -321,8 +315,6 @@ def apply_masks():
 
 def run_streamlit():
     """CLI command for running Streamlit app"""
-    import subprocess
-    import sys
     
     try:
         # Find streamlit app path
@@ -349,9 +341,6 @@ def setup_colab():
     """Setup function for Google Colab"""
     print("🔧 Setting up DS-COVID for Google Colab...")
     
-    # This function can be called from Colab to setup the environment
-    import subprocess
-    import sys
     
     commands = [
         "pip install opencv-python-headless",

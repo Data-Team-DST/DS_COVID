@@ -1,0 +1,780 @@
+% Template LaTeX professionnel pour rapport académique
+\documentclass[12pt,a4paper]{article}
+
+% Packages essentiels
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Configuration de la page
+\geometry{
+  left=2.5cm,
+  right=2.5cm,
+  top=3cm,
+  bottom=3cm,
+  headheight=15pt
+}
+
+% Configuration des liens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor=red,
+}
+
+% Configuration des en-têtes
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Analyse de Radiographies COVID-19}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Configuration des titres
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{1em}{}
+
+% Configuration des figures et tableaux
+\captionsetup{font=small,labelfont=bf}
+
+% Configuration du code
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny,
+    tabsize=2
+}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{titling}
+
+\pretitle{%
+\begin{center}
+  {\Huge\bfseries Analyse de Radiographies pulmonaires COVID-19}\\[2cm]
+  \includegraphics[width=8cm]{fig0.png}\\[2cm]
+  {\Large Classification automatisée par Intelligence Artificielle}\\[0.3cm]
+  {\large Projet de Data Science - Deep Learning}\\[2cm]   
+\end{center}
+} 
+
+
+
+\title{} % Vide, car le contenu est déjà inclus ci-dessus
+\author{
+    \textbf{Équipe projet :}\\[0.2cm]
+    Cirine Bouamrane 
+    Léna Bacot 
+    Steven Moire 
+    Rafael Cepa\\[0.5cm]
+    \textbf{Encadré par :}\\
+    Nicolas Mormiche
+}
+
+\date{\today}
+
+\usepackage[colorlinks=true, linkcolor=black]{hyperref}
+
+\begin{document}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=black,
+    citecolor=black
+}
+
+% Page de titre
+\maketitle
+\thispagestyle{empty}
+
+\newpage
+
+
+
+
+% Début du contenu principal
+\section{Introduction}
+\label{sec:introduction}
+
+
+La pandémie de COVID-19, causée par le virus SARS-CoV-2, a représenté un
+défi sanitaire mondial sans précédent avec plus de 690 millions de cas
+confirmés et 6,9 millions de décès recensés selon l'OMS. Dans ce
+contexte d'urgence sanitaire, l'identification rapide et précise des cas
+positifs s'est révélée cruciale pour maîtriser la transmission virale et
+optimiser la prise en charge thérapeutique.
+
+Les tests RT-PCR, bien que considérés comme référence diagnostique,
+présentent des limitations significatives : sensibilité variable
+(70-95\%) avec un taux de faux négatifs pouvant atteindre 20-30\%, délais
+d'obtention des résultats (6-24h), et coûts élevés. En parallèle,
+l'imagerie médicale, notamment la tomodensitométrie (CT), a été
+largement adoptée avec une sensibilité supérieure à 90\%, mais elle reste
+coûteuse, expose les patients à une irradiation ionisante notable (2-7
+mSv), et nécessite des équipements spécialisés.
+
+La radiographie thoracique (CXR) s'est imposée comme une alternative
+diagnostique plus accessible, rapide (< 5 minutes), économique et à
+faible irradiation (0,02-0,1 mSv). Cependant, son interprétation demeure
+complexe en raison des similitudes radiologiques entre les
+manifestations COVID-19 et d'autres pneumonies virales, bactériennes ou
+pathologies pulmonaires interstitielles, générant un risque d'erreurs
+diagnostiques même chez des radiologues expérimentés.
+
+Les manifestations radiographiques typiques du COVID-19 incluent :
+opacités en verre dépoli bilatérales, consolidations périphériques,
+épaississement septal, et distribution préférentiellement
+postéro-basale. Néanmoins, ces signes peuvent être absents dans 10-15\%
+des cas confirmés ou mimés par d'autres pathologies.
+
+
+L'intelligence artificielle et l'apprentissage profond, notamment via
+les réseaux de neurones convolutionnels (CNN), ont démontré leur
+potentiel révolutionnaire dans l'analyse automatisée des radiographies
+thoraciques COVID-19. Des études récentes rapportent des performances
+diagnostiques comparables, voire supérieures, à celles de radiologues
+expérimentés, avec des sensibilités et spécificités dépassant 90-95\%
+dans certains cas.
+
+Ces approches permettent de surmonter les limitations humaines : fatigue
+visuelle, variabilité inter-observateur, et contraintes temporelles en
+contexte de forte affluence. De plus, elles offrent une standardisation
+de l'interprétation et une disponibilité 24h/24, particulièrement
+précieuse dans les pays en développement ou les zones rurales avec accès
+limité à l'expertise radiologique.
+
+Notre projet s'inscrira dans cette dynamique en visant à développer une méthode robuste intégrant dès la première étape une étude approfondie des données dans la partie datavisualisation, permettant de comprendre leur distribution et caractéristiques. Ensuite, nous procèderons au prétraitement comprenant redimensionnement, conversion en niveaux de gris, normalisation des pixels et augmentation des données pour enrichir le dataset et limiter le surapprentissage.
+
+En modélisation, nous testerons trois modèles classiques de machine learning : SVM, KNN et Random Forest. Puis, en deep learning, nous utiliserons un modèle baseline, InceptionV3 pré-entraîné sur ImageNet, adapté à notre tâche. Durant la phase d'optimisation, nous améliorerons les performances des modèles de machine learning grâce à la recherche sur grille (grid search) et en expérimentant avec le classificateur XGBoost.
+
+Pour finir, nous appliquerons plusieurs méthodes d'interprétabilité sur les résultats obtenus avec le modèle deep learning, notamment LIME, SHAP et Grad-CAM, afin de garantir une meilleure compréhension et confiance dans les décisions du système.
+
+Cette démarche complète et structurée permettra de combiner rigueur scientifique, performance et interprétabilité pour une application fiable en contexte médical, facilitant son adoption même dans des environnements avec des ressources diagnostiques limitées.
+
+\section{Exploration des données et visualisation}
+\label{sec:exploration}
+
+\subsection{Base de données}
+\label{subsec:database}
+
+La base de données utilisée pour ce projet est la COVID-19 Radiography Database accessible sur Kaggle. Cette base de données regroupe différentes catégories d'images radiographiques pulmonaires permettant la détection et la classification des infections, notamment du Covid-19. Elle inclut :
+
+\begin{itemize}
+\item Des radiographies thoraciques de patients confirmés positifs au Covid-19.
+\item Des images de cas jugés normaux (sans infection pulmonaire détectée).
+\item Des radiographies de pneumonies virales autres que Covid-19.
+\item Des images présentant des opacités pulmonaires (infections pulmonaires non-COVID de type "Lung Opacity").
+\end{itemize}
+
+Les tailles des sous-ensembles composant la base de données sont représentées dans le tableau~\ref{tab:dataset}.
+
+\begin{table}[H]
+\centering
+\caption{Répartition des classes dans le dataset COVID-19 Radiography Database}
+\label{tab:dataset}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Classes} & \textbf{Images} & \textbf{Masques} \\
+\midrule
+COVID-19 & 3,616 & 3,616 \\
+Normal & 10,192 & 10,192 \\
+Pneumonie virale & 1,345 & 1,345 \\
+Opacité pulmonaire & 6,012 & 6,012 \\
+\midrule
+\textbf{Total} & \textbf{21,165} & \textbf{21,165} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ces images proviennent de multiples sources publiques, publications spécialisées et collaborations avec des hôpitaux.
+
+Un exemple d'une image de la classe normale et son masque sont représentés dans la figure~\ref{fig:example}.
+
+
+\subsection{Analyse des données (DataViz)}
+\label{subsec:dataviz}
+
+\subsubsection{Histogramme de la luminosité et du contraste}
+\label{subsubsec:histogramme}
+
+\paragraph{Luminosité :} Il s'agit de l'intensité lumineuse globale d'une image, c'est-à-dire du niveau moyen de clarté ou d'obscurité perçu sur l'ensemble de l'image. Mathématiquement, c'est simplement la moyenne des valeurs des canaux de chaque pixel. Pour une image en couleurs (RGB), on utilise la pondération de la norme ITU-R BT.601, correspondant à la sensibilité de l'œil humain (0.299 pour R, 0.587 pour G, 0.114 pour B).
+
+\paragraph{Contraste :} Le contraste représente la différence de luminosité entre les zones claires et sombres d'une image. Mathématiquement, c'est l'écart-type (std) de la valeur des pixels. Un contraste élevé signifie que la différence entre les parties les plus sombres et les plus claires est importante ; à l'inverse, un faible contraste indique que les valeurs de gris sont proches les unes des autres, rendant les détails moins visibles.
+
+Un histogramme de luminosité et de contraste fournit des informations essentielles sur la répartition des tons et la qualité d'exposition d'une image. L'histogramme permet de juger de la bonne exposition, du niveau de contraste, de repérer d'éventuelles pertes d'information, et de guider les ajustements à apporter pour optimiser une image.
+
+Il indique comment les pixels de l'image sont répartis des tons les plus foncés (gauche) aux plus clairs (droite) :
+
+\begin{itemize}
+\item À gauche : pixels sombres (ombres, noirs)
+\item Au centre : tons moyens (gris)  
+\item À droite : pixels clairs (hautes lumières, blancs)
+\end{itemize}
+
+Il permet d'identifier :
+
+\begin{itemize}
+\item Une sous-exposition (pic vers la gauche : image trop sombre)
+\item Une surexposition (pic vers la droite : image trop claire)
+\item Un bon contraste (répartition étalée de la gauche à la droite : l'image contient à la fois des zones sombres et claires, donc beaucoup de détails)
+\item Un faible contraste (histogramme ramené vers le centre, l'image paraît "plate" avec surtout des tons moyens)
+\end{itemize}
+
+L'histogramme aide aussi à :
+
+\begin{itemize}
+\item Éviter l'écrêtage : apparition de barres hautes à l'extrême gauche ou droite, signalant une perte d'information dans les ombres ou les hautes lumières.
+\item Ajuster la correction de la luminosité et du contraste pour améliorer la lisibilité ou la qualité technique de l'image.
+\end{itemize}
+
+Nous avons généré les histogrammes de luminosité pour chaque catégorie d'images (normal, Covid, pneumonie et lung). Les résultats correspondants sont illustrés dans la figure~\ref{fig:histogramme}.
+
+
+\paragraph{Interprétation :}
+
+À savoir :
+\begin{itemize}
+\item \textbf{Axe horizontal :} les valeurs de gris, de 0 (noir) à 255 (blanc).
+\item \textbf{Axe vertical :} nombre d'images.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Analyse comparative des histogrammes par classe}
+\label{tab:histogramme_analyse}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Type d'image} & \textbf{Histogramme luminosité} & \textbf{Histogramme contraste} \\
+\midrule
+Image normale & Ton vers le clair & Faible contraste \\
+Image COVID & Ton vers le clair & Bon contraste \\
+Image Pneumonie & Ton moyen (gris équilibré) & Bon contraste \\
+Image Lung Opacity & Ton vers le clair & Bon contraste \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Luminosité Globale :} 
+Exprime la répartition de la luminosité des images, pour chaque catégorie.
+
+
+\paragraph{Contraste Globale :}
+Exprime la répartition du contraste des images, pour chaque catégorie.
+
+
+\subsubsection{Visualisation des images en L et en RGB}
+\label{subsubsec:visualisation_rgb}
+
+
+140 images RGB détectées (hors norme) sur un total de 1345 images provenant de Viral Pneumonia.
+
+Après analyse, nous avons conclu qu'il s'agit en fait de 'faux RGB', c'est à dire des images encodées en 3 canaux, mais représentant en réalité une image L. En effet, quand on a essayé d'afficher quelques intrus, nous avions l'impression de voir des niveaux de gris. Pour chaque intrus 'img', convertie en np.array, nous avons :
+
+
+Ces 140 images sont bien codées en 3 canaux RGB, mais on a, à chaque fois, la même valeur pour les trois canaux, c'est donc une redondance d'informations, et la conversion en L sera alors encore plus simple. Pour rappel, une image RGB est convertie en L selon la norme ITU-R BT.601 (citée plus haut), grâce à la formule :
+
+\begin{equation}
+L = 0.299 \times R + 0.587 \times G + 0.114 \times B
+\end{equation}
+
+Autrement dit, le pixel converti en L n'est autre que la même valeur commune aux trois channels, on peut donc simplement choisir le premier canal (R, i.e. img\_array[:,:,0]) pour 'convertir' l'image en L.
+
+Nous avons remarqué qu’en réalité, ce problème est exactement le même pour les masks, qui sont tous des “faux RGB”. Pour la suite de notre projet, nous avons décidé d’utiliser les fonctions de conversion des packages reconnus (PIL, cv2 ...), même si utiliser le premier canal (par exemple) suffirait. En effet, nous voulons tester différentes approches, et essayer de comprendre ce qu’apportent ces fonctions. Il nous semblait cependant important de montrer notre réflexion face à ce problème. 
+
+\paragraph{ Analyse métier :}
+\begin{itemize}
+\item Les radiographies doivent être en niveau de gris (L), car les informations pertinentes ne sont pas dans les couleurs. 
+
+\item La présence de plusieurs images en RGB est donc anormale. 
+
+\item Cela peut indiquer des erreurs de traitement ou d'export depuis un outil d'annotation. 
+\end{itemize}
+
+\paragraph{Recommandations techniques :}
+
+\begin{itemize}
+\item Vérifier la cohérence du format des images avant le prétraitement.
+\item Identifier les images en RGB et les vérifier visuellement.
+\item Standardiser le format en niveaux de gris pour l'ensemble du dataset.
+\item La présence de plusieurs images en RGB est donc anormale.
+\end{itemize}
+
+
+\subsubsection{Interface StreamLit pour l'analyse}
+\label{subsubsec:streamlit}
+
+Nous avons développé une interface interactive utilisant StreamLit pour faciliter l'exploration et l'analyse des données.
+
+\paragraph{Introduction :} L'interface permet une analyse collaborative et interactive des données d'images radiographiques.
+
+\paragraph{Outils Collaboratifs :} L'interface offre des fonctionnalités d'inspection des fichiers et des fonctions backend.
+
+
+
+\paragraph{Inspection détaillée des fonctions :}
+
+
+
+\paragraph{Analyse Complète (Déséquilibrée) :}
+
+Nous avons utilisé les fonctionnalités de l'interface pour traiter et analyser nos données d'images sur l'ensemble complet du dataset.
+
+
+Les métriques analysées incluent :
+\begin{itemize}
+\item \textbf{Luminosité / Intensité :} Moyenne des valeurs de pixels, reflète la clarté globale de l'image.
+\item \textbf{Contraste :} Écart-type des valeurs de pixels, indique la variabilité des tons.
+\item \textbf{Entropie :} Mesure de l'information contenue dans l'image.
+\item \textbf{Netteté :} Évaluation de la précision des contours et détails.
+\end{itemize}
+
+\paragraph{Analyse Équilibrée :}
+
+Pour comparer les résultats, nous avons également effectué une analyse sur un sous-ensemble équilibré du dataset.
+
+
+
+\subsubsection{Génération d'images masquées et statistiques}
+\label{subsubsec:images_masquees}
+
+Cette fonctionnalité, appelée par un notebook, permet de générer des images masquées à l'aide d'images et de masques de notre dataset. La fonction permet, en lui donnant une image et un masque, de l'appliquer pour générer une image masquée, avec une possibilité de redimensionnement de l'image (dsize = 256×256 pixels).
+\paragraph{Exemple Génération Image Masqué :}
+
+La fonction permet en lui donnant une image et un masque, de l’appliquer pour générer une image masquée, avec une possibilité de redimensionnement de l’image. (Figure 12) 
+
+
+
+\section{Prétraitement des données}
+\label{sec:preprocessing}
+
+Suite à l'étape de data visualisation menée sur le jeu de données, une analyse exploratoire approfondie nous a permis d'identifier les caractéristiques clés et les problématiques spécifiques à adresser lors du préprocessing. Les visualisations ont mis en évidence la nécessité d'un traitement homogène des images pour faciliter l'analyse ultérieure. En conséquence, la première opération consistera à convertir l'ensemble des images initialement au format RGB en niveaux de gris. Cette conversion permet d'éliminer l'information chromatique et de se concentrer sur l'intensité lumineuse, simplifiant le cadre d'apprentissage et renforçant la cohérence inter-échantillons.
+
+Par ailleurs, l’étude des classes a révélé un déséquilibre important entre les catégories «pneumonia» et «normal». Pour pallier ce problème et éviter les biais d’apprentissage, nous appliquerons des stratégies d’échantillonnage adaptées: un sur-échantillonnage sera réalisé pour la classe minoritaire «pneumonia» afin d’accroître sa représentativité dans le corpus, tandis qu’un sous-échantillonnage viendra réduire la taille de la classe majoritaire «normal», poursuivant ainsi l’objectif d’obtenir un jeu de données plus équilibré et approprié à l’entraînement de modèles robustes. 
+
+\subsection{Redimensionnement et conversion en niveaux de gris}
+\label{subsec:redimensionnement}
+
+Dans la phase initiale du pré-processing des données, nous appliquons un redimensionnement des images dont la dimension initiale est de 299 pixels, pour les réduire à une taille uniforme de 256 pixels. Ce choix vise à garantir une cohérence des entrées du modèle tout en facilitant le traitement par lot et en réduisant la charge computationnelle. Ce redimensionnement est réalisé en utilisant des techniques d'interpolation adaptées, telles que l'interpolation bicubique, afin de préserver au mieux la qualité et les détails pertinents des images.
+
+Par la suite, la conversion de l'ensemble des images du format RGB vers une représentation en niveaux de gris est effectuée. Cette transformation réduit la dimension d'entrée des données de trois canaux à un seul, diminuant ainsi la complexité du modèle tout en conservant l'essentiel de l'information structurelle pertinente, particulièrement dans le contexte d'images médicales où la couleur est souvent secondaire. Cette étape est particulièrement judicieuse dans un cadre de classification, car elle simplifie le signal d'entrée, réduit le bruit potentiel lié à la variation chromatique, et permet d'optimiser les performances des algorithmes d'apprentissage en concentrant l'analyse sur les contrastes et textures essentielles à la discrimination des classes.
+
+
+
+Un exemple des images de la classe pneumonie obtenue après conversion en niveaux de gris et redimensionnement est représenté dans la figure~\ref{fig:exemple_conversion}.
+
+
+\subsection{Normalisation des pixels}
+\label{subsec:normalisation}
+
+Après redimensionnement, la normalisation des valeurs de pixels est essentielle pour aider les modèles d'apprentissage profond à converger rapidement. Dans notre cas, nous avons choisi de normaliser les pixels dans une plage [-1,1]. Cette normalisation permet d'accélérer la convergence et d'améliorer la stabilité numérique des algorithmes d'optimisation.
+
+
+\subsection{Augmentation des données}
+\label{subsec:augmentation}
+
+Lors du prétraitement des données, nous avons initialement chargé 3616 images pour la classe covid, 10192 images pour la classe normal, 1345 images pour la classe viral et 6012 images pour la classe lung. Afin d'équilibrer le nombre d'images par classe, une stratégie combinant sous-échantillonnage (undersampling) et sur-échantillonnage (oversampling) a été appliquée : la classe viral, initialement sous-représentée, a été sur-échantillonnée par augmentation de données pour atteindre 3000 images, tandis que les classes normal, covid et lung seront sous-échantillonnées afin d'obtenir un ensemble de données plus équilibré. Cette démarche vise à limiter les biais liés à un déséquilibre entre classes lors de l'entraînement du modèle.
+
+\subsubsection{Sous-échantillonnage}
+\label{subsubsec:undersampling}
+
+Le sous-échantillonnage consiste à réduire le nombre d’exemples de la classe majoritaire dans un jeu de données afin d’équilibrer la distribution des classes. Cette méthode implique généralement de supprimer aléatoirement des exemples de la classe majoritaire jusqu’à ce que sa taille soit comparable à celle de la classe minoritaire. L’objectif est d’éviter que la classe dominante ne biaise la performance du modèle, tout en cherchant à conserver la diversité des données restantes. Le code détaillé est disponible en annexe~\ref{app:undersampling}.
+
+\subsubsection{Sur-échantillonnage}  
+\label{subsubsec:oversampling}
+
+Le sur-échantillonnage consiste à augmenter le nombre d’exemples de la classe minoritaire, soit en dupliquant aléatoirement des exemples existants, soit en générant de nouveaux exemples synthétiques. Ce procédé permet d’équilibrer la taille des classes et de renforcer la capacité du modèle à apprendre les caractéristiques propres à la classe minoritaire, limitant ainsi les problèmes liés à un déséquilibre de classes lors de l’entraînement. Le code détaillé est disponible en annexe~\ref{app:oversampling}.
+
+
+\section{Modélisation}
+\label{sec:modeling}
+
+\subsection{Modèles de référence (Baseline)}
+\label{subsec:baseline}
+Un modèle baseline désigne un modèle simple ou rudimentaire utilisé en machine learning pour servir de point de comparaison aux modèles plus complexes développés par la suite. Son objectif principal n’est pas d’obtenir la meilleure précision possible, mais d’établir un niveau de performance minimal que tout modèle plus sophistiqué doit dépasser pour être jugé pertinent. [6] 
+Un modèle baseline en classification peut consister à prédire systématiquement la classe majoritaire du jeu de données. 
+
+En régression, il s’agira par exemple de prédire la valeur moyenne ou médiane de la variable cible, quelle que soit l’entrée. 
+
+Les modèles baseline ne cherchent pas la performance, mais servent à évaluer la difficulté intrinsèque du problème. 
+
+Exemples de modèles baseline: 
+
+\begin{itemize}
+
+\item Pour classification: prédire la classe majoritaire, prédire au hasard, DummyClassifier. 
+\item Pour régression: prédire la moyenne/médiane, DummyRegressor. 
+
+\end{itemize}
+
+Nous avons choisi de tester les méthodes de machines learning suivantes : SVM, KNN et Forest Random. 
+
+\subsection{Modèles d'apprentissage automatique classiques}
+\label{subsubsec:ml_classiques}
+
+Nous avons évalué trois algorithmes d'apprentissage automatique classiques pour établir une référence de performance :
+
+\paragraph{Support Vector Machine (SVM)}
+Un SVM (Support Vector Machine) est un algorithme supervisé de classification et de régression. Il fonctionne en trouvant l'hyperplan optimal qui sépare les différentes classes dans l'espace des caractéristiques, en maximisant la marge entre les classes.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{fig32.png}
+\caption{Principe de fonctionnement du SVM}
+\label{fig:principe_svm}
+\end{figure}
+
+\paragraph{k-Nearest Neighbors (k-NN)}
+L'algorithme k-NN classe un échantillon en fonction de la majorité des k voisins les plus proches dans l'espace des caractéristiques. Il attribue alors la classe la plus fréquente parmi ces voisins ("majorité") en classification.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{fig33.png}
+\caption{Principe de fonctionnement des k-NN}
+\label{fig:principe_knn}
+\end{figure}
+
+\paragraph{Random Forest}
+Random Forest est un algorithme d'ensemble qui combine plusieurs arbres de décision. Chaque arbre est entraîné sur un sous-ensemble aléatoire des données et des caractéristiques.\\
+La prédiction finale est obtenue par vote majoritaire des arbres individuels. Le modèle est très performant pour les données tabulaires et mixtes (catégorielles/numériques), mais peut être moins adapté à des données très éparses ou avec beaucoup de valeurs manquantes.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{fig34.png}
+\caption{Principe de fonctionnement de Random Forest}
+\label{fig:principe_rf}
+\end{figure}
+
+\paragraph{Avantages et inconveniences :}
+\begin{itemize}
+\item KNN: très simple, mais peu efficace sur des volumes importants ou en présence de bruit. 
+\item SVM: performant et robuste sur petites/moyennes dimensions, mais coûteux et difficile à régler. 
+\item Random Forest: généraliste et précis, bien adapté aux données complexes, mais lourd en calcul et moins interprétable.
+\end{itemize}
+
+\paragraph{Résultats des modèles classiques}
+
+Les résultats des métriques obtenus ont été enregistrés dans des rapports au format .pdf ou .docx. Un exemple de ces rapports est disponible en annexe 9.7.
+Les résultats de la matrice de confusion obtenus avec les 3 modèles de machine learning sur 200 données d'entraînement de chaque classe sont représentés dans la figure~\ref{fig:matrice_confusion_ml}.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{fig35a.png}\\[0.5em]
+    %\caption*{(a) Image de la base de données}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{fig35b.png}\\[0.5em]
+    %\caption*{(b) Masque correspondant}
+\end{minipage}
+ \includegraphics[width=0.7\textwidth]{fig35c.png}
+\caption{Résultats de la matrice de confusion pour les trois modèles SVM, k-NN et Random Forest}
+\label{fig:matrice_confusion_ml}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Comparaison des modèles de classification}
+\label{tab:comparaison_modeles}
+\begin{tabular}{p{3cm}p{4cm}p{5cm}p{3cm}}
+\toprule
+\textbf{Modèle} & \textbf{Points forts} & \textbf{Points faibles} & \textbf{Performance globale} \\
+\midrule
+Random Forest & Bonne précision, surtout sur normal et viral & Confusion covid $\leftrightarrow$ lung & Meilleurcompromis \\
+Linear SVM & Bonne généralisation, viral bien reconnu & Confusion lung $\leftrightarrow$ covid et normal $\leftrightarrow$ covid & Moinsperformant \\
+KNN & SIMPLE, normal bien reconnu & Confusions massives, surtout covid $\leftrightarrow$ normal et lung $\leftrightarrow$ normal & Moyenne \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+D’après les résultats obtenus on a :  
+Le Random Forest est le modèle le plus performant et le plus équilibré pour cette tâche. 
+Il présente la meilleure capacité de généralisation, notamment pour les classes normal et viral, malgré une confusion entre covid et lung, qu’on pourrait réduire par une meilleure sélection de caractéristiques ou un ensemble de données plus diversifié ou en utilisant des méthodes d’optimisations. 
+\subsection{Apprentissage profond}
+\label{subsec:deep_learning}
+
+\subsubsection{Architecture InceptionV3}
+\label{subsubsec:inceptionv3}
+
+Le modèle baseline InceptionV3 est un réseau de neurones à convolution profond de 48 couches comportant des modules « Inception » qui exécutent plusieurs opérations convolutives de tailles différentes en parallèle, puis concatènent leurs résultats. Conçu par Google, il est très utilisé en vision par ordinateur pour la classification d'images et sert de point de départ (baseline) lors de l'application du transfert d'apprentissage.
+
+\paragraph{Avantages d'InceptionV3 :}
+\begin{itemize}
+\item Précision élevée pour la classification d'images grâce à la profondeur et à la structure modulaire du réseau.
+\item Pré-entraînement sur ImageNet : permet d'obtenir immédiatement de bonnes performances sur des jeux de données où les images ont des similarités avec ImageNet.
+\item Architecture optimisée qui réduit le nombre de paramètres tout en maintenant la performance.
+\end{itemize}
+
+\paragraph{Implémentation et adaptation}
+
+Pour la classification multiclasses des images radiographiques en COVID-19, pneumonie virale, opacité pulmonaire et normal, nous avons utilisé le modèle InceptionV3 pré-entraîné sur ImageNet comme base d'extraction de caractéristiques. Pour adapter ce modèle à notre tâche spécifique, nous avons employé le modèle séquentiel de Keras, qui permet de créer un réseau de neurones en empilant des couches les unes après les autres.
+
+Nous avons ajouté sur la base InceptionV3 plusieurs couches personnalisées :
+\begin{itemize}
+\item Une couche d'aplatissement (Flatten)
+\item Une couche dense avec activation ReLU
+\item Une couche Dropout pour éviter le surapprentissage
+\item Une couche dense finale avec activation softmax correspondant au nombre de classes
+\end{itemize}
+
+Le modèle a ensuite été compilé avec l'optimiseur Adam, la fonction de perte adaptée aux labels entiers (sparse categorical crossentropy) pour la classification multiclasse, et la métrique d'évaluation précision (La précision mesure la proportion de prédictions positives correctes parmi toutes les prédictions positives du modèle. Elle évalue la capacité du modèle à éviter les faux positifs.). 
+
+De plus, nous avons intégré le callback ReduceLROnPlateau, qui ajuste automatiquement le taux d’apprentissage en fonction de la stagnation de la métrique de validation. Ce callback réduit le learning rate lorsque la performance cesse de s'améliorer, aidant ainsi le modèle à converger plus finement et à sortir des plateaux d’apprentissage. 
+
+\paragraph{Entraînement et résultats}
+
+Notre modèle a été entraîné sur 3000 données de chaque classe avec 25 epochs. Les résultats des courbes d'accuracy et de loss obtenus sont représentés dans la figure~\ref{fig:courbes_training}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{fig36.png}
+\caption{Courbes de loss et d'accuracy durant l'entraînement}
+\label{fig:courbes_training}
+\end{figure}
+
+\paragraph{Interprétation des résultats}
+
+\paragraph {Courbe de précision (Accuracy) :} 
+
+La courbe de précision d’entraînement demeure très élevée tout au long des époques, se stabilisant autour de 0.98 à 1.00. Cela indique que le modèle apprend efficacement sur les données d’entraînement. 
+
+La précision sur la validation est généralement stable autour de 0.90, avec de légères fluctuations et un point de chute net vers la 8 époque avant un retour rapide vers des valeurs élevées. 
+
+Cette différence entre la précision d’entraînement et de validation, notamment le pic de baisse, peut signaler une difficulté du modèle à généraliser sur certains lots de validation (batch) ou une instabilité temporaire liée à la répartition des données. 
+
+\paragraph {Courbe de la fonction de perte (Loss) :} 
+
+La perte d’entraînement reste constante et très faible, ce qui montre une optimisation maîtrisée du modèle sur les données apprises. 
+
+La perte de validation présente plusieurs fluctuations et un pic important à la 8 époque, ce qui correspond à la baisse de précision observée sur la même époque. 
+
+Après ce pic, la courbe retrouve sa tendance initiale. Ce comportement peut être lié à l’arrivée de batchs atypiques en validation, un bruit dans les données, ou à une étape critique de régularisation du modèle. 
+\paragraph {Conclusion:} 
+\begin{itemize}
+\item Le modèle apprend très bien et atteint une précision très haute sur l'entraînement.
+\item La précision en validation reste élevée, mais le modèle montre une légère tendance au surapprentissage (overfitting), visible par la différence entre les deux courbes et les pics de perte/accuracy.
+\item Pour améliorer la robustesse, il pourrait être pertinent d'effectuer davantage d'optimisations : data augmentation (diversifier les données), ou tuning de l'hyperparamètre de régularisation.
+\end{itemize}
+
+\subsubsection{Évaluation par matrice de confusion}
+\label{subsubsec:matrice_confusion_dl}
+
+Nous avons calculé la matrice de confusion pour évaluer les performances détaillées du modèle de deep learning. Les résultats sont représentés dans la figure~\ref{fig:matrice_confusion_dl}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{fig38.png}
+\caption{Résultats de la matrice de confusion pour le modèle de deep learning}
+\label{fig:matrice_confusion_dl}
+\end{figure}
+
+La matrice de confusion générée par le modèle de deep learning montre que notre modèle est très performant et qu'il arrive à bien identifier les différentes classes : covid, pneumonie virale et état normal. Cette performance élevée démontre l'efficacité de l'approche par transfert d'apprentissage avec InceptionV3 pour la classification d'images médicales.
+
+\section{Optimisation}
+\label{sec:optimization}
+
+Pour cette partie, nous avons choisi d’optimiser à la fois le modèle le plus performant, à savoir le Random Forest, et le modèle le moins performant, le SVM, en nous basant sur les résultats précédemment obtenus. Cette décision vise à améliorer davantage le modèle qui a déjà démontré une forte efficacité tout en cherchant à renforcer les performances du modèle présentant des résultats moins satisfaisants, afin d’avoir une analyse comparative plus complète. 
+
+\subsection{Grid Search pour l'optimisation des hyperparamètres}
+\label{subsec:grid_search}
+
+Pour optimiser les performances de nos modèles d'apprentissage automatique classiques, nous avons utilisé la méthode de Grid Search avec validation croisée. Cette approche systématique permet d'explorer l'espace des hyperparamètres pour trouver la combinaison optimale.
+
+\paragraph{Méthodologie}
+
+Le Grid Search teste toutes les combinaisons possibles d'hyperparamètres définis dans une grille. Pour chaque combinaison, une validation croisée est effectuée pour évaluer la performance du modèle de manière robuste.
+\\
+
+Hyperparamètres testés : 
+
+\begin{itemize}
+\item \textbf{SVM} : Paramètre de régularisation C, max itération
+\item \textbf{Random Forest} : Nombre d'arbres, profondeur maximale, critères de division \\
+\end{itemize}
+
+
+ Les différents hyperparamètres ont été sauvegardés dans un fichier.json voir  la figure suivante (figure 29)
+
+ \begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{grid_search parametres.png}
+\caption{Hyperparamètres grid search}
+\label{fig:Hyperparamètres grid search}
+\end{figure}
+ 
+\paragraph{Résultats d'optimisation}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{fig39a.png}
+    %\caption*{(a) Image de la base de données}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{fig39b.png}\\[0.5em]
+    %\caption*{(b) Masque correspondant}
+\end{minipage}
+\caption{Résultats de la matrice de confusion pour les modèles SVM et Random Forest avec Grid search}
+\label{fig:matrice_confusion_ml}
+\end{figure}
+
+Les hyperparamètres optimaux identifiés par Grid Search ont permis d'améliorer significativement les performances de base des modèles.
+
+\subsection{XGBoost : modèle de gradient boosting}
+\label{subsec:xgboost}
+
+XGBoost (eXtreme Gradient Boosting) est un algorithme d'ensemble basé sur le gradient boosting qui combine séquentiellement des modèles faibles (généralement des arbres de décision) pour créer un modèle fort. Il est particulièrement efficace pour les données tabulaires et offre de bonnes performances de généralisation.
+
+\paragraph{Principe de fonctionnement}
+
+XGBoost fonctionne selon le principe suivant :
+\begin{enumerate}
+\item Entraînement séquentiel d'arbres de décision
+\item Chaque nouvel arbre corrige les erreurs du modèle précédent
+\item Optimisation d'une fonction de perte régularisée
+\item Agrégation des prédictions de tous les arbres
+\end{enumerate}
+
+\paragraph{Avantages de XGBoost}
+
+\begin{itemize}
+\item \textbf{Performance élevée} : Souvent classé parmi les meilleurs algorithmes pour les données tabulaires
+\item \textbf{Gestion des valeurs manquantes} : Traitement automatique des données incomplètes
+\item \textbf{Régularisation intégrée} : Réduction du risque de surapprentissage
+\item \textbf{Parallélisation} : Entraînement efficace sur plusieurs cœurs
+\item \textbf{Flexibilité} : Support de différentes fonctions objectifs
+\end{itemize}
+
+\paragraph{Implémentation et résultats}
+
+Nous avons testé la méthode XGBoost sur 200 données d’entrainement le résultat de la matrice de confusion obtenu est représenté dans la figure 30. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{fig40.png}
+\caption{Matrice de confusion du modèle XGBoost}
+\label{fig:matrice_confusion_xgboost}
+\end{figure} 
+
+La matrice de confusion du modèle XGBoost démontre d'excellentes performances de classification, avec une capacité particulièrement notable à distinguer les cas COVID-19 des autres pathologies pulmonaires.
+
+
+
+\subsection{Comparaison des performances}
+\label{subsec:comparaison_performances}
+
+\begin{itemize}
+
+\item XGBoost représente la meilleure option parmi les modèles d'apprentissage automatique classiques
+\item L'optimisation par Grid Search améliore significativement les performances de base
+\item Le modèle Random Forest obtient les meilleurs résultats comparativement aux autres modèles de machine learning, tels que SVM et KNN, pour la classification des cas covid, normaux, pneumonies et affections pulmonaires.
+\item Le modèle de deep learning InceptionV3 obtient les meilleures performances globales
+\end{itemize}
+
+\section{L'interprétabilité}
+\label{sec:L'interprétabilité}
+
+\subsection{LIME: Local Interpretable Model-agnostic Explanations}
+\label{sec:LIME: Local Interpretable Model-agnostic Explanations}
+
+Est une technique d'interprétabilité qui approximativement simplifie localement un modèle complexe autour d'une prédiction donnée pour en expliquer le fonctionnement. Plutôt que d'analyser le modèle dans sa globalité, LIME se concentre sur une instance spécifique et génère des données artificielles proches de cette instance à travers de petites perturbations. Ces instances modifiées sont utilisées pour entraîner un modèle interprétable simple, souvent une régression linéaire, qui permet de comprendre quelles caractéristiques influencent la prédiction. 
+
+LIME repose sur quatre principes majeurs : facilité de compréhension, fiabilité (minimiser l'écart d'explication avec le modèle original), flexibilité (fonctionne avec tout type de modèle) et généralisation (expliquer aussi bien une prédiction unique qu’un sous-ensemble via SP-LIME). 
+
+Cette méthode est avantageuse pour expliquer des prédictions locales notamment dans des contextes où la transparence est cruciale.
+
+Nootre modèle a été entraîné sur 2000 images 20 epochs de feature extraction + 30 epochs de fine-tuning (20 dernières couches dégelées).
+Les résultats obtenus sont représentés ci-dessus:
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{lime_01.png}\\[0.5em]
+    %\caption*{(a) Image de la base de données}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{lime_02.png}\\[0.5em]
+    %\caption*{(b) Masque correspondant}
+\end{minipage}
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{lime_03.png}\\[0.5em]
+    %\caption*{(a) Image de la base de données}
+\end{minipage}\hfill
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{lime_04.png}\\[0.5em]
+    %\caption*{(b) Masque correspondant}
+\end{minipage}
+\caption{Exemples des résultats du modèle LIME}
+\label{fig:Exemple des résultats du modèle LIME}
+\end{figure}
+
+\subsection{Analyse comparative des prédictions par classe}
+\label{subsec:Analyse comparative des prédictions par classe}
+
+\begin{itemize}
+    \item \textbf{Caractéristiques par classe :}
+    \begin{itemize}
+        \item {Lung\_Opacity :} Opacités denses et localisées.
+        \item {Pneumonie virale :} Infiltrats alvéolaires.
+        \item {COVID-19 :} Opacités périphériques bilatérales, motif mal exploité malgré une forte spécificité.
+        \item {Normal :} Absence de pattern, aucune reconnaissance active de la « normalité ».
+    \end{itemize}
+
+    \item \textbf{Risques identifiés :}
+    \begin{itemize}
+        \item \textbf{Faux positifs :} Risque élevé pour la classe \textit{Normal} (patient malade non détecté).
+        \item \textbf{Faux négatifs :} Risque critique pour \textit{COVID-19} (cas non détectés).
+        \item \textbf{Robustesse :} bonne pour \textit{Lung\_Opacity}, faible pour \textit{Normal} et \textit{COVID-19}.
+    \end{itemize}
+\end{itemize}
+
+ Le modèle InceptionV3 montre des performances encourageantes avec une bonne capacité à localiser les anomalies pathologiques. Cependant, la classe Normal et le déséquilibre des features pour le COVID nécessitent une attention particulière.
+
+\section{Conclusion}
+\label{sec:conclusion}
+L'étude s'inscrit dans une démarche visant à évaluer la pertinence des méthodes d'apprentissage profond et d'apprentissage automatique classique pour la classification d'images thoraciques. Les résultats obtenus mettent en lumière la performance remarquable du modèle InceptionV3, qui se distingue par une capacité élevée à identifier et à différencier les divers types de cas. Ces résultats soulignent l'efficacité et la fiabilité de l'approche par transfert d'apprentissage, particulièrement adaptée aux exigences du domaine médical..
+
+Parallèlement, l'évaluation des modèles classiques a mis en évidence la supériorité de XGBoost parmi les algorithmes traditionnels, tandis que Random Forest a surpassé SVM et KNN dans la classification des différentes affections pulmonaires. L'application d'une optimisation par Grid Search a permis d'améliorer significativement les performances de base grâce à un ajustement précis des hyperparamètres et à une meilleure capacité de généralisation du modèle.
+
+Sur le plan méthodologique, la phase de prétraitement a joué un rôle déterminant. Les opérations d'augmentation de données, de sous-échantillonnage et de suréchantillonnage ont permis de compenser le déséquilibre entre les classes et d'enrichir la diversité des échantillons d'apprentissage. Le redimensionnement des images, leur conversion en niveaux de gris et leur normalisation ont contribué à uniformiser les données et à stabiliser la convergence lors de l'entraînement.
+
+La phase de modélisation s'appuie sur une architecture profonde optimisée, associée à des techniques d'interprétation visant à garantir la transparence des décisions. L'intégration de la méthode LIME a permis d'identifier de manière explicite les zones discriminantes activées par le réseau de neurones.
+
+Toutefois, plusieurs difficultés ont été rencontrées au cours du projet. Les limites des ressources informatiques ont restreint la taille des lots d'entraînement et la profondeur des modèles. Des contraintes organisationnelles liées à la gestion du pipeline de traitement, ainsi que quelques problèmes de synchronisation avec GitHub, ont exigé une planification rigoureuse des itérations. Enfin, malgré les apports de LIME, l'interprétabilité des modèles profonds demeure partielle, en particulier pour les classes présentant un déséquilibre important.
+
+Pour les perspectives, plusieurs axes d'amélioration peuvent être envisagés. L'exploration de modèles plus récents, tels qu'EfficientNet ou Vision Transformer (ViT), pourrait renforcer la capacité de généralisation du système. L'association d'approches hybrides, combinant réseaux de neurones convolutifs et méthodes d'ensemble comme XGBoost, offre également une piste prometteuse. Enfin, l'intégration d'outils d'explicabilité plus avancés, tels que SHAP ou Grad-CAM++, permet d'enrichir la compréhension des décisions du modèle et d'augmenter la fiabilité de son déploiement en milieu clinique.\\
+
+\end{document}

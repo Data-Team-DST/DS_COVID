@@ -26,7 +26,11 @@ from keras.applications.resnet50 import preprocess_input as resnet_preprocess
 from keras.applications.vgg16 import preprocess_input as vgg16_preprocess
 
 # Import from interpretability module
+<<<<<<< HEAD
 from src.interpretability.gradcam import GradCAM, visualize_gradcam
+=======
+from DS_COVID.src.interpretability.Experimental.gradcam import GradCAM, visualize_gradcam
+>>>>>>> origin/Dev
 
 # Configure logger
 logger = logging.getLogger(__name__)

@@ -2,20 +2,17 @@
 import streamlit as st
 import importlib.util
 from pathlib import Path
-from typing import List
 
 # --- Liste des pages ---
 _PAGE_DIR = Path(__file__).parent / "page"
 _PAGE_FILENAMES = [
     "01_accueil.py",
     "02_donnees.py",
-    "04_preprocessing.py",
-    "05_modeles.py",
-    "06_analyse_du_meilleur_modele.py",
-    "07_conclusion.py",
-    "08_critique.py",
-    "09_cicd.py",
-    "10_Selection_Pipeline.py",
+    "03_preprocessing.py",
+    "04_Machine_learning_et_optimisation.py",
+    "05_Deep_learning_et_Interprétabilité.py",
+    "06_cicd.py",
+    "07_conclusion_critique_perspective.py",
 ]
 
 # --- Import dynamique des modules ---
@@ -133,43 +130,44 @@ _nav_labels = [
     "01 - Accueil",
     "02 - Données",
     "03 - Preprocessing",
-    "04 - Modèles",
-    "05 - Analyse meilleur modèle",
-    "06 - Conclusion",
-    "07 - Critique",
-    "08 - CI/CD",
-    "09 - Sélection Pipeline",
+    "04 - Machine Learning & Optimisation",
+    "05 - Deep Learning & Interprétabilité",
+    "06 - CI/CD & Pipeline",
+    "07 - Conclusion & Perspectives",
 ]
 
 # --- Badges simples via emoji ---
 _badges_emojis = ["🔹", "🟢", "🔴", "🟡", "🟣", "🟠", "🔵", "⚡", "⭐", "🔬"]
 
-# Onglets avec badges emoji
+# Onglets avec badges emoji (sécurisé)
 _nav_labels_with_badges = [f"{label} {_badges_emojis[i]}" for i, label in enumerate(_nav_labels)]
 
 # Création onglets
 tabs = st.tabs(_nav_labels_with_badges)
 
+# --- Gradients dynamiques alignés sur le nombre de pages ---
+_gradients = [
+    "linear-gradient(90deg, #0f204f, #071022)",
+    "linear-gradient(90deg, #1b2a50, #0a1020)",
+    "linear-gradient(90deg, #2a3b6c, #071022)",
+    "linear-gradient(90deg, #10203f, #0f204f)",
+    "linear-gradient(90deg, #1a204f, #0f1830)",
+    "linear-gradient(90deg, #071022, #1a296b)",
+    "linear-gradient(90deg, #0a1a30, #071022)",
+]
+
+# --- Boucle onglets sécurisée ---
 for idx, tab in enumerate(tabs):
     fname, mod = _loaded_pages[idx]
     with tab:
         # Hero header dynamique
-        gradients = [
-            "linear-gradient(90deg, #0f204f, #071022)",
-            "linear-gradient(90deg, #1b2a50, #0a1020)",
-            "linear-gradient(90deg, #2a3b6c, #071022)",
-            "linear-gradient(90deg, #10203f, #0f204f)",
-            "linear-gradient(90deg, #1a204f, #0f1830)",
-            "linear-gradient(90deg, #071022, #1a296b)",
-            "linear-gradient(90deg, #0a1a30, #071022)",
-            "linear-gradient(90deg, #142850, #0f204f)",
-            "linear-gradient(90deg, #0f204f, #071022)",
-            "linear-gradient(90deg, #1a3050, #0f1a35)"
-        ]
+        gradient = _gradients[idx % len(_gradients)]  # sécurité si mismatch
         st.markdown(
-            f"<div class='hero-header' style='background:{gradients[idx]}'>{_nav_labels[idx]}</div>",
+            f"<div class='hero-header' style='background:{gradient}'>{_nav_labels[idx]}</div>",
             unsafe_allow_html=True
         )
+
+        # Exécution du module
         try:
             mod.run()
             st.markdown(

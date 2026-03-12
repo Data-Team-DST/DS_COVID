@@ -156,7 +156,7 @@ class HistogramVisualizer(BaseTransform):
                 height=400
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         
         else:
             # Matplotlib
@@ -214,7 +214,7 @@ class HistogramVisualizer(BaseTransform):
                 showlegend=True
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
         
         else:
             # Matplotlib
@@ -273,7 +273,7 @@ class HistogramVisualizer(BaseTransform):
                 height=600
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
             
             if y_sorted is not None:
                 # Afficher distribution des classes

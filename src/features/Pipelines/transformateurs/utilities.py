@@ -17,35 +17,35 @@ class VisualizeTransformer(BaseEstimator, TransformerMixin):
         if self.save_dir:
             os.makedirs(self.save_dir, exist_ok=True)
 
-    def fit(self, data_x, data_y=None):  # pylint: disable=unused-argument
+    def fit(self, X, y=None):  # pylint: disable=unused-argument
         """Fit the transformer (no-op for visualization).
 
         Args:
-            data_x: Input data (unused)
-            data_y: Target data (unused)
+            X: Input data (unused)
+            y: Target data (unused)
 
         Returns:
             self: Returns self for method chaining
         """
         return self
 
-    def transform(self, data_x, data_y=None):  # pylint: disable=unused-argument
+    def transform(self, X, y=None):  # pylint: disable=unused-argument
         """Transform data by visualizing sample images.
 
         Args:
-            data_x: Array of images to visualize
-            data_y: Target data (unused)
+            X: Array of images to visualize
+            y: Target data (unused)
 
         Returns:
             np.ndarray: Input data passed through unchanged
         """
-        for i in range(min(self.n_samples, len(data_x))):
+        for i in range(min(self.n_samples, len(X))):
             plt.figure()
             title = f"{self.prefix}_sample_{i}"
-            if data_x[i].ndim == 2:
-                plt.imshow(data_x[i], cmap="gray")
+            if X[i].ndim == 2:
+                plt.imshow(X[i], cmap="gray")
             else:
-                plt.imshow(data_x[i])
+                plt.imshow(X[i])
             plt.title(title)
             plt.axis("off")
             if self.save_dir:
@@ -54,7 +54,7 @@ class VisualizeTransformer(BaseEstimator, TransformerMixin):
                 print(f"Image sauvegardée : {path}")
             plt.show()
             plt.close()
-        return data_x
+        return X
 
 
 class SaveTransformer(BaseEstimator, TransformerMixin):
@@ -65,29 +65,29 @@ class SaveTransformer(BaseEstimator, TransformerMixin):
         self.prefix = prefix
         os.makedirs(self.save_dir, exist_ok=True)
 
-    def fit(self, data_x, data_y=None):  # pylint: disable=unused-argument
+    def fit(self, X, y=None):  # pylint: disable=unused-argument
         """Fit the transformer (no-op for saving).
 
         Args:
-            data_x: Input data (unused)
-            data_y: Target data (unused)
+            X: Input data (unused)
+            y: Target data (unused)
 
         Returns:
             self: Returns self for method chaining
         """
         return self
 
-    def transform(self, data_x, data_y=None):  # pylint: disable=unused-argument
+    def transform(self, X, y=None):  # pylint: disable=unused-argument
         """Transform data by saving features to disk.
 
         Args:
-            data_x: Array of features to save
-            data_y: Target data (unused)
+            X: Array of features to save
+            y: Target data (unused)
 
         Returns:
             np.ndarray: Input data passed through unchanged
         """
         path = os.path.join(self.save_dir, f"{self.prefix}.npy")
-        np.save(path, data_x)
+        np.save(path, X)
         print(f"Features sauvegardées dans {path}")
-        return data_x
+        return X

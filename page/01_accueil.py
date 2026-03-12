@@ -1,16 +1,14 @@
-# 01_accueil.py — version finale : glossaire FR+EN dans un seul .rtf (Word-friendly)
-# - Un seul bouton : .rtf contenant sections FR + EN (longues)
-# - Glossaire court visible (FR)
-# - Header developpé (4-8 lignes)
-# - Objectifs SMART (S M A R T)
-# - Pas de notes orateur / risques
+# 01_accueil.py — Accueil détaillé mais oral-friendly
 
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
-import datetime
-import html
+from pathlib import Path
 
-st.set_page_config(page_title="Analyse de Radiographies — Accueil", layout="wide", page_icon="🧪")
+st.set_page_config(
+    page_title="Analyse de radiographies — Accueil",
+    layout="wide",
+    page_icon="analyse"
+)
 
 _CSS = """
 <style>
@@ -27,303 +25,99 @@ abbr { text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,0.12); 
 </style>
 """
 
-def _render_card(title: str, text: str, container=st):
-    container.markdown(
-        f"<div class='card'><div class='card-title'>{html.escape(title)}</div><div class='card-body'>{text}</div></div>", 
-        unsafe_allow_html=True
-    )
-
-# Glossaire court (FR) visible
-GLOSSARY_MIN_FR = {
-    "CXR": "Radiographie thoracique — image standard, rapide.",
-    "CT": "Tomodensitométrie — examen plus sensible, plus coûteux.",
-    "RT-PCR": "Test moléculaire de référence pour détection d'ARN viral.",
-    "AUC": "Aire sous la courbe ROC — métrique de discrimination.",
-    "LIME": "Méthodes d'explicabilité locale pour modèles.",
-    "SHAP": "Méthodes d'explicabilité basées sur valeurs de Shapley.",
-    "Grad-CAM": "Carte visuelle indiquant régions d'intérêt pour CNN."
-}
-
-# Définitions longues FR
-GLOSSARY_LONG_FR = {
-    "CXR": (
-        "La radiographie thoracique (CXR) est un examen d'imagerie de projection, "
-        "généralement réalisé en vues frontale et/ou latérale, permettant d'examiner rapidement "
-        "les poumons, le cœur et la cage thoracique, à l'aide de rayons X. "
-        "Elle est largement disponible, peu coûteuse et rapide à effectuer, ce qui la rend adaptée "
-        "au triage initial des patients suspectés d'atteinte pulmonaire. "
-        "Même si sa sensibilité est inférieure à celle de la tomodensitométrie pour certaines lésions, "
-        "la CXR demeure une étape clinique essentielle dans de nombreux flux de diagnostic."
-    ),
-    "CT": (
-        "La tomodensitométrie (CT) produit des images en coupes successives du thorax avec une résolution spatiale élevée, également "
-        "à l'aide de rayons X. "
-        "Elle permet une exploration très détaillée des structures pulmonaires et cardiaques, détectant souvent "
-        "des anomalies que la radiographie simple peut manquer. "
-        "Son emploi est toutefois limité par la disponibilité de l'appareillage, le coût et l'exposition "
-        "accumulée aux radiations ionisantes pour le patient."
-    ),
-    "RT-PCR": (
-        "La RT-PCR est une méthode moléculaire qui convertit l'ARN viral en ADN complémentaire (transcription inverse) puis amplifie "
-        "des séquences cibles afin de détecter la présence du virus. "
-        "C'est la méthode de référence pour le diagnostic de la COVID-19 en raison de sa sensibilité analytique \"moyenne/élevée\" "
-        "(seulement 70\\% en conditions réelles selon certaines études, loin des 95\\% théoriques, en conditions optimales). "
-        "Ses limites pratiques incluent le coût, le temps de traitement, les ruptures de stock et pénuries, la dépendance aux conditions d'échantillonnage et "
-        "la nécessité d'infrastructures de laboratoire et de personnel qualifié."
-    ),
-    "AUC": (
-        "L'aire sous la courbe ROC (AUC) résume la performance discriminante d'un classifieur indépendamment "
-        "du choix d'un seuil de décision. "
-        "Elle représente la probabilité que le modèle classe correctement un exemple positif par rapport à un négatif. "
-        "Une AUC élevée indique un fort pouvoir discriminant; l'AUC est utile pour comparer différents modèles."
-    ),
-    "LIME": (
-        "LIME (Local Interpretable Model-agnostic Explanations) explique des décisions individuelles en "
-        "construisant un modèle simple local autour d'une instance donnée. "
-        "En perturbant légèrement les entrées et en observant la sensibilité de la prédiction, LIME fournit "
-        "un sur-ensemble interprétable expliquant pourquoi le modèle a prédit d'une certaine manière pour cet exemple."
-    ),
-    "SHAP": (
-        "SHAP (SHapley Additive exPlanations) s'appuie sur la théorie des jeux pour répartir de manière cohérente "
-        "la contribution de chaque variable à une prédiction. "
-        "SHAP fournit des explications locales précises et peut être agrégé pour obtenir une vue globale de l'importance "
-        "des variables sur l'ensemble des prédictions."
-    ),
-    "Grad-CAM": (
-        "Grad-CAM (Gradient-weighted Class Activation Mapping) produit des cartes de chaleur "
-        "qui superposées à l'image indiquent les zones les plus influentes pour la décision d'un réseau convolutionnel. "
-        "Cette visualisation aide à vérifier que le modèle se concentre sur des régions anatomiquement pertinentes et "
-        "facilite l'interprétation qualitative des prédictions en imagerie."
-    )
-}
-
-# Définitions longues EN
-GLOSSARY_LONG_EN = {
-    "CXR": (
-        "Chest X-Ray (CXR) is a projection radiograph acquired in frontal and/or lateral views to visualize the lungs, heart and thoracic cage, using X-rays. "
-        "It is fast, widely available and cost-effective, making it ideal for initial screening and triage in many clinical settings. "
-        "While less sensitive than CT for certain lesions, CXR remains an essential first-line imaging modality in routine care."
-    ),
-    "CT": (
-        "Computed Tomography (CT) provides cross-sectional imaging with high spatial resolution, also using X-rays, enabling detailed assessment of pulmonary parenchyma. "
-        "CT is highly sensitive for detecting small consolidations and interstitial disease, but requires specialized equipment and involves higher radiation exposure."
-    ),
-    "RT-PCR": (
-        "Reverse Transcription Polymerase Chain Reaction (RT-PCR) is a molecular assay converting viral RNA to DNA (reverse transcription) and amplifying target sequences for detection. "
-        "RT-PCR is the reference standard for diagnosing SARS-CoV-2 due to its \"medium/high\" analytical sensitivity "
-        "(only 70\\% in real-world conditions according to some studies, far from the theoretical 95\\% in optimal conditions). "
-        "Its practical limitations include cost, processing time, stock shortages and supply disruptions, dependence on sampling conditions, and "
-        "the need for laboratory infrastructure and qualified personnel."
-    ),
-    "AUC": (
-        "Area Under the Receiver Operating Characteristic Curve (AUC-ROC) quantifies a classifier's discrimination ability across all thresholds. "
-        "AUC values range from 0.5 (no discrimination) to 1.0 (perfect discrimination) and are commonly used to compare binary classifiers."
-    ),
-    "LIME": (
-        "Local Interpretable Model-agnostic Explanations (LIME) approximates a complex model locally with a simple surrogate model to explain individual predictions. "
-        "By perturbing the input and observing prediction changes, LIME offers human-readable explanations that are model-agnostic."
-    ),
-    "SHAP": (
-        "SHapley Additive exPlanations (SHAP) uses Shapley values from cooperative game theory to assign additive contributions of each feature to a prediction. "
-        "SHAP provides consistent and locally accurate explanations and can be aggregated for global feature importance analysis."
-    ),
-    "Grad-CAM": (
-        "Gradient-weighted Class Activation Mapping (Grad-CAM) generates heatmaps highlighting image regions that most influenced a convolutional neural network's decision. "
-        "These visual explanations help verify whether the network focuses on anatomically relevant regions and support qualitative interpretation."
-    )
-}
-
-# Fonction pour échapper les caractères RTF et accents
-def _escape_rtf(text):
-    result = ""
-    for c in text:
-        if c in "\\{}":
-            result += "\\" + c
-        elif ord(c) > 127:  # non-ascii
-            result += r"\u" + str(ord(c)) + "?"
-        else:
-            result += c
-    return result
-
-# Génération du RTF combiné FR+EN
-def _make_combined_rtf_bytes(fr_map: dict, en_map: dict) -> bytes:
-    header = r"{\rtf1\ansi\ansicpg1252\deff0"
-    body = []
-    body.append(r"\b Glossaire des acronymes — FR \b0\par\par")
-    for k, v in fr_map.items():
-        safe_v = _escape_rtf(v)
-        body.append(r"\b " + k + r" \b0 : " + safe_v + r"\par\par")
-    body.append(r"\par\par")
-    body.append(r"\b Glossary of acronyms — EN \b0\par\par")
-    for k, v in en_map.items():
-        safe_v = _escape_rtf(v)
-        body.append(r"\b " + k + r" \b0 : " + safe_v + r"\par\par")
-    footer = r"}"
-    rtf = header + "\n" + "\n".join(body) + "\n" + footer
-    return rtf.encode("utf-8")
-
-# --- Page
 def run():
     st.markdown(_CSS, unsafe_allow_html=True)
 
-    # Header (développé)
+    # Header
     try:
         colored_header(
-            label="Analyse de Radiographies pulmonaires — Classification COVID-19",
-            description=(
-                "Prototype d'assistance diagnostique visuelle conçu pour démontrer la faisabilité d'un outil "
-                "rapide et interprétable. Le pipeline intègre acquisition, prétraitement, modèles ML/DL et "
-                "méthodes d'interprétabilité afin de rapprocher la décision algorithmique de l'intuition clinique. "
-                "L'objectif de cette application est double : (1) présenter des résultats reproductibles et chiffrés, "
-                "et (2) offrir une démo interactive qui illustre clairement comment le modèle prend ses décisions."
-            ),
+            label="Analyse de radiographies pulmonaires — Classification COVID-19 et aide au diagnostic",
+            description="Projet réalisé par Cirine B., Lena B., Steven M., Rafael C., encadré par Nicolas M.",
             color_name="blue-70"
         )
     except Exception:
-        st.markdown("<h2>Analyse de Radiographies pulmonaires — Classification COVID-19</h2>", unsafe_allow_html=True)
-        st.markdown("<div class='small-note'>Prototype d'assistance diagnostique visuelle — rapide, interprétable et prêt pour la démo.</div>", unsafe_allow_html=True)
+        st.markdown("<h2>Analyse de radiographies pulmonaires — Classification COVID-19</h2>", unsafe_allow_html=True)
+        st.markdown("<div class='small-note'>Prototype d'assistance diagnostique visuelle — rapide, interprétable et prêt pour la démonstration.</div>", unsafe_allow_html=True)
 
     st.divider()
 
-    # Contexte étendu avec problématique et solutions
-    left, right = st.columns([3, 1])
-    with left:
-        st.markdown("### 📊 Contexte de l'épidémie COVID-19")
-        
-        # Bilan mondial
-        st.markdown(
-            "<div class='project-hero'>"
-            "<strong>🌍 Bilan mondial</strong><br>"
-            "• 3 ans d'épidémie mondiale<br>"
-            "• Plus de <strong>700 millions</strong> de cas confirmés<br>"
-            "• Plus de <strong>7 millions</strong> de décès<br>"
-            "• Type spécifique de pneumonie virale (<em>Viral Pneumonia</em>) causée par le virus <strong>SARS-CoV-2</strong>"
-            "</div>", 
-            unsafe_allow_html=True
-        )
-        
-        st.markdown("")
-        
-        # Problème 1 → Solution 1
-        st.markdown(
-            "<div class='project-hero'>"
-            "<strong>⚠️ Problème 1 : Limites des tests <abbr title='Reverse Transcription PCR'>RT-PCR</abbr></strong><br>"
-            "• Tests moléculaires <strong>lents</strong> (délais de traitement importants)<br>"
-            "• Sensibilité <strong>variable</strong> (~70% en conditions réelles vs 95% théoriques)<br>"
-            "• <strong>Pénuries de stocks</strong> et dépendance aux laboratoires<br>"
-            "<br>"
-            "<strong>✅ Solution 1 : Imagerie médicale complémentaire</strong><br>"
-            "Utiliser des méthodes d'imagerie telles que la <abbr title='Chest X-Ray'>CXR</abbr> (radiographie thoracique) "
-            "ou la <abbr title='Computed Tomography'>CT</abbr> (tomodensitométrie) pour un diagnostic plus rapide et accessible."
-            "</div>",
-            unsafe_allow_html=True
-        )
-        
-        st.markdown("")
-        
-        # Problème 2 → Solution 2
-        st.markdown(
-            "<div class='project-hero'>"
-            "<strong>⚠️ Problème 2 : Difficulté du diagnostic visuel</strong><br>"
-            "Même un radiologue expérimenté a du mal à <strong>distinguer</strong> un cas de COVID-19 "
-            "d'un autre type de pneumonie sur une image radiographique, en raison de la similarité des patterns visuels.<br>"
-            "<br>"
-            "<strong>⚠️ Problème 2.1 : Surcharge des radiologues</strong><br>"
-            "Pendant l'épidémie, les radiologues sont <strong>surchargés</strong> et n'ont pas le temps "
-            "de lire toutes les radiographies avec l'attention nécessaire, créant un goulot d'étranglement diagnostique.<br>"
-            "<br>"
-            "<strong>✅ Solution 2 : Intelligence artificielle</strong><br>"
-            "Utiliser <strong>ML/DL</strong> pour accélérer la détection des cas positifs depuis les images "
-            "et fournir une solution <strong>interprétable</strong> et <strong>reproductible</strong> "
-            "pour la démonstration et le POC (Proof of Concept)."
-            "</div>",
-            unsafe_allow_html=True
-        )
-
-    with right:
-        st.markdown(
-            "<div style='text-align:center'>"
-            "<div style='font-size:18px;'>🧑‍🔬 Équipe</div>"
-            "<div class='kv'>Cirine Bouamrane<br>Lena Bacot<br>Steven Moire<br>Rafael Cepa</div>"
-            "<div style='margin-top:8px;font-size:12px;color:#98a1b3;'>Encadré par : Nicolas Mormiche</div>"
-            f"<div style='margin-top:6px;font-size:12px;color:#98a1b3;'>{datetime.date.today().strftime('%d %B %Y')}</div>"
-            "</div>", unsafe_allow_html=True
-        )
-
-    st.divider()
-
-    # Glossaire visible (short defs)
-    st.markdown("## Glossaire des acronymes")
-    for k, short_def in GLOSSARY_MIN_FR.items():
-        st.markdown(f"- **{k}** — {short_def}")
-
-    # Bouton de téléchargement RTF combiné
-    combined_rtf = _make_combined_rtf_bytes(GLOSSARY_LONG_FR, GLOSSARY_LONG_EN)
-    st.download_button(
-        label="Télécharger le glossaire détaillé (FR+EN — .rtf)",
-        data=combined_rtf,
-        file_name="glossaire_acronymes_FR_EN.rtf",
-        mime="application/rtf"
-    )
-
-    st.divider()
-
-    # Paragraphe central
+    # Contexte
+    st.markdown("### Contexte de l’épidémie de COVID-19")
     st.markdown(
-        "La radiographie thoracique reste un examen rapide, simple d'accès et couramment utilisé dans le triage initial des pathologies pulmonaires. "
-        "Notre pipeline combine des modèles classiques de machine learning et un réseau convolutionnel deep-learning (InceptionV3 fine-tuned) "
-        "pour extraire des signaux diagnostiques robustes à partir des images. "
-        "Nous ajoutons des méthodes d'interprétabilité visuelle (Grad-CAM) et feature-based (SHAP) afin de rendre la décision du modèle plus transparente "
-        "pour le clinicien et de faciliter la validation visuelle des prédictions. "
-        "L'approche vise une solution équilibrée entre performance, explicabilité et faisabilité opérationnelle, adaptée pour une démonstration en soutenance.",
+        "<div class='project-hero'>"
+        "<strong>Bilan mondial</strong><br>"
+        "• Trois ans d’épidémie mondiale<br>"
+        "• Plus de <strong>700 millions</strong> de cas<br>"
+        "• Plus de <strong>7 millions</strong> de décès<br>"
+        "• Pneumonie virale spécifique (<em>viral pneumonia</em>) due au <strong>SARS-CoV-2</strong>"
+        "</div>",
         unsafe_allow_html=True
     )
 
+    # Problème 1 + Solution 1
+    st.markdown(
+        "<div class='project-hero'>"
+        "<strong>Problème 1 : limites des tests <abbr title='Reverse Transcription PCR'>RT-PCR</abbr></strong><br>"
+        "• Tests lents, sensibilité variable, dépendance aux laboratoires<br>"
+        "<strong>Solution :</strong> imagerie médicale (CXR/CT) pour un triage rapide et accessible."
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+    # Images et diagnostic visuel
+    img_col, text_col = st.columns([1, 2])
+    with img_col:
+        images_data = {
+            "Fig1": ("Fig1.jpg", "Opacités en verre dépoli périphériques bilatérales."),
+            "Fig2": ("Fig2.jpg", "Consolidation pulmonaire sévère bilatérale."),
+            "Fig3": ("Fig3.jpg", "Progression radiologique COVID-19."),
+            "Fig4": ("Fig4.jpg", "Évolution temporelle des atteintes pulmonaires."),
+        }
+        selected_fig = st.selectbox("Sélectionner une image :", list(images_data.keys()))
+        img_name, caption = images_data[selected_fig]
+        img_path = Path(__file__).parent / "images" / "covid_cxr_symptoms" / img_name
+        if img_path.exists(): st.image(str(img_path), caption=caption)
+        else: st.info("Image non disponible.")
+
+    with text_col:
+        st.markdown(
+            "<div class='project-hero'>"
+            "<strong>Difficulté du diagnostic visuel</strong><br>"
+            "Les patterns radiologiques du COVID-19 sont proches d’autres pneumonies virales, complexe même pour des radiologues expérimentés.<br><br>"
+            "<strong>Problème 2 : surcharge des radiologues</strong><br>"
+            "Volume d’examens élevé → temps réduit par examen.<br><br>"
+            "<strong>Solution : intelligence artificielle</strong><br>"
+            "Machine learning et deep learning accélèrent la détection, tout en proposant une solution interprétable et reproductible."
+            "</div>",
+            unsafe_allow_html=True
+        )
+
     st.divider()
+    st.markdown(
+        "Avant de présenter les résultats, précisons des objectifs clairs, mesurables et adaptés à un cadre exploratoire."
+    )
 
     # Objectifs SMART
-    st.markdown("## Objectifs SMART (propositions retenues)")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("Objectif 1 — Performance diagnostique")
-        st.markdown(
-            "- **S** : AUC ≥ **0.88** sur classification COVID vs non-COVID (patient-level hold-out).\n"
-            "- **M** : ROC AUC + IC 95% via bootstrap; rapport automatisé.\n"
-            "- **A** : fine-tuning InceptionV3 + augmentation et reweighting.\n"
-            "- **R** : priorite clinique — permet un triage plus rapide et fiable.\n"
-            "- **T** : démontré en Phase Validation (S11)."
-        )
-    with col2:
-        st.subheader("Objectif 2 — Sensibilité & Spécificité")
-        st.markdown(
-            "- **S** : Sensibilité ≥ **0.85** & Spécificité ≥ **0.90** (seuil choisi via ROC).\n"
-            "- **M** : confusion matrix, ROC/PR, rapports par fold.\n"
-            "- **A** : calibration du modèle et ajustement de seuils.\n"
-            "- **R** : réduit le risque de faux négatifs tout en contrôlant faux positifs.\n"
-            "- **T** : preuve opérationnelle pour la démo (S13)."
-        )
-
-    st.divider()
-
-    # Livrables succincts
-    st.markdown("## Livrables & artefacts (résumé)")
-    _render_card(
-        "Livrables attendus",
-        "<ul><li>Rapport final</li><li>Notebooks & scripts reproductibles</li><li>Modèle(s) exporté(s) (pickle/ONNX)</li><li>Application Streamlit (POC)</li></ul>",
-        st
-    )
-
-    st.divider()
-
-    # Timeline courte
-    st.markdown("## Timeline & jalons")
+    st.markdown("## Objectifs SMART")
+    # col1, col2 = st.columns(2)
+    # with col1:
+    st.subheader("Objectif 1 — Performance")
     st.markdown(
-        "- Phase 0 — Kickoff & snapshot données (S0)\n"
-        "- Phase 1 — Exploration & dataViz (S1–S4)\n"
-        "- Phase 2 — Modélisation & tests (S5–S10)\n"
-        "- Phase 3 — Validation & CI (S11–S12)\n"
-        "- Phase 4 — Démo / Soutenance (S13+)"
-    )
+            "- **S** : classification COVID vs non-COVID\n"
+            "- **M** : F1 ≥ 0,80 sur validation indépendante\n"
+            "- **A** : fine-tuning InceptionV3\n"
+            "- **R** : réduire faux négatifs\n"
+            "- **T** : 12/01/2024 démonstration"
+        )
+    # with col2:
+    #     st.subheader("Objectif 2 — Sensibilité / Spécificité ")
+    #     st.markdown(
+    #         "- **S** : maximiser détection positives\n"
+    #         "- **M** : matrice de confusion pour comparaison\n"
+    #         "- **A** : ajustement seuils et calibration\n"
+    #         "- **R** : réduire faux négatifs\n"
+    #         "- **T** : démontré sur validation"
+    #     )
 
-    st.divider()
-    st.markdown("<small class='small-note'>Détails sur données et plan d'atténuation : onglet **02 - Données**.</small>", unsafe_allow_html=True)
+if __name__ == "__main__":
+    run()

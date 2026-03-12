@@ -37,9 +37,9 @@ class ImageHistogram(BaseEstimator, TransformerMixin):
         self.range_ = None
         self.n_features_ = None
 
-    def fit(self, data_x):
+    def fit(self, X, y=None):
         """Fit the transformer by determining feature dimensions."""
-        data_array = np.array(data_x)
+        data_array = np.array(X)
 
         # Détermine la plage de valeurs
         self.range_ = self.hist_range or (data_array.min(), data_array.max())
@@ -60,15 +60,15 @@ class ImageHistogram(BaseEstimator, TransformerMixin):
 
         return self
 
-    def transform(self, data_x):
+    def transform(self, X, y=None):
         """Transform images by computing histograms."""
         if self.range_ is None:
-            self.fit(data_x)
+            self.fit(X)
 
         if self.verbose:
-            logger.info("Computing histograms for %d images...", len(data_x))
+            logger.info("Computing histograms for %d images...", len(X))
 
-        data_array = np.array(data_x)
+        data_array = np.array(X)
         histograms = []
 
         for img in data_array:
@@ -123,9 +123,9 @@ class ImagePCA(BaseEstimator, TransformerMixin):
         self.n_components_ = None
         self.explained_variance_ratio_ = None
 
-    def fit(self, data_x):
+    def fit(self, X, y=None):
         """Fit PCA on flattened images."""
-        data_array = np.array(data_x)
+        data_array = np.array(X)
         n_samples = data_array.shape[0]
         data_flat = data_array.reshape(n_samples, -1)
 
@@ -158,12 +158,12 @@ class ImagePCA(BaseEstimator, TransformerMixin):
 
         return self
 
-    def transform(self, data_x):
+    def transform(self, X, y=None):
         """Transform images using fitted PCA."""
         if self.pca_ is None:
             raise RuntimeError("PCA must be fitted before transform")
 
-        data_array = np.array(data_x)
+        data_array = np.array(X)
         n_samples = data_array.shape[0]
         data_flat = data_array.reshape(n_samples, -1)
 
@@ -177,12 +177,12 @@ class ImagePCA(BaseEstimator, TransformerMixin):
 
         return data_pca
 
-    def inverse_transform(self, data_x: np.ndarray) -> np.ndarray:
+    def inverse_transform(self, X: np.ndarray) -> np.ndarray:
         """Reconstruct images from PCA components."""
         if self.pca_ is None:
             raise RuntimeError("PCA must be fitted before inverse_transform")
 
-        return self.pca_.inverse_transform(data_x)
+        return self.pca_.inverse_transform(X)
 
 
 class ImageStandardScaler(BaseEstimator, TransformerMixin):
@@ -210,9 +210,9 @@ class ImageStandardScaler(BaseEstimator, TransformerMixin):
         self.scaler_ = None
         self.original_shape_ = None
 
-    def fit(self, data_x):
+    def fit(self, X, y=None):
         """Fit StandardScaler on flattened images."""
-        data_array = np.array(data_x)
+        data_array = np.array(X)
         self.original_shape_ = data_array.shape[1:]
         n_samples = data_array.shape[0]
         data_flat = data_array.reshape(n_samples, -1)
@@ -232,12 +232,12 @@ class ImageStandardScaler(BaseEstimator, TransformerMixin):
 
         return self
 
-    def transform(self, data_x):
+    def transform(self, X, y=None):
         """Transform images using fitted StandardScaler."""
         if self.scaler_ is None:
             raise RuntimeError("StandardScaler must be fitted before transform")
 
-        data_array = np.array(data_x)
+        data_array = np.array(X)
         n_samples = data_array.shape[0]
         data_flat = data_array.reshape(n_samples, -1)
 
@@ -260,16 +260,16 @@ class ImageStandardScaler(BaseEstimator, TransformerMixin):
 
         return data_scaled
 
-    def inverse_transform(self, data_x: np.ndarray) -> np.ndarray:
+    def inverse_transform(self, X: np.ndarray) -> np.ndarray:
         """Reverse standardization."""
         if self.scaler_ is None:
             raise RuntimeError("StandardScaler must be fitted before inverse_transform")
 
-        original_shape = data_x.shape
+        original_shape = X.shape
         n_samples = original_shape[0] if len(original_shape) > 2 else None
 
         # Flatten if needed
-        data_flat = data_x.reshape(n_samples, -1) if n_samples else data_x
+        data_flat = X.reshape(n_samples, -1) if n_samples else X
 
         data_inverse = self.scaler_.inverse_transform(data_flat)
 

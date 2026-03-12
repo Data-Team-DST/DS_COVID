@@ -55,6 +55,9 @@ from .visualization_utils import (
     plot_training_curves,
 )
 
+# Pipeline execution (Streamlit)
+from .pipeline_executor import StreamlitPipelineExecutor
+
 __all__ = [
     # Data
     "load_dataset",
@@ -80,4 +83,6 @@ __all__ = [
     "run_gradcam_analysis",
     "select_sample_images",
     "get_preprocessing_function",
+    # Pipeline execution
+    "StreamlitPipelineExecutor",
 ]
